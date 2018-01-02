@@ -18,7 +18,7 @@ start(_StartType, _StartArgs) ->
     Routes = [ {
         '_',
         [
-            {"/", http_root, []}
+            {"/", http_root_handler, []},
         ]
     } ],
     Dispatch = cowboy_router:compile(Routes),
