@@ -2,25 +2,25 @@
 %% @doc @todo Add description to chat.
 
 
--module(chat).
+-module(chat_server).
 -behaviour(gen_server).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([start_link/0, add_message/2, get_messages/1]).
+-export([start_link/0, add_message/1, get_messages/0]).
 
 -define(SERVER, ?MODULE).
 
 start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+    gen_server:start_link({local, chat_room}, ?MODULE, [], []).
 
-add_message(Pid, Message) ->
-    gen_server:cast(Pid, {add_message, Message}).
+add_message(Message) ->
+    gen_server:cast(chat_room, {add_message, Message}).
 
-get_messages(Pid) ->
-    gen_server:call(Pid, get_messages).
+get_messages() ->
+    gen_server:call(chat_room, get_messages).
 
 %% ====================================================================
 %% Behavioural functions
