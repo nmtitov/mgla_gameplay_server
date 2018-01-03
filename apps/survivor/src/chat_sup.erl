@@ -36,9 +36,11 @@ start_link() ->
 	Modules :: [module()] | dynamic.
 %% ====================================================================
 init([]) ->
-    AChild = {chat_sup,{chat_server,start_link,[]},
-	      permanent,2000,worker,[chat_server]},
-    {ok,{{one_for_one,4,3600}, [AChild]}}.
+    Server = {chat_sup, {chat_server, start_link, []},
+              permanent, 2000, worker, [chat_server]},
+    Children = [Server],
+    RestartStrategy = {one_for_one, 4, 3600},
+    {ok, {RestartStrategy, Children}}.
 
 %% ====================================================================
 %% Internal functions
