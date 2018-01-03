@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc survivor_erlang public API
+%% @doc survivor public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(survivor_erlang_app).
+-module(survivor_app).
 
 -behaviour(application).
 
@@ -27,8 +27,8 @@ start(_StartType, _StartArgs) ->
     TransOpts = [{ip, {0,0,0,0}}, {port, 8000}],
     ProtoOpts = #{env => #{dispatch => Dispatch}},
     
-    {ok, _} = cowboy:start_clear(survivor_erlang, TransOpts, ProtoOpts),
-    survivor_erlang_sup:start_link().
+    {ok, _} = cowboy:start_clear(survivor, TransOpts, ProtoOpts),
+    survivor_sup:start_link().
 
 %%--------------------------------------------------------------------
 stop(_State) ->

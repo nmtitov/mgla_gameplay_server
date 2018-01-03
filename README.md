@@ -1,4 +1,4 @@
-survivor_erlang
+survivor
 =====
 
 An OTP application

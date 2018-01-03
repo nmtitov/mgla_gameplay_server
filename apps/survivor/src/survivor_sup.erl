@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc survivor_erlang top level supervisor.
+%% @doc survivor top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(survivor_erlang_sup).
+-module(survivor_sup).
 
 -behaviour(supervisor).
 

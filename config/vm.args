@@ -1,6 +1,6 @@
--sname survivor_erlang
+-sname survivor
 
--setcookie survivor_erlang_cookie
+-setcookie survivor_cookie
 
 +K true
 +A30
