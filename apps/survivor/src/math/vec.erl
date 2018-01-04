@@ -6,7 +6,7 @@
 -type vec() :: {float(), float()}.
 -export_type([vec/0]).
 
--spec vec(float(), float()) -> vec().
+-spec vec(number(), number()) -> vec().
 vec(X, Y) ->
   {float(X), float(Y)}.
 

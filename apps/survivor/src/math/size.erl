@@ -3,7 +3,7 @@
 
 -export([size/2, width/1, height/1]).
 
--type size() :: {float(), float()}.
+-type size() :: {number(), number()}.
 -export_type([size/0]).
 
 -spec size(float(), float()) -> size().

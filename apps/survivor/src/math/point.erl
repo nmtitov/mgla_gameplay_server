@@ -6,7 +6,7 @@
 -type point() :: {float(), float()}.
 -export_type([point/0]).
 
--spec point(float(), float()) -> point().
+-spec point(number(), number()) -> point().
 point(X, Y) -> {float(X), float(Y)}.
 
 -spec x(point()) -> float().
