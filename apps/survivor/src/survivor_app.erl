@@ -18,6 +18,7 @@ start(_StartType, _StartArgs) ->
   ProtoOpts = #{env => #{dispatch => Dispatch}},
 
   {ok, _} = cowboy:start_clear(survivor, TransOpts, ProtoOpts),
+  id_server:start_link(),
   survivor_sup:start_link().
 
 stop(_State) ->
