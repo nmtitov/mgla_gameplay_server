@@ -9,12 +9,23 @@ init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 websocket_init(State) ->
+  erlang:start_timer(0, self(), init),
   {ok, State}.
 
-websocket_handle({text, Msg}, State) ->
-  {reply, {text, << "That's what she said! ", Msg/binary >>}, State};
+%%websocket_handle({text, Msg}, State) ->
+%%  {reply, {text, << "That's what she said! ", Msg/binary >>}, State};
 websocket_handle(_Data, State) ->
   {ok, State}.
 
+websocket_info({timeout, _, init}, State) ->
+  Message = response:teleport(point:point(0, 0)),
+  {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
   {ok, State}.
+
+terminate({remote, _, _}, _Req, State) ->
+  io:format("Client disconnected~n"),
+  ok;
+terminate(Reason, _Req, _State) ->
+  io:format("~p~n", [Reason]),
+  ok.
