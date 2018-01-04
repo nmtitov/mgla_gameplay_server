@@ -1,18 +1,8 @@
-%%%-------------------------------------------------------------------
-%% @doc survivor public API
-%% @end
-%%%-------------------------------------------------------------------
-
 -module(survivor_app).
 
 -behaviour(application).
 
-%% Application callbacks
 -export([start/2, stop/1]).
-
-%%====================================================================
-%% API
-%%====================================================================
 
 start(_StartType, _StartArgs) ->
     Routes = [ {
@@ -30,6 +20,5 @@ start(_StartType, _StartArgs) ->
     {ok, _} = cowboy:start_clear(survivor, TransOpts, ProtoOpts),
     survivor_sup:start_link().
 
-%%--------------------------------------------------------------------
 stop(_State) ->
     ok.

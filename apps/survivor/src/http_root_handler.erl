@@ -1,7 +1,3 @@
-%% @author nt
-%% @doc @todo Add description to http_root.
-
-
 -module(http_root_handler).
 
 -export([init/2]).
