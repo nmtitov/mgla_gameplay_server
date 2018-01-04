@@ -12,8 +12,12 @@ websocket_init(State) ->
   erlang:start_timer(0, self(), init),
   {ok, State}.
 
-%%websocket_handle({text, Msg}, State) ->
-%%  {reply, {text, << "That's what she said! ", Msg/binary >>}, State};
+websocket_handle({text, Msg}, State) ->
+  io:format("~p~n", [Msg]),
+  [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
+  Point = point:point(X, Y),
+  Message = response:teleport(Point),
+  {reply, {text, Message}, State};
 websocket_handle(_Data, State) ->
   {ok, State}.
 
