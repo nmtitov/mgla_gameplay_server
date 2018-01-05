@@ -35,7 +35,7 @@ add({X, Y}, {X1, Y1}) ->
 subtract({X, Y}, {X1, Y1}) ->
   vec(X - X1, Y - Y1).
 
--spec scale(vec(), float()) -> vec().
+-spec scale(vec(), number()) -> vec().
 scale({X, Y}, K) ->
   vec(X * K, Y * K).
 

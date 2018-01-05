@@ -9,6 +9,8 @@
 
 -record(state, {
   id = 1,
+  x = undefined,
+  y = undefined,
   target_x = undefined,
   target_y = undefined
   }).
@@ -18,7 +20,7 @@ init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 
-websocket_init(State) ->
+websocket_init(_) ->
   erlang:start_timer(0, self(), init),
   {ok, #state{}}.
 
@@ -33,18 +35,26 @@ websocket_handle(_Data, State) ->
 
 
 websocket_info({timeout, _, init}, State) ->
-  Message = response:teleport(point:point(0, 0)),
+  X = 0,
+  Y = 0,
+  Message = response:teleport(point:point(X, Y)),
   schedule_next_tick(),
-  {reply, {text, Message}, State};
+  {reply, {text, Message}, State#state{x = X, y = Y}};
 
-websocket_info({timeout, _, ?TICK}, State=#state{target_x = X, target_y = Y}) ->
+websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
   if
-    is_float(X) and is_float(Y) ->
-      Point = point:point(X, Y),
+    is_float(TargetX) and is_float(TargetY) ->
+      io:format("true~n"),
+      Vec = vec:vec(TargetX - X, TargetY - Y),
+      {X1, Y1} = vec:scale(Vec, 0.01),
+      NewX = X + X1,
+      NewY = Y + Y1,
+      Point = point:point(NewX, NewY),
       Message = response:teleport(Point),
       schedule_next_tick(),
-      {reply, {text, Message}, State#state{target_x = undefined, target_y = undefined}};
+      {reply, {text, Message}, State#state{x = NewX, y = NewY}};
     true ->
+      io:format("false~n"),
       schedule_next_tick(),
       {ok, State}
   end;
@@ -53,7 +63,7 @@ websocket_info(_Info, State) ->
   {ok, State}.
 
 
-terminate({remote, _, _}, _Req, State) ->
+terminate({remote, _, _}, _Req, _) ->
   io:format("Client disconnected~n"),
   ok;
 
