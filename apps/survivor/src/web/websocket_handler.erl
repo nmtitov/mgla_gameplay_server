@@ -9,8 +9,8 @@
 
 -record(state, {
   id = 1,
-  x = undefined,
-  y = undefined
+  target_x = undefined,
+  target_y = undefined
   }).
 
 
@@ -26,7 +26,7 @@ websocket_init(State) ->
 websocket_handle({text, Msg}, State) ->
   io:format("~p~n", [Msg]),
   [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
-  {ok, State#state{x = X, y = Y}};
+  {ok, State#state{target_x = X, target_y = Y}};
 
 websocket_handle(_Data, State) ->
   {ok, State}.
@@ -37,16 +37,14 @@ websocket_info({timeout, _, init}, State) ->
   schedule_next_tick(),
   {reply, {text, Message}, State};
 
-websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y}) ->
+websocket_info({timeout, _, ?TICK}, State=#state{target_x = X, target_y = Y}) ->
   if
     is_float(X) and is_float(Y) ->
-      io:format("X, Y are integer~n"),
       Point = point:point(X, Y),
       Message = response:teleport(Point),
       schedule_next_tick(),
-      {reply, {text, Message}, State#state{x = undefined, y = undefined}};
+      {reply, {text, Message}, State#state{target_x = undefined, target_y = undefined}};
     true ->
-      io:format("X, Y are undefined~n"),
       schedule_next_tick(),
       {ok, State}
   end;
