@@ -43,9 +43,8 @@ websocket_info({timeout, _, init}, State) ->
   {reply, {text, Message}, State#state{x = X, y = Y}};
 
 websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
-  if
+  Reply = if
     is_float(TargetX) and is_float(TargetY) ->
-%%      io:format("Going to target~n"),
       Point = point:point(X, Y),
       TargetPoint = point:point(TargetX, TargetY),
       Vec = vec:vec(TargetX - X, TargetY - Y),
@@ -60,20 +59,16 @@ websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = Target
       NewDistanceToTarget = point:distance(NewPoint, TargetPoint),
       if
         DistanceToTarget > NewDistanceToTarget ->
-%%          io:format("Teleport~n"),
           Message = response:teleport(NewPoint),
-          schedule_next_tick(),
           {reply, {text, Message}, State#state{x = NewX, y = NewY}};
         true ->
-%%          io:format("Completed~n"),
-          schedule_next_tick(),
           {ok, State#state{target_x = undefined, target_y = undefined}}
       end;
     true ->
-%%      io:format("Doing nothing~n"),
-      schedule_next_tick(),
       {ok, State}
-  end;
+  end,
+  schedule_next_tick(),
+  Reply;
 
 websocket_info(_Info, State) ->
   {ok, State}.
