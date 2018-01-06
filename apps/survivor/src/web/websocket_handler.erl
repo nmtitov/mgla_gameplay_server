@@ -45,24 +45,15 @@ websocket_info({timeout, _, init}, State) ->
 websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
   Reply = if
     is_float(TargetX) and is_float(TargetY) ->
-      Point = point:point(X, Y),
-      TargetPoint = point:point(TargetX, TargetY),
-      Vec = vec:vec(TargetX - X, TargetY - Y),
-      Unit = vec:unit(Vec),
-      Speed = 100,
-      Distance = ?TICK_RATE / 1000.0 * Speed,
-      {X1, Y1} = vec:scale(Unit, Distance),
-      NewX = X + X1,
-      NewY = Y + Y1,
-      NewPoint = point:point(NewX, NewY),
-      DistanceToTarget = point:distance(Point, TargetPoint),
-      NewDistanceToTarget = point:distance(NewPoint, TargetPoint),
-      if
-        DistanceToTarget > NewDistanceToTarget ->
+      Current = point:point(X, Y),
+      Target = point:point(TargetX, TargetY),
+      case new_point(Current, Target) of
+        undefined ->
+          {ok, State#state{target_x = undefined, target_y = undefined}};
+        NewPoint  ->
           Message = response:teleport(NewPoint),
-          {reply, {text, Message}, State#state{x = NewX, y = NewY}};
-        true ->
-          {ok, State#state{target_x = undefined, target_y = undefined}}
+          {NewX, NewY} = NewPoint,
+          {reply, {text, Message}, State#state{x = NewX, y = NewY}}
       end;
     true ->
       {ok, State}
@@ -85,3 +76,20 @@ terminate(Reason, _Req, _State) ->
 %%
 
 schedule_next_tick() -> erlang:start_timer(?TICK_RATE, self(), ?TICK).
+
+-spec new_point(point:point(), point:point()) -> point:point() | undefined.
+new_point(Current, Target) ->
+  Vec = vec:vec_from_points(Current, Target),
+  Unit = vec:unit(Vec),
+  Speed = 100,
+  Distance = ?TICK_RATE / 1000.0 * Speed,
+  Delta = vec:scale(Unit, Distance),
+  NewPoint = point:translate(Current, Delta),
+  DistanceToTarget = point:distance(Current, Target),
+  NewDistanceToTarget = point:distance(NewPoint, Target),
+  if
+    NewDistanceToTarget < DistanceToTarget  ->
+      NewPoint;
+    true ->
+      undefined
+  end.

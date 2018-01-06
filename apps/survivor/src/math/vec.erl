@@ -1,7 +1,7 @@
 -module(vec).
 -author("nt").
 
--export([vec/2, x/1, y/1, magnitude/1, unit/1, add/2, subtract/2, scale/2, scalar_multiply/2]).
+-export([vec/2, vec_from_points/2, x/1, y/1, magnitude/1, unit/1, add/2, subtract/2, scale/2, scalar_multiply/2]).
 
 -type vec() :: {float(), float()}.
 -export_type([vec/0]).
@@ -9,6 +9,10 @@
 -spec vec(number(), number()) -> vec().
 vec(X, Y) ->
   {float(X), float(Y)}.
+
+-spec vec_from_points(point:point(), point:point()) -> vec().
+vec_from_points({X1, Y1}, {X2, Y2}) ->
+  vec:vec(X2 - X1, Y2 - Y1).
 
 -spec x(vec()) -> float().
 x({X, _}) ->
