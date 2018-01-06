@@ -9,7 +9,7 @@ start(_StartType, _StartArgs) ->
     '_',
     [
       {"/", http_root_handler, []},
-      {"/websocket", ws_handler, []}
+      {"/websocket", websocket_handler, []}
     ]
   } ],
   Dispatch = cowboy_router:compile(Routes),
