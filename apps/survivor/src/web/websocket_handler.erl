@@ -6,6 +6,7 @@
 -export([websocket_info/2]).
 
 -define(TICK, tick).
+-define(TICK_RATE, 33).
 
 -record(state, {
   id = 1,
@@ -44,17 +45,26 @@ websocket_info({timeout, _, init}, State) ->
 websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
   if
     is_float(TargetX) and is_float(TargetY) ->
-      io:format("true~n"),
-      Vec = vec:vec(TargetX - X, TargetY - Y),
-      {X1, Y1} = vec:scale(Vec, 0.01),
-      NewX = X + X1,
-      NewY = Y + Y1,
-      Point = point:point(NewX, NewY),
-      Message = response:teleport(Point),
-      schedule_next_tick(),
-      {reply, {text, Message}, State#state{x = NewX, y = NewY}};
+      DiffX = abs(TargetX - X),
+      DiffY = abs(TargetY - Y),
+      if
+        (DiffX < 0.1) and (DiffY < 0.1) ->
+          schedule_next_tick(),
+          {ok, State#state{target_x = undefined, target_y = undefined}};
+        true ->
+          Vec = vec:vec(TargetX - X, TargetY - Y),
+          Unit = vec:unit(Vec),
+          Speed = 10,
+          Distance = ?TICK_RATE / 1000.0 * Speed,
+          {X1, Y1} = vec:scale(Unit, Distance),
+          NewX = X + X1,
+          NewY = Y + Y1,
+          Point = point:point(NewX, NewY),
+          Message = response:teleport(Point),
+          schedule_next_tick(),
+          {reply, {text, Message}, State#state{x = NewX, y = NewY}}
+      end;
     true ->
-      io:format("false~n"),
       schedule_next_tick(),
       {ok, State}
   end;
@@ -73,4 +83,4 @@ terminate(Reason, _Req, _State) ->
 
 %%
 
-schedule_next_tick() -> erlang:start_timer(33, self(), ?TICK).
+schedule_next_tick() -> erlang:start_timer(?TICK_RATE, self(), ?TICK).
