@@ -45,26 +45,32 @@ websocket_info({timeout, _, init}, State) ->
 websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
   if
     is_float(TargetX) and is_float(TargetY) ->
-      DiffX = abs(TargetX - X),
-      DiffY = abs(TargetY - Y),
+%%      io:format("Going to target~n"),
+      Point = point:point(X, Y),
+      TargetPoint = point:point(TargetX, TargetY),
+      Vec = vec:vec(TargetX - X, TargetY - Y),
+      Unit = vec:unit(Vec),
+      Speed = 100,
+      Distance = ?TICK_RATE / 1000.0 * Speed,
+      {X1, Y1} = vec:scale(Unit, Distance),
+      NewX = X + X1,
+      NewY = Y + Y1,
+      NewPoint = point:point(NewX, NewY),
+      DistanceToTarget = point:distance(Point, TargetPoint),
+      NewDistanceToTarget = point:distance(NewPoint, TargetPoint),
       if
-        (DiffX < 0.1) and (DiffY < 0.1) ->
+        DistanceToTarget > NewDistanceToTarget ->
+%%          io:format("Teleport~n"),
+          Message = response:teleport(NewPoint),
           schedule_next_tick(),
-          {ok, State#state{target_x = undefined, target_y = undefined}};
+          {reply, {text, Message}, State#state{x = NewX, y = NewY}};
         true ->
-          Vec = vec:vec(TargetX - X, TargetY - Y),
-          Unit = vec:unit(Vec),
-          Speed = 10,
-          Distance = ?TICK_RATE / 1000.0 * Speed,
-          {X1, Y1} = vec:scale(Unit, Distance),
-          NewX = X + X1,
-          NewY = Y + Y1,
-          Point = point:point(NewX, NewY),
-          Message = response:teleport(Point),
+%%          io:format("Completed~n"),
           schedule_next_tick(),
-          {reply, {text, Message}, State#state{x = NewX, y = NewY}}
+          {ok, State#state{target_x = undefined, target_y = undefined}}
       end;
     true ->
+%%      io:format("Doing nothing~n"),
       schedule_next_tick(),
       {ok, State}
   end;
