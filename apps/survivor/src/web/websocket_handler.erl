@@ -34,7 +34,7 @@ websocket_handle(_Data, State) ->
 
 
 websocket_info({timeout, _, init}, State) ->
-  P = point:point(0, 0),
+  P = movement:initial_point(),
   Message = response:teleport(P),
   schedule_next_tick(),
   {reply, {text, Message}, State#state{current = P}};
@@ -44,7 +44,7 @@ websocket_info({timeout, _, tick}, State=#state{current = C, target = T}) ->
      undefined ->
        {ok, State};
      T ->
-       case new_point(C, T, ?TICK_RATE / 1000.0, 100.0) of
+       case movement:next_point(C, T, ?TICK_RATE / 1000.0, 100.0) of
          undefined ->
            {ok, State#state{target = undefined}};
          New ->
@@ -71,18 +71,3 @@ terminate(Reason, _Req, _State) ->
 
 schedule_next_tick() ->
   erlang:start_timer(?TICK_RATE, self(), tick).
-
--spec new_point(point:point(), point:point(), float(), float()) -> point:point() | undefined.
-new_point(Current, Target, Dt, Speed) ->
-  Distance = Dt * Speed,
-  Unit = vec:unit(vec:vec_from_points(Current, Target)),
-  Offset = vec:scale(Unit, Distance),
-  NewPoint = point:translate(Current, Offset),
-  CurrentDistanceToTarget = point:distance(Current, Target),
-  NewDistanceToTarget = point:distance(NewPoint, Target),
-  if
-    NewDistanceToTarget < CurrentDistanceToTarget ->
-      NewPoint;
-    true ->
-      undefined
-  end.
