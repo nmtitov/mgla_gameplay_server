@@ -50,7 +50,7 @@ websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = Target
       case new_point(Current, Target, ?TICK_RATE / 1000.0, 100.0) of
         undefined ->
           {ok, State#state{target_x = undefined, target_y = undefined}};
-        NewPoint  ->
+        NewPoint ->
           Message = response:teleport(NewPoint),
           {NewX, NewY} = NewPoint,
           {reply, {text, Message}, State#state{x = NewX, y = NewY}}
