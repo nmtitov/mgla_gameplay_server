@@ -10,10 +10,8 @@
 
 -record(state, {
   id = 1,
-  x = undefined,
-  y = undefined,
-  target_x = undefined,
-  target_y = undefined
+  current = undefined,
+  target = undefined
   }).
 
 
@@ -29,34 +27,31 @@ websocket_init(_) ->
 websocket_handle({text, Msg}, State) ->
   io:format("~p~n", [Msg]),
   [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
-  {ok, State#state{target_x = X, target_y = Y}};
+  P = point:point(X, Y),
+  {ok, State#state{target = P}};
 
 websocket_handle(_Data, State) ->
   {ok, State}.
 
 
 websocket_info({timeout, _, init}, State) ->
-  X = 0,
-  Y = 0,
-  Message = response:teleport(point:point(X, Y)),
+  P = point:point(0, 0),
+  Message = response:teleport(P),
   schedule_next_tick(),
-  {reply, {text, Message}, State#state{x = X, y = Y}};
+  {reply, {text, Message}, State#state{current = P}};
 
-websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = TargetX, target_y = TargetY}) ->
-  Reply = if
-    is_float(TargetX) and is_float(TargetY) ->
-      Current = point:point(X, Y),
-      Target = point:point(TargetX, TargetY),
-      case new_point(Current, Target, ?TICK_RATE / 1000.0, 100.0) of
-        undefined ->
-          {ok, State#state{target_x = undefined, target_y = undefined}};
-        NewPoint ->
-          Message = response:teleport(NewPoint),
-          {NewX, NewY} = NewPoint,
-          {reply, {text, Message}, State#state{x = NewX, y = NewY}}
-      end;
-    true ->
-      {ok, State}
+websocket_info({timeout, _, ?TICK}, State=#state{current = C, target = T}) ->
+  Reply = case T of
+     undefined ->
+       {ok, State};
+     T ->
+       case new_point(C, T, ?TICK_RATE / 1000.0, 100.0) of
+         undefined ->
+           {ok, State#state{target = undefined}};
+         New ->
+           Message = response:teleport(New),
+           {reply, {text, Message}, State#state{current = New}}
+       end
   end,
   schedule_next_tick(),
   Reply;
