@@ -4,39 +4,46 @@
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
 -record(state, {
-
+  id :: non_neg_integer()
 }).
 
--spec teleport(pid(), point:point()) -> ok.
-teleport(WebSocket, P) ->
-  WebSocket ! {teleport, P}, ok.
+-spec teleport(non_neg_integer(), point:point()) -> ok.
+teleport(Id, P) ->
+%%  io:format("teleport(~p, ~p)~n", [Id, P]),
+  gproc:send({p, l, {player, broadcast}}, {teleport, Id, P}).
 
 init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 websocket_init(_) ->
-  world_server:connect(self()),
-  {ok, #state{}}.
+  Id = id_server:id(),
+  gproc:reg({n, l, {player, Id}}),
+  gproc:reg({p, l, {player, broadcast}}),
+  world_server:enter(Id),
+  {ok, #state{id = Id}}.
 
-websocket_handle({text, Msg}, State) ->
+websocket_handle({text, Msg}, #state{id = Id} = State) ->
   io:format("~p~n", [Msg]),
   [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
   P = point:point(X, Y),
-  world_server:target(self(), P),
+  world_server:input(Id, P),
   {ok, State};
 websocket_handle(_Data, State) ->
   {ok, State}.
 
-websocket_info({teleport, P}, State) ->
-  Message = response:teleport(P),
+websocket_info({teleport, Id, P}, State) ->
+%%  io:format("websocket_info({teleport, ~p}, State)~n", [P]),
+  Message = response:teleport(Id, P),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
   {ok, State}.
 
 
-terminate({error, closed}, _Req, _) ->
+terminate({error, closed}, _Req, #state{id = Id}) ->
   io:format("Client disconnected~n"),
-  world_server:disconnect(self()),
+  gproc:unreg({n, l, {player, Id}}),
+  gproc:unreg({p, l, {player, broadcast}}),
+  world_server:leave(Id),
   ok;
 terminate(Reason, _Req, _State) ->
   io:format("~p~n", [Reason]),

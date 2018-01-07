@@ -1,15 +1,18 @@
 -module(response).
 -author("nt").
 
--export([teleport/1]).
+-export([teleport/2]).
 
 -type teleport() :: binary().
 -export_type([teleport/0]).
 
--spec teleport(point:point()) -> teleport().
-teleport(P) ->
+-spec teleport(non_neg_integer(), point:point()) -> teleport().
+teleport(Id, P) ->
   {X, Y} = P,
   jsx:encode(#{
-    x => X,
-    y => Y
+    id => Id,
+    point => #{
+      x => X,
+      y => Y
+    }
   }).
