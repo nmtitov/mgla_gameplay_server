@@ -11,8 +11,10 @@
 
 -behaviour(gen_server).
 
+-define(TICK_RATE, 33).
+
 %% API
--export([start_link/0]).
+-export([start_link/0, connect/1, disconnect/1, target/2]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -24,11 +26,25 @@
 
 -define(SERVER, ?MODULE).
 
--record(state, {}).
+-record(state, {
+  id = 1,
+  webSocket = undefined,
+  current = undefined,
+  target = undefined
+}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+connect(WebSocket) ->
+  gen_server:cast(?SERVER, {connect, WebSocket}).
+
+disconnect(WebSocket) ->
+  gen_server:cast(?SERVER, {disconnect, WebSocket}).
+
+target(WebSocket, P) ->
+  gen_server:cast(?SERVER, {target, P}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -60,7 +76,7 @@ start_link() ->
   {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term()} | ignore).
 init([]) ->
-  {ok, #state{}}.
+  {ok, [], 0}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -91,6 +107,10 @@ handle_call(_Request, _From, State) ->
   {noreply, NewState :: #state{}} |
   {noreply, NewState :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #state{}}).
+handle_cast({connect, Websocket}, State) ->
+  {noreply, [#state{webSocket = Websocket, current = point:point(0, 0)}]};
+handle_cast({disconnect, Websocket}, State) ->
+  {noreply, []};
 handle_cast(_Request, State) ->
   {noreply, State}.
 
@@ -108,6 +128,19 @@ handle_cast(_Request, State) ->
   {noreply, NewState :: #state{}} |
   {noreply, NewState :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #state{}}).
+handle_info({timeout, _Ref, tick}, State) ->
+  NewState = update(State),
+  lists:foreach(fun(State2) ->
+    WebSocket = State2#state.webSocket,
+    P = State2#state.current,
+    websocket_handler:teleport(WebSocket, P)
+  end, NewState),
+  schedule_next_tick(),
+  {noreply, State};
+
+handle_info(timeout, State) ->
+  schedule_next_tick(),
+  {noreply, State};
 handle_info(_Info, State) ->
   {noreply, State}.
 
@@ -144,3 +177,24 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+schedule_next_tick() ->
+  erlang:start_timer(?TICK_RATE, self(), tick).
+
+update([]) -> [];
+update([H|T]) ->
+  NewH = H,
+  [NewH | update(T)].
+
+%%  Reply = case T of
+%%     undefined ->
+%%       {ok, State};
+%%     T ->
+%%       case movement:next_point(C, T, ?TICK_RATE / 1000.0, 100.0) of
+%%         undefined ->
+%%           {ok, State#state{target = undefined}};
+%%         New ->
+%%           Message = response:teleport(New),
+%%           {reply, {text, Message}, State#state{current = New}}
+%%       end
+%%  end,
