@@ -47,7 +47,7 @@ websocket_info({timeout, _, ?TICK}, State=#state{x = X, y = Y, target_x = Target
     is_float(TargetX) and is_float(TargetY) ->
       Current = point:point(X, Y),
       Target = point:point(TargetX, TargetY),
-      case new_point(Current, Target) of
+      case new_point(Current, Target, ?TICK_RATE / 1000.0, 100.0) of
         undefined ->
           {ok, State#state{target_x = undefined, target_y = undefined}};
         NewPoint  ->
@@ -77,18 +77,16 @@ terminate(Reason, _Req, _State) ->
 
 schedule_next_tick() -> erlang:start_timer(?TICK_RATE, self(), ?TICK).
 
--spec new_point(point:point(), point:point()) -> point:point() | undefined.
-new_point(Current, Target) ->
-  Vec = vec:vec_from_points(Current, Target),
-  Unit = vec:unit(Vec),
-  Speed = 100,
-  Distance = ?TICK_RATE / 1000.0 * Speed,
-  Delta = vec:scale(Unit, Distance),
-  NewPoint = point:translate(Current, Delta),
-  DistanceToTarget = point:distance(Current, Target),
+-spec new_point(point:point(), point:point(), float(), float()) -> point:point() | undefined.
+new_point(Current, Target, Dt, Speed) ->
+  Distance = Dt * Speed,
+  Unit = vec:unit(vec:vec_from_points(Current, Target)),
+  Offset = vec:scale(Unit, Distance),
+  NewPoint = point:translate(Current, Offset),
+  CurrentDistanceToTarget = point:distance(Current, Target),
   NewDistanceToTarget = point:distance(NewPoint, Target),
   if
-    NewDistanceToTarget < DistanceToTarget  ->
+    NewDistanceToTarget < CurrentDistanceToTarget ->
       NewPoint;
     true ->
       undefined
