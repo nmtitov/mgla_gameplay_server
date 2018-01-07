@@ -5,7 +5,6 @@
 -export([websocket_handle/2]).
 -export([websocket_info/2]).
 
--define(TICK, tick).
 -define(TICK_RATE, 33).
 
 -record(state, {
@@ -40,7 +39,7 @@ websocket_info({timeout, _, init}, State) ->
   schedule_next_tick(),
   {reply, {text, Message}, State#state{current = P}};
 
-websocket_info({timeout, _, ?TICK}, State=#state{current = C, target = T}) ->
+websocket_info({timeout, _, tick}, State=#state{current = C, target = T}) ->
   Reply = case T of
      undefined ->
        {ok, State};
@@ -70,7 +69,8 @@ terminate(Reason, _Req, _State) ->
 
 %%
 
-schedule_next_tick() -> erlang:start_timer(?TICK_RATE, self(), ?TICK).
+schedule_next_tick() ->
+  erlang:start_timer(?TICK_RATE, self(), tick).
 
 -spec new_point(point:point(), point:point(), float(), float()) -> point:point() | undefined.
 new_point(Current, Target, Dt, Speed) ->
