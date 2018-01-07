@@ -181,11 +181,6 @@ code_change(_OldVsn, State, _Extra) ->
 schedule_next_tick() ->
   erlang:start_timer(?TICK_RATE, self(), tick).
 
-update([]) -> [];
-update([H|T]) ->
-  NewH = H,
-  [NewH | update(T)].
-
 %%  Reply = case T of
 %%     undefined ->
 %%       {ok, State};
