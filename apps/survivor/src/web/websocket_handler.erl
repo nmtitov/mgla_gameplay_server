@@ -36,7 +36,6 @@ websocket_info({teleport, Id, P}, State) ->
 websocket_info(_Info, State) ->
   {ok, State}.
 
-
 terminate({error, closed}, _Req, #state{id = Id}) ->
   io:format("Client disconnected~n"),
   gproc:unreg({n, l, {player, Id}}),
