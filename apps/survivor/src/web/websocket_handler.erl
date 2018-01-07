@@ -9,7 +9,6 @@
 
 -spec teleport(non_neg_integer(), point:point()) -> ok.
 teleport(Id, P) ->
-%%  io:format("teleport(~p, ~p)~n", [Id, P]),
   gproc:send({p, l, {player, broadcast}}, {teleport, Id, P}).
 
 init(Req, Opts) ->
@@ -32,7 +31,6 @@ websocket_handle(_Data, State) ->
   {ok, State}.
 
 websocket_info({teleport, Id, P}, State) ->
-%%  io:format("websocket_info({teleport, ~p}, State)~n", [P]),
   Message = response:teleport(Id, P),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
