@@ -20,7 +20,8 @@
   id :: integer(),
   position :: point:point(),
   speed :: float(),
-  target :: point:point() | undefined
+  target :: point:point() | undefined,
+  should_send_teleport = false :: boolean()
 }).
 
 -spec enter(non_neg_integer()) -> ok.
@@ -66,9 +67,8 @@ handle_call(_Request, _From, State) ->
   {stop, Reason :: term(), NewState :: [#player_state{}]}).
 handle_cast({enter, Id}, State) ->
   P = point:point(0, 0),
-  PlayerState = #player_state{id = Id, position = P, speed = 100.0},
+  PlayerState = #player_state{id = Id, position = P, speed = 100.0, should_send_teleport = true},
   NewState = [PlayerState | State],
-  websocket_handler:teleport(Id, P),
   {noreply, NewState};
 handle_cast({leave, Id}, State) ->
   NewState = lists:filter(fun(Player) -> Player#player_state.id =/= Id end, State),
@@ -90,7 +90,7 @@ handle_cast(_Request, State) ->
   {stop, Reason :: term(), NewState :: [#player_state{}]}).
 handle_info({timeout, _Ref, tick}, State) ->
   TimeA = erlang:system_time(),
-  NewState = lists:map(fun(#player_state{position = P, speed = S, target = T} = Player) ->
+  State2 = lists:map(fun(#player_state{position = P, speed = S, target = T} = Player) ->
     case T of
        undefined ->
          Player;
@@ -99,17 +99,23 @@ handle_info({timeout, _Ref, tick}, State) ->
            undefined ->
              Player#player_state{target = undefined};
            New ->
-             Player#player_state{position = New}
+             Player#player_state{position = New, should_send_teleport = true}
          end
     end
   end, State),
+  PlayersToNotify = lists:filter(fun(#player_state{should_send_teleport = Should}) ->
+    Should == true
+  end, State2),
   lists:foreach(fun(#player_state{id = Id, position = P} = Player) ->
     websocket_handler:teleport(Id, P)
-  end, NewState),
+  end, PlayersToNotify),
+  State3 = lists:map(fun(Player) ->
+    Player#player_state{should_send_teleport = false}
+  end, State2),
   TimeB = erlang:system_time(),
   TimeDiff = TimeB - TimeA,
   schedule_next_tick(),
-  {noreply, NewState};
+  {noreply, State3};
 handle_info(timeout, State) ->
   schedule_next_tick(),
   {noreply, State};
