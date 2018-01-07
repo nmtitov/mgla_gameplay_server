@@ -129,12 +129,11 @@ handle_cast(_Request, State) ->
   {noreply, NewState :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #state{}}).
 handle_info({timeout, _Ref, tick}, State) ->
-  NewState = update(State),
   lists:foreach(fun(State2) ->
     WebSocket = State2#state.webSocket,
     P = State2#state.current,
     websocket_handler:teleport(WebSocket, P)
-  end, NewState),
+  end, State),
   schedule_next_tick(),
   {noreply, State};
 
