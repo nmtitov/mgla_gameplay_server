@@ -29,6 +29,8 @@ input(Players, Id, T) ->
     end
   end, Players).
 
+move(#player{target = undefined} = Player, _) ->
+  Player;
 move(#player{position = P, target = T, speed = S} = Player, Dt) ->
   case pathfinding:next_point(P, T, S, Dt) of
     undefined ->
