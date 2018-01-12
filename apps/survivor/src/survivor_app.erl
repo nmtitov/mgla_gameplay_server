@@ -8,7 +8,6 @@ start(_StartType, _StartArgs) ->
   Routes = [ {
     '_',
     [
-      {"/", http_root_handler, []},
       {"/websocket", ws_handler, []}
     ]
   } ],
