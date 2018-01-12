@@ -10,7 +10,7 @@ init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 websocket_init(_) ->
-  Id = id_server:id(),
+  {ok, Id} = id_server:id(),
   gproc:reg({n, l, {player, Id}}),
   gproc:reg({p, l, {player, broadcast}}),
   map_server:enter(Id),
