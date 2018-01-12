@@ -95,7 +95,7 @@ handle_info({timeout, _Ref, tick}, State) ->
        undefined ->
          Player;
        T ->
-         case movement:next_point(P, T, ?TICK_RATE / 1000.0, S) of
+         case pathfinding:next_point(P, T, ?TICK_RATE / 1000.0, S) of
            undefined ->
              Player#player_state{target = undefined};
            New ->

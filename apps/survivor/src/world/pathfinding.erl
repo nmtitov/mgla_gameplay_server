@@ -1,4 +1,4 @@
--module(movement).
+-module(pathfinding).
 -author("nt").
 
 %% API
