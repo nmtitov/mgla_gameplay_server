@@ -16,10 +16,8 @@ websocket_init(_) ->
   map_server:enter(Id),
   {ok, #state{id = Id}}.
 
-websocket_handle({text, Msg}, #state{id = Id} = State) ->
-  io:format("~p~n", [Msg]),
-  [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
-  P = point:point(X, Y),
+websocket_handle({text, M}, #state{id = Id} = State) ->
+  {ok, P} = ws_receive:input(M),
   map_server:input(Id, P),
   {ok, State};
 websocket_handle(_Data, State) ->
