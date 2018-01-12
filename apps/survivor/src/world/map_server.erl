@@ -26,18 +26,15 @@
 
 -spec enter(non_neg_integer()) -> ok.
 enter(Id) ->
-  gen_server:cast(?SERVER, {enter, Id}),
-  ok.
+  gen_server:cast(?SERVER, {enter, Id}).
 
 -spec leave(non_neg_integer()) -> ok.
 leave(Id) ->
-  gen_server:cast(?SERVER, {leave, Id}),
-  ok.
+  gen_server:cast(?SERVER, {leave, Id}).
 
 -spec input(non_neg_integer(), point:point()) -> ok.
 input(Id, P) ->
-  gen_server:cast(?SERVER, {input, Id, P}),
-  ok.
+  gen_server:cast(?SERVER, {input, Id, P}).
 
 -spec(start_link() ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
