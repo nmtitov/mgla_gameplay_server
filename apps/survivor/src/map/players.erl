@@ -33,17 +33,15 @@ input(Players, Id, T) ->
   end, Players).
 
 update(State, Dt) ->
-  State2 = lists:map(fun(P) -> move(P, Dt) end, State),
+  Moved = lists:map(fun(P) -> move(P, Dt) end, State),
   Update = lists:filter(fun(#player{update_position = Update}) ->
     Update == true
-  end, State2),
+  end, Moved),
   lists:foreach(fun(#player{id = Id, position = P}) ->
     ws_send:teleport(Id, P)
   end, Update),
-  State3 = lists:map(fun(Player) ->
-    Player#player{update_position = false}
-  end, State2),
-  State3.
+  Clean = lists:map(fun(P) -> clean(P) end, Moved),
+  Clean.
 
 move(#player{target = undefined} = Player, _) ->
   Player;
@@ -54,3 +52,6 @@ move(#player{position = P, target = T, speed = S} = Player, Dt) ->
     New ->
       Player#player{position = New, update_position = true}
   end.
+
+clean(Player) ->
+  Player#player{update_position = false}.
