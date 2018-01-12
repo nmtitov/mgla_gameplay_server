@@ -29,12 +29,12 @@ input(Id, P) ->
   gen_server:cast(?SERVER, {input, Id, P}).
 
 start_link() ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+  gen_server:start_link({local, ?SERVER}, ?MODULE, players:players(), []).
 
 %% Callbacks
 
-init([]) ->
-  {ok, players:players(), 0}.
+init(State) ->
+  {ok, State, 0}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
