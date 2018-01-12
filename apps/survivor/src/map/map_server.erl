@@ -28,32 +28,17 @@ leave(Id) ->
 input(Id, P) ->
   gen_server:cast(?SERVER, {input, Id, P}).
 
--spec(start_link() ->
-  {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
--spec(init(Args :: term()) ->
-  {ok, State :: [map_state:player()]} | {ok, State :: [map_state:player()], timeout() | hibernate} |
-  {stop, Reason :: term()} | ignore).
+%% Callbacks
+
 init([]) ->
   {ok, [], 0}.
 
--spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
-    State :: [map_state:player()]) ->
-  {reply, Reply :: term(), NewState :: [map_state:player()]} |
-  {reply, Reply :: term(), NewState :: [map_state:player()], timeout() | hibernate} |
-  {noreply, NewState :: [map_state:player()]} |
-  {noreply, NewState :: [map_state:player()], timeout() | hibernate} |
-  {stop, Reason :: term(), Reply :: term(), NewState :: [map_state:player()]} |
-  {stop, Reason :: term(), NewState :: [map_state:player()]}).
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
--spec(handle_cast(Request :: term(), State :: [map_state:player()]) ->
-  {noreply, NewState :: [map_state:player()]} |
-  {noreply, NewState :: [map_state:player()], timeout() | hibernate} |
-  {stop, Reason :: term(), NewState :: [map_state:player()]}).
 handle_cast({enter, Id}, State) ->
   NewState = players:add(State, Id),
   {noreply, NewState};
@@ -66,10 +51,6 @@ handle_cast({input, Id, T}, State) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
--spec(handle_info(Info :: timeout() | term(), State :: [map_state:player()]) ->
-  {noreply, NewState :: [map_state:player()]} |
-  {noreply, NewState :: [map_state:player()], timeout() | hibernate} |
-  {stop, Reason :: term(), NewState :: [map_state:player()]}).
 handle_info({timeout, _Ref, tick}, State) ->
   TimeA = erlang:system_time(),
   NewState = players:update(State, ?TICK_RATE / 1000.0),
@@ -83,16 +64,13 @@ handle_info(timeout, State) ->
 handle_info(_Info, State) ->
   {noreply, State}.
 
--spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
-    State :: [map_state:player()]) -> term()).
 terminate(_Reason, _State) ->
   ok.
 
--spec(code_change(OldVsn :: term() | {down, term()}, State :: [map_state:player()],
-    Extra :: term()) ->
-  {ok, NewState :: [map_state:player()]} | {error, Reason :: term()}).
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+%% Private
 
 schedule_next_tick() ->
   erlang:start_timer(?TICK_RATE, self(), tick).
