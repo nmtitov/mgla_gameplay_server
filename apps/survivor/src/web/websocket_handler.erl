@@ -1,15 +1,10 @@
 -module(websocket_handler).
 
--export([teleport/2]).
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
 -record(state, {
   id :: non_neg_integer()
 }).
-
--spec teleport(non_neg_integer(), point:point()) -> ok.
-teleport(Id, P) ->
-  gproc:send({p, l, {player, broadcast}}, {teleport, Id, P}).
 
 init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
@@ -30,8 +25,7 @@ websocket_handle({text, Msg}, #state{id = Id} = State) ->
 websocket_handle(_Data, State) ->
   {ok, State}.
 
-websocket_info({teleport, Id, P}, State) ->
-  Message = response:teleport(Id, P),
+websocket_info({send, Message}, State) ->
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
   {ok, State}.

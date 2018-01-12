@@ -107,7 +107,7 @@ handle_info({timeout, _Ref, tick}, State) ->
     Should == true
   end, State2),
   lists:foreach(fun(#player_state{id = Id, position = P} = Player) ->
-    websocket_handler:teleport(Id, P)
+    ws_broadcast:teleport(Id, P)
   end, PlayersToNotify),
   State3 = lists:map(fun(Player) ->
     Player#player_state{should_send_teleport = false}
