@@ -49,4 +49,3 @@ update(State, Dt) ->
     Player#player{update_position = false}
   end, State2),
   State3.
-
