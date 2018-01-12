@@ -17,8 +17,11 @@ websocket_init(_) ->
   {ok, #state{id = Id}}.
 
 websocket_handle({text, M}, #state{id = Id} = State) ->
-  {ok, P} = ws_receive:input(M),
-  map_server:input(Id, P),
+  case ws_receive:decode(M) of
+    {<<"input">>, Body} ->
+      P = ws_receive:input(Body),
+      map_server:input(Id, P)
+  end,
   {ok, State};
 websocket_handle(_Data, State) ->
   {ok, State}.
