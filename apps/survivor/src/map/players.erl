@@ -39,12 +39,12 @@ move(#player{position = P, target = T, speed = S} = Player, Dt) ->
 
 update(State, Dt) ->
   State2 = lists:map(fun(P) -> move(P, Dt) end, State),
-  Notify = lists:filter(fun(#player{update_position = Update}) ->
+  Update = lists:filter(fun(#player{update_position = Update}) ->
     Update == true
   end, State2),
   lists:foreach(fun(#player{id = Id, position = P}) ->
     ws_send:teleport(Id, P)
-  end, Notify),
+  end, Update),
   State3 = lists:map(fun(Player) ->
     Player#player{update_position = false}
   end, State2),
