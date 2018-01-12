@@ -32,16 +32,6 @@ input(Players, Id, T) ->
     end
   end, Players).
 
-move(#player{target = undefined} = Player, _) ->
-  Player;
-move(#player{position = P, target = T, speed = S} = Player, Dt) ->
-  case pathfinding:next_point(P, T, S, Dt) of
-    undefined ->
-      Player#player{target = undefined};
-    New ->
-      Player#player{position = New, update_position = true}
-  end.
-
 update(State, Dt) ->
   State2 = lists:map(fun(P) -> move(P, Dt) end, State),
   Update = lists:filter(fun(#player{update_position = Update}) ->
@@ -54,3 +44,13 @@ update(State, Dt) ->
     Player#player{update_position = false}
   end, State2),
   State3.
+
+move(#player{target = undefined} = Player, _) ->
+  Player;
+move(#player{position = P, target = T, speed = S} = Player, Dt) ->
+  case pathfinding:next_point(P, T, S, Dt) of
+    undefined ->
+      Player#player{target = undefined};
+    New ->
+      Player#player{position = New, update_position = true}
+  end.
