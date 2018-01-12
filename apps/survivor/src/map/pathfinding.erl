@@ -9,6 +9,8 @@ initial_point() ->
   point:point(0, 0).
 
 -spec next_point(point:point(), point:point(), float(), float()) -> point:point() | undefined.
+next_point(_, undefined, _, _) ->
+  undefined;
 next_point(Current, Target, Dt, Speed) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(Current, Target)),
