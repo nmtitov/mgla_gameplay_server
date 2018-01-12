@@ -3,7 +3,7 @@
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
 -record(state, {
-  id :: non_neg_integer()
+  id :: id_server:id()
 }).
 
 init(Req, Opts) ->

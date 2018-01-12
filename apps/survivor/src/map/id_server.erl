@@ -14,9 +14,10 @@
 
 -define(SERVER, ?MODULE).
 
--spec id() -> {ok, non_neg_integer()}.
+-type id() :: non_neg_integer().
+-spec id() -> {ok, id()}.
 id() ->
-  {ok, Id} = gen_server:call(?SERVER, id).
+  gen_server:call(?SERVER, id).
 
 -spec(start_link() ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
