@@ -18,14 +18,14 @@ websocket_init(_) ->
   Id = id_server:id(),
   gproc:reg({n, l, {player, Id}}),
   gproc:reg({p, l, {player, broadcast}}),
-  world_server:enter(Id),
+  map_server:enter(Id),
   {ok, #state{id = Id}}.
 
 websocket_handle({text, Msg}, #state{id = Id} = State) ->
   io:format("~p~n", [Msg]),
   [{<<"y">>, Y}, {<<"x">>, X}] = jsx:decode(Msg),
   P = point:point(X, Y),
-  world_server:input(Id, P),
+  map_server:input(Id, P),
   {ok, State};
 websocket_handle(_Data, State) ->
   {ok, State}.
@@ -40,7 +40,7 @@ terminate({error, closed}, _Req, #state{id = Id}) ->
   io:format("Client disconnected~n"),
   gproc:unreg({n, l, {player, Id}}),
   gproc:unreg({p, l, {player, broadcast}}),
-  world_server:leave(Id),
+  map_server:leave(Id),
   ok;
 terminate(Reason, _Req, _State) ->
   io:format("~p~n", [Reason]),

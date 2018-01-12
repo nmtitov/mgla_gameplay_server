@@ -1,4 +1,4 @@
--module(world_server).
+-module(map_server).
 -author("nt").
 
 -behaviour(gen_server).
