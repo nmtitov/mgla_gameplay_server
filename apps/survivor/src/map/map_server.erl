@@ -34,7 +34,7 @@ start_link() ->
 %% Callbacks
 
 init([]) ->
-  {ok, [], 0}.
+  {ok, players:players(), 0}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.

@@ -1,7 +1,7 @@
 -module(players).
 -author("nt").
 
--export([add/2, remove/2, update/2, input/3]).
+-export([players/0, add/2, remove/2, update/2, input/3]).
 
 -record(player, {
   id :: integer(),
@@ -12,6 +12,9 @@
 }).
 -opaque player() :: #player{}.
 -export_type([player/0]).
+
+players() ->
+  [].
 
 add(Players, Id) ->
   P = point:point(0, 0),
