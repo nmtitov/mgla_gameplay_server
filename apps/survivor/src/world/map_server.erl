@@ -135,16 +135,3 @@ code_change(_OldVsn, State, _Extra) ->
 
 schedule_next_tick() ->
   erlang:start_timer(?TICK_RATE, self(), tick).
-
-%%  Reply = case T of
-%%     undefined ->
-%%       {ok, State};
-%%     T ->
-%%       case movement:next_point(C, T, ?TICK_RATE / 1000.0, 100.0) of
-%%         undefined ->
-%%           {ok, State#state{target = undefined}};
-%%         New ->
-%%           Message = response:teleport(New),
-%%           {reply, {text, Message}, State#state{current = New}}
-%%       end
-%%  end,
