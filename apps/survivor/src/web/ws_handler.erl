@@ -1,4 +1,4 @@
--module(websocket_handler).
+-module(ws_handler).
 
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
