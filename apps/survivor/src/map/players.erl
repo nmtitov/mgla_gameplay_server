@@ -17,7 +17,7 @@ players() ->
   [].
 
 add(Players, Id) ->
-  P = point:point(0, 0),
+  P = point:point(300, 500),
   Player = #player{id = Id, position = P, speed = 100.0, update_position = true},
   [Player | Players].
 
