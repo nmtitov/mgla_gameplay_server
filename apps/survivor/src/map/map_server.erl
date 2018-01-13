@@ -41,6 +41,7 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({enter, Id}, State) ->
   NewState = players:add(State, Id),
+  ws_send:map(Id),
   ws_send:enter(Id),
   {noreply, NewState};
 handle_cast({leave, Id}, State) ->
