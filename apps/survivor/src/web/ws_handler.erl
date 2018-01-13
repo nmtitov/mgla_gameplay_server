@@ -15,6 +15,7 @@ init(Req, Opts) ->
 
 websocket_init(_) ->
   {ok, Id} = id_server:id(),
+  io:format("Client connected: {Id=~p}~n", [Id]),
   gproc:reg(players_key(Id)),
   gproc:reg(players_broadcast_key()),
   {ok, #state{id = Id}}.
@@ -40,7 +41,7 @@ websocket_info(_Info, State) ->
   {ok, State}.
 
 terminate({error, closed}, _Req, #state{id = Id}) ->
-  io:format("Client disconnected~n"),
+  io:format("Client disconnected: {Id=~p}~n", [Id]),
   gproc:unreg(players_key(Id)),
   gproc:unreg(players_broadcast_key()),
   map_server:leave(Id),
