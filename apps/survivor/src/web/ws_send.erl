@@ -1,7 +1,7 @@
 -module(ws_send).
 -author("nt").
 
--export([teleport/2]).
+-export([enter/1, leave/1, teleport/2]).
 
 -spec teleport(id_server:id(), point:point()) -> ok.
 teleport(Id, {X, Y}) ->
@@ -15,4 +15,22 @@ teleport(Id, {X, Y}) ->
       }
     }
   }),
-  gproc:send({p, l, {players, broadcast}}, {send, M}).
+  gproc:send(ws_handler:players_broadcast_key(), {send, M}).
+
+enter(Id) ->
+  M = jsx:encode(#{
+    type => enter,
+    body => #{
+      id => Id
+    }
+  }),
+  gproc:send(ws_handler:players_broadcast_key(), {send, M}).
+
+leave(Id) ->
+  M = jsx:encode(#{
+    type => leave,
+    body => #{
+      id => Id
+    }
+  }),
+  gproc:send(ws_handler:players_broadcast_key(), {send, M}).
