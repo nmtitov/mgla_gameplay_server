@@ -15,4 +15,4 @@ teleport(Id, {X, Y}) ->
       }
     }
   }),
-  gproc:send({p, l, {player, broadcast}}, {send, M}).
+  gproc:send({p, l, {players, broadcast}}, {send, M}).
