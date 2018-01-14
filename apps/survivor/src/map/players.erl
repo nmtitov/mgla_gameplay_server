@@ -40,9 +40,9 @@ input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
       P#player.id == Id ->
-        case not lists:any(fun(Block) -> rect:intersects_line(Block, P#player.position, T) end, Blocks) of
-          true -> P#player{destination = T};
-          false -> P
+        case pathfinding:destination_point(P#player.position, T, Blocks) of
+          undefined -> P;
+          Destination -> P#player{destination = Destination}
         end;
       true -> P
     end
