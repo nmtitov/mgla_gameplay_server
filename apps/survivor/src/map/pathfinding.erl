@@ -6,7 +6,7 @@
 
 -spec initial_point() -> point:point().
 initial_point() ->
-  point:point(0, 0).
+  point:point(100, 100).
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
   A :: point:point(),

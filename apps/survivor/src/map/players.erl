@@ -24,7 +24,7 @@ players() ->
   [].
 
 add(Players, Id) ->
-  P = point:point(100, 100),
+  P = pathfinding:initial_point(),
   Player = #player{
     id = Id,
     position = P,
