@@ -52,7 +52,7 @@ calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
 asc(X, Y) when X < Y -> {X, Y};
 asc(X, Y) -> {Y, X}.
 
--spec vertices(R) -> [V] when R :: rect, V :: point:point().
+-spec vertices(R) -> [V] when R :: rect(), V :: point:point().
 vertices({{OriginX, OriginY}, {W, H}}) ->
   [
     point:point(OriginX, OriginY),
