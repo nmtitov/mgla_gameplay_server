@@ -17,13 +17,18 @@ initial_point() ->
   Blocks :: [rect:rect()],
   NextPoint :: point:point() | undefined.
 next_point(A, B, Dt, Speed, MapRect, Blocks) ->
+  % if not visible -> undefined
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
   Suggested = point:translate(A, Offset),
   case accessible(Suggested, MapRect, Blocks) of
-    true -> validate(A, B, Suggested);
-    false -> undefined
+    true ->
+      case (not lists:any(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks)) of
+        true -> validate(A, B, Suggested);
+        false -> undefined
+      end;
+      false -> undefined
   end.
 
 accessible(Point, MapRect, Blocks) ->
