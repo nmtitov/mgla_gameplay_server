@@ -7,7 +7,7 @@
   id :: integer(),
   position :: point:point(),
   movement_speed :: float(),
-  destination :: point:point() | undefined,
+  path :: [point:point()],
   update_position = false :: boolean(),
   health = 0 :: integer(),
   health_regen = 0 :: non_neg_integer(),
@@ -29,6 +29,7 @@ add(Players, Id) ->
     id = Id,
     position = P,
     movement_speed = 100.0,
+    path = [],
     update_position = true
   },
   [Player | Players].
@@ -40,8 +41,8 @@ input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
       P#player.id == Id ->
-        D = pathfinding:destination_point(P#player.position, T, Blocks),
-        P#player{destination = D};
+        Path = pathfinding:destination_point(P#player.position, T, Blocks),
+        P#player{path = Path};
       true -> P
     end
   end, Players).
@@ -56,12 +57,12 @@ update(State, Dt, MapRect, Blocks) ->
   end, Update),
   lists:map(fun(P) -> clean(P) end, Moved).
 
-move(#player{destination = undefined} = Player, _, _, _) ->
+move(#player{path = []} = Player, _, _, _) ->
   Player;
-move(#player{position = A, destination = B, movement_speed = S} = Player, Dt, MapRect, Blocks) ->
+move(#player{position = A, path = [B|Tail], movement_speed = S} = Player, Dt, MapRect, Blocks) ->
   case pathfinding:next_point(A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-      Player#player{destination = undefined};
+      Player#player{path = Tail};
     New ->
       Player#player{position = New, update_position = true}
   end.

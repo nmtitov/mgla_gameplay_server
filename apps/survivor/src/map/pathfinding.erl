@@ -8,13 +8,13 @@
 initial_point() ->
   point:point(100, 100).
 
--spec destination_point(A, B, Blocks) -> C when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
+-spec destination_point(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
 destination_point(A, B, Blocks) ->
   Intersected = lists:filter(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks),
   do_destination_point(A, B, Intersected).
 
--spec do_destination_point(A, B, Intersected) -> C when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
-do_destination_point(_, B, []) -> B;
+-spec do_destination_point(A, B, Intersected) -> [C] when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
+do_destination_point(_, B, []) -> [B];
 do_destination_point(A, B, [Block|_]) ->
   Vertices = rect:vertices(Block),
   VisibleFromA = rect:visible_vertices(Block, A),
@@ -30,8 +30,7 @@ do_destination_point(A, B, [Block|_]) ->
   lists:foreach(fun({From, To}) -> digraph:add_edge(G, From, To), digraph:add_edge(G, To, From) end, InternalEdges),
   Path = digraph:get_short_path(G, A, B),
   [_|Tail] = Path,
-  [Next|_] = Tail,
-  Next.
+  Tail.
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
   A :: point:point(),
