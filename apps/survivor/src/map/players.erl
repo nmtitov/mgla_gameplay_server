@@ -1,7 +1,7 @@
 -module(players).
 -author("nt").
 
--export([players/0, add/2, remove/2, update/4, input/3]).
+-export([players/0, add/2, remove/2, update/4, input/4]).
 
 -record(player, {
   id :: integer(),
@@ -36,10 +36,14 @@ add(Players, Id) ->
 remove(Players, Id) ->
   lists:filter(fun(P) -> P#player.id =/= Id end, Players).
 
-input(Players, Id, T) ->
+input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
-      P#player.id == Id -> P#player{destination = T};
+      P#player.id == Id ->
+        case not lists:any(fun(Block) -> rect:intersects_line(Block, P#player.position, T) end, Blocks) of
+          true -> P#player{destination = T};
+          false -> P
+        end;
       true -> P
     end
   end, Players).

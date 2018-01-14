@@ -60,8 +60,8 @@ handle_cast({leave, Id}, #map_server_state{players = Players} = MapServerState) 
   ws_send:leave(Id),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
-handle_cast({input, Id, T}, #map_server_state{players = Players} = MapServerState) ->
-  NewPlayers = players:input(Players, Id, T),
+handle_cast({input, Id, T}, #map_server_state{players = Players, blocks = Blocks} = MapServerState) ->
+  NewPlayers = players:input(Players, Id, T, Blocks),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast(_Request, State) ->
