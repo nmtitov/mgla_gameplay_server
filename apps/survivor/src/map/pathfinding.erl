@@ -8,19 +8,19 @@
 initial_point() ->
   point:point(0, 0).
 
--spec next_point(A, B, Dt, Speed, MapSize) -> NextPoint when
+-spec next_point(A, B, Dt, Speed, MapRect) -> NextPoint when
   A :: point:point(),
   B :: point:point(),
   Dt :: float(),
   Speed :: float(),
-  MapSize :: size:size(),
+  MapRect :: rect:rect(),
   NextPoint :: point:point() | undefined.
-next_point(A, B, Dt, Speed, MapSize) ->
+next_point(A, B, Dt, Speed, MapRect) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
   NextPoint = point:translate(A, Offset),
-  case point_inside(NextPoint, MapSize) of
+  case rect:contains(MapRect, NextPoint) of
     true ->
       CurrentDistanceToTarget = point:distance(A, B),
       NewDistanceToTarget = point:distance(NextPoint, B),
@@ -33,6 +33,3 @@ next_point(A, B, Dt, Speed, MapSize) ->
     false ->
       undefined
   end.
-
-point_inside({X, Y}, {W, H}) ->
-  ((0 < X) and (X < W)) and ((0 < Y) and (Y < H)).

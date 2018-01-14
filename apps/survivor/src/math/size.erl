@@ -6,7 +6,7 @@
 -type size() :: {number(), number()}.
 -export_type([size/0]).
 
--spec size(float(), float()) -> size().
+-spec size(number(), number()) -> size().
 size(W, H) -> {float(W), float(H)}.
 
 -spec width(size()) -> float().

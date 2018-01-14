@@ -16,6 +16,11 @@
 
 -define(SERVER, ?MODULE).
 
+-record(map_server_state, {
+    map_rect :: rect:rect(),
+    players :: [players:player()]
+}).
+
 -spec enter(non_neg_integer()) -> ok.
 enter(Id) ->
   gen_server:cast(?SERVER, {enter, Id}).
@@ -34,31 +39,38 @@ start_link() ->
 %% Callbacks
 
 init(_) ->
-  {ok, players:players(), 0}.
+  MapRect = rect:rect(point:point(0, 0), size:size(600, 1000)),
+  Players = players:players(),
+  State = #map_server_state{map_rect = MapRect, players = Players},
+  {ok, State, 0}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({enter, Id}, State) ->
-  NewState = players:add(State, Id),
+handle_cast({enter, Id}, #map_server_state{players = Players} = MapServerState) ->
+  NewPlayers = players:add(Players, Id),
   ws_send:map(Id),
   ws_send:enter(Id),
+  NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
-handle_cast({leave, Id}, State) ->
-  NewState = players:remove(State, Id),
+handle_cast({leave, Id}, #map_server_state{players = Players} = MapServerState) ->
+  NewPlayers = players:remove(Players, Id),
   ws_send:leave(Id),
+  NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
-handle_cast({input, Id, T}, State) ->
-  NewState = players:input(State, Id, T),
+handle_cast({input, Id, T}, #map_server_state{players = Players} = MapServerState) ->
+  NewPlayers = players:input(Players, Id, T),
+  NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info({timeout, _Ref, tick}, State) ->
+handle_info({timeout, _Ref, tick}, #map_server_state{map_rect = MapRect, players = Players} = MapServerState) ->
   TimeA = erlang:system_time(),
-  NewState = players:update(State, ?TICK_RATE / 1000.0),
+  NewPlayers = players:update(Players, ?TICK_RATE / 1000.0, MapRect),
+  NewState = MapServerState#map_server_state{players = NewPlayers},
   TimeB = erlang:system_time(),
-  TimeDiff = TimeB - TimeA,
+  _ = TimeB - TimeA,
   schedule_next_tick(),
   {noreply, NewState};
 handle_info(timeout, State) ->
