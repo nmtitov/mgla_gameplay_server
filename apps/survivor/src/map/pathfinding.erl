@@ -37,5 +37,5 @@ next_point(A, B, Dt, Speed, MapRect, Blocks) ->
 
 accessible(Point, MapRect, Blocks) ->
   InsideMapRect = rect:contains(MapRect, Point),
-  InsideBlock = lists:any(fun(_) -> false end, Blocks),
+  InsideBlock = lists:any(fun(B) -> rect:contains(B, Point) end, Blocks),
   InsideMapRect and (not InsideBlock).
