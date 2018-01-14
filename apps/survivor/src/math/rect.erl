@@ -10,7 +10,7 @@
 -author("nt").
 
 %% API
--export([rect/2, contains/2, intersects_line/3]).
+-export([rect/2, contains/2, intersects_line/3, vertices/1]).
 
 -type rect() :: {{float(), float()}, {float(), float()}}.
 -export_type([rect/0]).
@@ -51,3 +51,12 @@ calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
 
 asc(X, Y) when X < Y -> {X, Y};
 asc(X, Y) -> {Y, X}.
+
+-spec vertices(R) -> [V] when R :: rect, V :: point:point().
+vertices({{OriginX, OriginY}, {W, H}}) ->
+  [
+    point:point(OriginX, OriginY),
+    point:point(OriginX + W, OriginY),
+    point:point(OriginX + W, OriginY + H),
+    point:point(OriginX, OriginY + H)
+  ].
