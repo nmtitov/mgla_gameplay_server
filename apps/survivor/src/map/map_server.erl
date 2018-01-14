@@ -42,7 +42,7 @@ start_link() ->
 init(_) ->
   MapRect = rect:rect(point:point(0, 0), size:size(600, 1000)),
   Players = players:players(),
-  Blocks = [],
+  Blocks = map:blocks(),
   State = #map_server_state{map_rect = MapRect, players = Players, blocks = Blocks},
   {ok, State, 0}.
 

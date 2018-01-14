@@ -1,7 +1,14 @@
 -module(map).
 -author("nt").
 
--export([map/0]).
+-export([blocks/0, map/0]).
+
+-spec blocks() -> Blocks when Blocks :: [rect:rect()].
+blocks() ->
+  [rect:rect(point:point(100, 700), size:size(100, 100)),
+  rect:rect(point:point(250, 450), size:size(100, 100)),
+  rect:rect(point:point(400, 700), size:size(100, 100)),
+  rect:rect(point:point(400, 200), size:size(100, 100))].
 
 map() ->
   <<"{
