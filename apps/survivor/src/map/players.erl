@@ -25,7 +25,12 @@ players() ->
 
 add(Players, Id) ->
   P = point:point(300, 500),
-  Player = #player{id = Id, position = P, movement_speed = 100.0, update_position = true},
+  Player = #player{
+    id = Id,
+    position = P,
+    movement_speed = 100.0,
+    update_position = true
+  },
   [Player | Players].
 
 remove(Players, Id) ->
