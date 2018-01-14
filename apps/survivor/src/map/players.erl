@@ -52,8 +52,7 @@ update(State, Dt) ->
   lists:foreach(fun(#player{id = Id, position = P}) ->
     ws_send:teleport(Id, P)
   end, Update),
-  Clean = lists:map(fun(P) -> clean(P) end, Moved),
-  Clean.
+  lists:map(fun(P) -> clean(P) end, Moved).
 
 move(#player{destination = undefined} = Player, _) ->
   Player;
