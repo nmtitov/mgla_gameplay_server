@@ -10,7 +10,7 @@
 -author("nt").
 
 %% API
--export([rect/2, contains/2, intersects_line/3, vertices/1, wrapper/1]).
+-export([rect/2, contains/2, intersects_line/3, vertices/1]).
 
 -type rect() :: {{float(), float()}, {float(), float()}}.
 -export_type([rect/0]).
@@ -64,7 +64,3 @@ vertices({{OriginX, OriginY}, {W, H}}) ->
     point:point(OriginX + W, OriginY + H),
     point:point(OriginX, OriginY + H)
   ].
-
--spec wrapper(R1) -> R2 when R1 :: rect(), R2 :: rect().
-wrapper({{OriginX, OriginY}, {W, H}}) ->
-  rect(point:point(OriginX - 1, OriginY - 1), size:size(W + 2, H + 2)).
