@@ -8,13 +8,16 @@
 initial_point() ->
   point:point(100, 100).
 
--spec destination_point(A, B, Blocks) -> C when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point() | undefined.
+-spec destination_point(A, B, Blocks) -> C when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
 destination_point(A, B, Blocks) ->
-%%  Intersected = lists:filter(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks),
-  case not lists:any(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks) of
-    true -> B;
-    false -> undefined
-  end.
+  Intersected = lists:filter(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks),
+  destination_point2(A, B, Intersected).
+
+-spec destination_point2(A, B, Intersected) -> C when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
+destination_point2(_, B, []) -> B;
+destination_point2(A, _, [H|_]) ->
+  [V|_] = rect:visible_vertices(H, A),
+  V.
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
   A :: point:point(),

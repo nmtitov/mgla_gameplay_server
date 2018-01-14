@@ -40,10 +40,8 @@ input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
       P#player.id == Id ->
-        case pathfinding:destination_point(P#player.position, T, Blocks) of
-          undefined -> P;
-          Destination -> P#player{destination = Destination}
-        end;
+        D = pathfinding:destination_point(P#player.position, T, Blocks),
+        P#player{destination = D};
       true -> P
     end
   end, Players).
