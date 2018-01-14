@@ -8,17 +8,22 @@
 initial_point() ->
   point:point(0, 0).
 
--spec next_point(point:point(), point:point(), float(), float()) -> point:point() | undefined.
-next_point(Current, Target, Dt, Speed) ->
+-spec next_point(A, B, Dt, Speed) -> NextPoint when
+  A :: point:point(),
+  B :: point:point(),
+  Dt :: float(),
+  Speed :: float(),
+  NextPoint :: point:point() | undefined.
+next_point(A, B, Dt, Speed) ->
   Distance = Dt * Speed,
-  Unit = vec:unit(vec:vec_from_points(Current, Target)),
+  Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
-  NewPoint = point:translate(Current, Offset),
-  CurrentDistanceToTarget = point:distance(Current, Target),
-  NewDistanceToTarget = point:distance(NewPoint, Target),
+  NextPoint = point:translate(A, Offset),
+  CurrentDistanceToTarget = point:distance(A, B),
+  NewDistanceToTarget = point:distance(NextPoint, B),
   if
     NewDistanceToTarget < CurrentDistanceToTarget ->
-      NewPoint;
+      NextPoint;
     true ->
       undefined
   end.
