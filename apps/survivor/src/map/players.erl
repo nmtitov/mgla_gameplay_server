@@ -8,7 +8,14 @@
   position :: point:point(),
   speed :: float(),
   target :: point:point() | undefined,
-  update_position = false :: boolean()
+  update_position = false :: boolean(),
+  health :: integer(),
+  health_regen :: pos_integer(),
+  mana :: integer(),
+  mana_regen :: integer(),
+  attack_speed :: float(),
+  attack_range :: float(),
+  attack_damage :: integer()
 }).
 -opaque player() :: #player{}.
 -export_type([player/0]).
