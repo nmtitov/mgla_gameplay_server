@@ -46,6 +46,8 @@ intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
   end.
 
 -spec calculate_y_for_x(X, A, B) -> Y when X :: float(), A :: point:point(), B :: point:point(), Y :: float().
+calculate_y_for_x(_, {X1, _}, {X1, _}) ->
+  error(badarg);
 calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
   ((X - X1) / (X2 - X1)) * (Y2 - Y1) + Y1.
 
