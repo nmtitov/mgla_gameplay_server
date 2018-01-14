@@ -6,8 +6,8 @@
 -record(player, {
   id :: integer(),
   position :: point:point(),
-  speed :: float(),
-  target :: point:point() | undefined,
+  movement_speed :: float(),
+  destination :: point:point() | undefined,
   update_position = false :: boolean(),
   health :: integer(),
   health_regen :: pos_integer(),
@@ -25,7 +25,7 @@ players() ->
 
 add(Players, Id) ->
   P = point:point(300, 500),
-  Player = #player{id = Id, position = P, speed = 100.0, update_position = true},
+  Player = #player{id = Id, position = P, movement_speed = 100.0, update_position = true},
   [Player | Players].
 
 remove(Players, Id) ->
@@ -34,7 +34,7 @@ remove(Players, Id) ->
 input(Players, Id, T) ->
   lists:map(fun(P) ->
     if
-      P#player.id == Id -> P#player{target = T};
+      P#player.id == Id -> P#player{destination = T};
       true -> P
     end
   end, Players).
@@ -50,12 +50,12 @@ update(State, Dt) ->
   Clean = lists:map(fun(P) -> clean(P) end, Moved),
   Clean.
 
-move(#player{target = undefined} = Player, _) ->
+move(#player{destination = undefined} = Player, _) ->
   Player;
-move(#player{position = P, target = T, speed = S} = Player, Dt) ->
-  case pathfinding:next_point(P, T, S, Dt) of
+move(#player{position = A, destination = B, movement_speed = S} = Player, Dt) ->
+  case pathfinding:next_point(A, B, S, Dt) of
     undefined ->
-      Player#player{target = undefined};
+      Player#player{destination = undefined};
     New ->
       Player#player{position = New, update_position = true}
   end.
