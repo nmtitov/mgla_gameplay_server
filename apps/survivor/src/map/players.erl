@@ -24,7 +24,7 @@ players() ->
   [].
 
 add(Players, Id) ->
-  P = point:point(300, 500),
+  P = point:point(100, 100),
   Player = #player{
     id = Id,
     position = P,
