@@ -9,13 +9,13 @@
   movement_speed :: float(),
   destination :: point:point() | undefined,
   update_position = false :: boolean(),
-  health :: integer(),
-  health_regen :: pos_integer(),
-  mana :: integer(),
-  mana_regen :: integer(),
-  attack_speed :: float(),
-  attack_range :: float(),
-  attack_damage :: integer()
+  health = 0 :: integer(),
+  health_regen = 0 :: non_neg_integer(),
+  mana = 0 :: integer(),
+  mana_regen = 0 :: non_neg_integer(),
+  attack_speed = 0.0 :: float(),
+  attack_range = 0.0 :: float(),
+  attack_damage = 0 :: integer()
 }).
 -opaque player() :: #player{}.
 -export_type([player/0]).
