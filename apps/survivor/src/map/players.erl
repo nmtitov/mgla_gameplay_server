@@ -1,7 +1,7 @@
 -module(players).
 -author("nt").
 
--export([players/0, add/2, remove/2, update/3, input/3]).
+-export([players/0, add/2, remove/2, update/4, input/3]).
 
 -record(player, {
   id :: integer(),
@@ -44,8 +44,8 @@ input(Players, Id, T) ->
     end
   end, Players).
 
-update(State, Dt, MapRect) ->
-  Moved = lists:map(fun(P) -> move(P, Dt, MapRect) end, State),
+update(State, Dt, MapRect, Blocks) ->
+  Moved = lists:map(fun(P) -> move(P, Dt, MapRect, Blocks) end, State),
   Update = lists:filter(fun(#player{update_position = Update}) ->
     Update == true
   end, Moved),
@@ -54,10 +54,10 @@ update(State, Dt, MapRect) ->
   end, Update),
   lists:map(fun(P) -> clean(P) end, Moved).
 
-move(#player{destination = undefined} = Player, _, _) ->
+move(#player{destination = undefined} = Player, _, _, _) ->
   Player;
-move(#player{position = A, destination = B, movement_speed = S} = Player, Dt, MapRect) ->
-  case pathfinding:next_point(A, B, S, Dt, MapRect) of
+move(#player{position = A, destination = B, movement_speed = S} = Player, Dt, MapRect, Blocks) ->
+  case pathfinding:next_point(A, B, S, Dt, MapRect, Blocks) of
     undefined ->
       Player#player{destination = undefined};
     New ->
