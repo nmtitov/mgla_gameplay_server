@@ -10,7 +10,7 @@
 -author("nt").
 
 %% API
--export([rect/2, contains/2, intersects_line/3, vertices/1]).
+-export([rect/2, contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
 
 -type rect() :: {{float(), float()}, {float(), float()}}.
 -export_type([rect/0]).
@@ -64,3 +64,7 @@ vertices({{OriginX, OriginY}, {W, H}}) ->
     point:point(OriginX + W, OriginY + H),
     point:point(OriginX, OriginY + H)
   ].
+
+-spec visible_vertices(B, From) -> [V] when B :: rect(), From ::point:point(), V :: point:point().
+visible_vertices(B, From) ->
+  lists:filter(fun(V) -> not intersects_line(B, From, V) end, vertices(B)).
