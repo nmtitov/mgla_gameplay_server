@@ -1,13 +1,13 @@
 -module(players).
 -author("nt").
 
--export([players/0, add/2, remove/2, update/3, input/3]).
+-export([players/0, add/2, remove/2, update/4, input/4]).
 
 -record(player, {
   id :: integer(),
   position :: point:point(),
   movement_speed :: float(),
-  destination :: point:point() | undefined,
+  path :: [point:point()],
   update_position = false :: boolean(),
   health = 0 :: integer(),
   health_regen = 0 :: non_neg_integer(),
@@ -24,11 +24,12 @@ players() ->
   [].
 
 add(Players, Id) ->
-  P = point:point(300, 500),
+  P = pathfinding:initial_point(),
   Player = #player{
     id = Id,
     position = P,
     movement_speed = 100.0,
+    path = [],
     update_position = true
   },
   [Player | Players].
@@ -36,16 +37,18 @@ add(Players, Id) ->
 remove(Players, Id) ->
   lists:filter(fun(P) -> P#player.id =/= Id end, Players).
 
-input(Players, Id, T) ->
+input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
-      P#player.id == Id -> P#player{destination = T};
+      P#player.id == Id ->
+        Path = pathfinding:destination_point(P#player.position, T, Blocks),
+        P#player{path = Path};
       true -> P
     end
   end, Players).
 
-update(State, Dt, MapRect) ->
-  Moved = lists:map(fun(P) -> move(P, Dt, MapRect) end, State),
+update(State, Dt, MapRect, Blocks) ->
+  Moved = lists:map(fun(P) -> move(P, Dt, MapRect, Blocks) end, State),
   Update = lists:filter(fun(#player{update_position = Update}) ->
     Update == true
   end, Moved),
@@ -54,12 +57,12 @@ update(State, Dt, MapRect) ->
   end, Update),
   lists:map(fun(P) -> clean(P) end, Moved).
 
-move(#player{destination = undefined} = Player, _, _) ->
+move(#player{path = []} = Player, _, _, _) ->
   Player;
-move(#player{position = A, destination = B, movement_speed = S} = Player, Dt, MapRect) ->
-  case pathfinding:next_point(A, B, S, Dt, MapRect) of
+move(#player{position = A, path = [B|Tail], movement_speed = S} = Player, Dt, MapRect, Blocks) ->
+  case pathfinding:next_point(A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-      Player#player{destination = undefined};
+      Player#player{path = Tail};
     New ->
       Player#player{position = New, update_position = true}
   end.

@@ -18,7 +18,8 @@
 
 -record(map_server_state, {
     map_rect :: rect:rect(),
-    players :: [players:player()]
+    players :: [players:player()],
+    blocks :: [rect:rect()]
 }).
 
 -spec enter(non_neg_integer()) -> ok.
@@ -41,7 +42,8 @@ start_link() ->
 init(_) ->
   MapRect = rect:rect(point:point(0, 0), size:size(600, 1000)),
   Players = players:players(),
-  State = #map_server_state{map_rect = MapRect, players = Players},
+  Blocks = map:blocks(),
+  State = #map_server_state{map_rect = MapRect, players = Players, blocks = Blocks},
   {ok, State, 0}.
 
 handle_call(_Request, _From, State) ->
@@ -58,16 +60,16 @@ handle_cast({leave, Id}, #map_server_state{players = Players} = MapServerState) 
   ws_send:leave(Id),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
-handle_cast({input, Id, T}, #map_server_state{players = Players} = MapServerState) ->
-  NewPlayers = players:input(Players, Id, T),
+handle_cast({input, Id, T}, #map_server_state{players = Players, blocks = Blocks} = MapServerState) ->
+  NewPlayers = players:input(Players, Id, T, Blocks),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info({timeout, _Ref, tick}, #map_server_state{map_rect = MapRect, players = Players} = MapServerState) ->
+handle_info({timeout, _Ref, tick}, #map_server_state{map_rect = MapRect, players = Players, blocks = Blocks} = MapServerState) ->
   TimeA = erlang:system_time(),
-  NewPlayers = players:update(Players, ?TICK_RATE / 1000.0, MapRect),
+  NewPlayers = players:update(Players, ?TICK_RATE / 1000.0, MapRect, Blocks),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
