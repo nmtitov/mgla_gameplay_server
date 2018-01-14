@@ -2,7 +2,7 @@
 -author("nt").
 
 %% API
--export([initial_point/0, next_point/6, destination_point/3]).
+-export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
 
 -spec initial_point() -> point:point().
 initial_point() ->
@@ -28,9 +28,10 @@ do_destination_point(A, B, [Block|_]) ->
   [VH|VT] = Vertices,
   InternalEdges = lists:zip(Vertices, VT ++ [VH]),
   lists:foreach(fun({From, To}) -> digraph:add_edge(G, From, To), digraph:add_edge(G, To, From) end, InternalEdges),
-  Path = digraph:get_short_path(G, A, B),
-  [_|Tail] = Path,
-  Tail.
+  case digraph:get_short_path(G, A, B) of
+    false -> [B];
+    [_|Tail] -> Tail
+  end.
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
   A :: point:point(),
