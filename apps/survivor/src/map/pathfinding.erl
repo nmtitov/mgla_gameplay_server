@@ -20,22 +20,19 @@ next_point(A, B, Dt, Speed, MapRect, Blocks) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
-  NextPoint = point:translate(A, Offset),
-  case accessible(NextPoint, MapRect, Blocks) of
-    true ->
-      CurrentDistanceToTarget = point:distance(A, B),
-      NewDistanceToTarget = point:distance(NextPoint, B),
-      if
-        NewDistanceToTarget < CurrentDistanceToTarget ->
-          NextPoint;
-        true ->
-          undefined
-      end;
-    false ->
-      undefined
+  Suggested = point:translate(A, Offset),
+  case accessible(Suggested, MapRect, Blocks) of
+    true -> validate(A, B, Suggested);
+    false -> undefined
   end.
 
 accessible(Point, MapRect, Blocks) ->
   InsideMapRect = rect:contains(MapRect, Point),
   InsideBlock = lists:any(fun(B) -> rect:contains(B, Point) end, Blocks),
   InsideMapRect and (not InsideBlock).
+
+validate(A, B, Suggested) ->
+  case point:distance(Suggested, B) < point:distance(A, B) of
+    true -> Suggested;
+    false -> undefined
+  end.
