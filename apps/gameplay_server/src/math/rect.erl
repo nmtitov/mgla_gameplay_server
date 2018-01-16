@@ -15,7 +15,7 @@
 -type rect() :: {{float(), float()}, {float(), float()}}.
 -export_type([rect/0]).
 
--spec rect(Origin, Size) -> Rect when Origin :: {number(), number()}, Size :: size:size(), Rect :: rect().
+-spec rect(Origin, Size) -> Rect when Origin :: {number(), number()}, Size :: {number(), number()}, Rect :: rect().
 rect(Origin, Size) -> {Origin, Size}.
 
 -spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: {number(), number()}.
@@ -45,7 +45,7 @@ intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
       end
   end.
 
-%% P0 = {0, 0). S = size:size(10, 10). R = rect:rect(P0, S). PX1 = {0, -5). PX2 = {0, 0). P1 = {5, -5). P2 = {5, 0). A = {-20, -20). B = {20, 20). In = {5,5). Blocks = [R].
+%% P0 = {0, 0). S = {10, 10). R = rect:rect(P0, S). PX1 = {0, -5). PX2 = {0, 0). P1 = {5, -5). P2 = {5, 0). A = {-20, -20). B = {20, 20). In = {5,5). Blocks = [R].
 
 -spec calculate_y_for_x(X, A, B) -> Y when X :: float(), A :: {number(), number()}, B :: {number(), number()}, Y :: float().
 calculate_y_for_x(_, {X1, _}, {X1, _}) ->
