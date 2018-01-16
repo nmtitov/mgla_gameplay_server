@@ -6,7 +6,7 @@
 
 -spec initial_point() -> {number(), number()}.
 initial_point() ->
-  {100, 100}.
+  {400, 100}.
 
 -spec destination_point(A, B, Blocks) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Blocks :: [rect:rect()], C :: {number(), number()}.
 destination_point(A, B, Blocks) ->
