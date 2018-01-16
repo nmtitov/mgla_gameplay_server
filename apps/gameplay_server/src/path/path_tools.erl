@@ -45,7 +45,7 @@ next_point(A, B, Dt, Speed, MapRect, Blocks) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
-  Suggested = point_tools:translate(A, Offset),
+  Suggested = point:translate(A, Offset),
   case accessible(Suggested, MapRect, Blocks) of
     true -> validate(A, B, Suggested);
     false -> undefined
@@ -57,7 +57,7 @@ accessible(Point, MapRect, Blocks) ->
   InsideMapRect and (not InsideBlock).
 
 validate(A, B, Suggested) ->
-  case point_tools:distance(Suggested, B) < point_tools:distance(A, B) of
+  case point:distance(Suggested, B) < point:distance(A, B) of
     true -> Suggested;
     false -> undefined
   end.

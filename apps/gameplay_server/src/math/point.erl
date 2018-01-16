@@ -1,4 +1,4 @@
--module(point_tools).
+-module(point).
 -author("nt").
 
 -export([distance/2, translate/2]).
