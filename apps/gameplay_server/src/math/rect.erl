@@ -10,13 +10,10 @@
 -author("nt").
 
 %% API
--export([rect/2, contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
+-export([contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
 
--type rect() :: {{float(), float()}, {float(), float()}}.
+-type rect() :: {{number(), number()}, {number(), number()}}.
 -export_type([rect/0]).
-
--spec rect(Origin, Size) -> Rect when Origin :: {number(), number()}, Size :: {number(), number()}, Rect :: rect().
-rect(Origin, Size) -> {Origin, Size}.
 
 -spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: {number(), number()}.
 contains({{OriginX, OriginY}, {W, H}}, {X, Y}) -> ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).

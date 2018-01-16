@@ -40,7 +40,7 @@ start_link() ->
 %% Callbacks
 
 init(_) ->
-  MapRect = rect:rect({0, 0}, {600, 1000}),
+  MapRect = {{0, 0}, {600, 1000}},
   Players = players:players(),
   Blocks = map_tools:blocks(),
   State = #map_server_state{map_rect = MapRect, players = Players, blocks = Blocks},
