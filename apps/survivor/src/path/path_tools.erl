@@ -1,4 +1,4 @@
--module(pathfinding).
+-module(path_tools).
 -author("nt").
 
 %% API

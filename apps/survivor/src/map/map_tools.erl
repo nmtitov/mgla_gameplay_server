@@ -1,4 +1,4 @@
--module(map).
+-module(map_tools).
 -author("nt").
 
 -export([blocks/0, map/0]).

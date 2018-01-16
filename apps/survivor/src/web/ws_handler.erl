@@ -22,7 +22,7 @@ websocket_init(_) ->
 
 websocket_handle({text, M}, #state{id = Id} = State) ->
   Term = jsx:decode(M),
-  case ws_receive:get_type_body(Term) of
+  case ws_receive:get_type_and_body(Term) of
     {<<"input">>, Body} ->
       P = ws_receive:get_input(Body),
       map_server:input(Id, P);
