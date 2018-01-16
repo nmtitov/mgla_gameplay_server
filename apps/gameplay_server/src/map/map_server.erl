@@ -19,7 +19,7 @@
 -record(map_server_state, {
     map_rect :: rect:rect(),
     players :: [players:player()],
-    blocks :: [rect:rect()]
+    blocks :: [map_tools:block()]
 }).
 
 -spec enter(non_neg_integer()) -> ok.

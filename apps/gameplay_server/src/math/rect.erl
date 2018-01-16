@@ -8,6 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(rect).
 -author("nt").
+-include("../map/block.hrl").
 
 %% API
 -export([contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
@@ -54,6 +55,6 @@ vertices({{OriginX, OriginY}, {W, H}}) ->
     {OriginX, OriginY + H}
   ].
 
--spec visible_vertices(R, A) -> [V] when R :: rect(), A :: {number(), number()}, V :: {number(), number()}.
-visible_vertices(R, A) ->
-  lists:filter(fun(V) -> not intersects_line(R, A, V) end, vertices(R)).
+-spec visible_vertices(Block, A) -> [V] when Block :: block(), A :: {number(), number()}, V :: {number(), number()}.
+visible_vertices(#block{rect = R, graph_vertices = Vs}, A) ->
+  lists:filter(fun(V) -> not intersects_line(R, A, V) end, Vs).

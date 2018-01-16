@@ -1,16 +1,25 @@
 -module(map_tools).
 -author("nt").
-
+-include("block.hrl").
 -export([blocks/0, map/0]).
 
--spec blocks() -> Blocks when Blocks :: [rect:rect()].
+-spec blocks() -> Blocks when Blocks :: [block()].
 blocks() ->
   [
-    {{100, 700}, {100, 100}},
-    {{250, 450}, {100, 100}},
-    {{400, 700}, {100, 100}},
-    {{400, 200}, {100, 100}}
+    block({{100, 700}, {100, 100}}),
+    block({{250, 450}, {100, 100}}),
+    block({{400, 700}, {100, 100}}),
+    block({{400, 200}, {100, 100}})
   ].
+
+-spec block(A) -> B when A :: rect:rect(), B :: block().
+block({{X, Y}, {W, H}} = R) ->
+  #block{rect = R, graph_vertices = [
+    {X - 1, Y - 1},
+    {X + W + 1, Y - 1},
+    {X + W + 1, Y + H + 1},
+    {X - 1, Y + H + 1}
+  ]}.
 
 map() ->
   <<"{

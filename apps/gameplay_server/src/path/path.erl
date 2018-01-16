@@ -1,5 +1,6 @@
 -module(path).
 -author("nt").
+-include("../map/block.hrl").
 
 %% API
 -export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
@@ -10,13 +11,13 @@ initial_point() ->
 
 -spec destination_point(A, B, Blocks) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Blocks :: [rect:rect()], C :: {number(), number()}.
 destination_point(A, B, Blocks) ->
-  Intersected = lists:filter(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks),
+  Intersected = lists:filter(fun(#block{rect = R}) -> rect:intersects_line(R, A, B) end, Blocks),
   do_destination_point(A, B, Intersected).
 
 -spec do_destination_point(A, B, Intersected) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Intersected :: [rect:rect()], C :: {number(), number()}.
 do_destination_point(_, B, []) -> [B];
 do_destination_point(A, B, [Block|_]) ->
-  Vertices = rect:vertices(Block),
+  Vertices = Block#block.graph_vertices,
   VisibleFromA = rect:visible_vertices(Block, A),
   VisibleFromB = rect:visible_vertices(Block, B),
   G = digraph:new(),
@@ -53,7 +54,7 @@ next_point(A, B, Dt, Speed, MapRect, Blocks) ->
 
 accessible(Point, MapRect, Blocks) ->
   InsideMapRect = rect:contains(MapRect, Point),
-  InsideBlock = lists:any(fun(B) -> rect:contains(B, Point) end, Blocks),
+  InsideBlock = lists:any(fun(#block{rect = R}) -> rect:contains(R, Point) end, Blocks),
   InsideMapRect and (not InsideBlock).
 
 validate(A, B, Suggested) ->
