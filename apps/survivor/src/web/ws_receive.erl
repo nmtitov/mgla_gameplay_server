@@ -1,12 +1,10 @@
 -module(ws_receive).
 -author("nt").
 
--export([decode/1, input/1]).
+-export([get_type_body/1, get_input/1]).
 
-decode(Message) ->
-  io:format("~p~n", [Message]),
-  [{<<"type">>, Type}, {<<"body">>, Body}] = jsx:decode(Message),
+get_type_body([{<<"type">>, Type}, {<<"body">>, Body}]) when is_bitstring(Type) ->
   {Type, Body}.
 
-input([{<<"y">>, Y}, {<<"x">>, X}]) ->
+get_input([{<<"y">>, Y}, {<<"x">>, X}]) when is_float(X), is_float(Y) ->
   point:point(X, Y).

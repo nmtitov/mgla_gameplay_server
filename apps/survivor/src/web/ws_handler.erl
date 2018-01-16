@@ -21,15 +21,15 @@ websocket_init(_) ->
   {ok, #state{id = Id}}.
 
 websocket_handle({text, M}, #state{id = Id} = State) ->
-  case ws_receive:decode(M) of
+  Term = jsx:decode(M),
+  case ws_receive:get_type_body(Term) of
     {<<"input">>, Body} ->
-      P = ws_receive:input(Body),
+      P = ws_receive:get_input(Body),
       map_server:input(Id, P);
     {<<"enter">>, _} ->
       map_server:enter(Id);
     {<<"leave">>, _} ->
-      map_server:leave(Id);
-    _ -> ok
+      map_server:leave(Id)
   end,
   {ok, State};
 websocket_handle(_Data, State) ->
