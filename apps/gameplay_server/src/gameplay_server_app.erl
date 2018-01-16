@@ -1,4 +1,4 @@
--module(survivor_app).
+-module(gameplay_server_app).
 
 -behaviour(application).
 
@@ -16,10 +16,10 @@ start(_StartType, _StartArgs) ->
   TransOpts = [{ip, {0,0,0,0}}, {port, 8080}],
   ProtoOpts = #{env => #{dispatch => Dispatch}},
 
-  {ok, _} = cowboy:start_clear(survivor, TransOpts, ProtoOpts),
+  {ok, _} = cowboy:start_clear(gameplay_server_cowboy_listener, TransOpts, ProtoOpts),
   id_server:start_link(),
   map_server:start_link(),
-  survivor_sup:start_link().
+  gameplay_server_sup:start_link().
 
 stop(_State) ->
   ok.

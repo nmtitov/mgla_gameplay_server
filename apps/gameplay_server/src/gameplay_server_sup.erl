@@ -1,4 +1,4 @@
--module(survivor_sup).
+-module(gameplay_server_sup).
 -behaviour(supervisor).
 -export([start_link/0, init/1]).
 

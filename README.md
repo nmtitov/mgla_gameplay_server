@@ -1,4 +1,4 @@
-survivor
+gameplay_server
 =====
 
 An OTP application

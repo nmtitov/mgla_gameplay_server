@@ -1,6 +1,6 @@
--sname survivor
+-sname gameplay_server
 
--setcookie survivor_cookie
+-setcookie gameplay_server_cookie
 
 +K true
 +A30

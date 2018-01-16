@@ -27,7 +27,7 @@ enter(Id) ->
   gproc:send(ws_handler:players_broadcast_key(), {send, M}).
 
 map(Id) ->
-  gproc:send(ws_handler:players_key(Id), {send, map:map()}).
+  gproc:send(ws_handler:players_key(Id), {send, map_tools:map()}).
 
 leave(Id) ->
   M = jsx:encode(#{
