@@ -3,7 +3,7 @@
 
 -export([enter/1, map/1, leave/1, teleport/2]).
 
--spec teleport(id_server:id(), point:point()) -> ok.
+-spec teleport(id_server:id(), {number(), number()}) -> ok.
 teleport(Id, {X, Y}) ->
   M = jsx:encode(#{
     type => teleport,

@@ -10,7 +10,7 @@
 vec(X, Y) ->
   {float(X), float(Y)}.
 
--spec vec_from_points(point:point(), point:point()) -> vec().
+-spec vec_from_points({number(), number()}, {number(), number()}) -> vec().
 vec_from_points({X1, Y1}, {X2, Y2}) ->
   vec:vec(X2 - X1, Y2 - Y1).
 

@@ -7,4 +7,4 @@ get_type_and_body([{<<"type">>, Type}, {<<"body">>, Body}]) when is_bitstring(Ty
   {Type, Body}.
 
 get_input([{<<"y">>, Y}, {<<"x">>, X}]) when is_float(X), is_float(Y) ->
-  point:point(X, Y).
+  {X, Y}.

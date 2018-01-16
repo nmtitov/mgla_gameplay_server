@@ -6,10 +6,10 @@
 -spec blocks() -> Blocks when Blocks :: [rect:rect()].
 blocks() ->
   [
-    rect:rect(point:point(100, 700), size:size(100, 100)),
-    rect:rect(point:point(250, 450), size:size(100, 100)),
-    rect:rect(point:point(400, 700), size:size(100, 100)),
-    rect:rect(point:point(400, 200), size:size(100, 100))
+    rect:rect({100, 700}, size:size(100, 100)),
+    rect:rect({250, 450}, size:size(100, 100)),
+    rect:rect({400, 700}, size:size(100, 100)),
+    rect:rect({400, 200}, size:size(100, 100))
   ].
 
 map() ->

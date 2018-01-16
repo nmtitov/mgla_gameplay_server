@@ -4,16 +4,16 @@
 %% API
 -export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
 
--spec initial_point() -> point:point().
+-spec initial_point() -> {number(), number()}.
 initial_point() ->
-  point:point(100, 100).
+  {100, 100}.
 
--spec destination_point(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
+-spec destination_point(A, B, Blocks) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Blocks :: [rect:rect()], C :: {number(), number()}.
 destination_point(A, B, Blocks) ->
   Intersected = lists:filter(fun(Block) -> rect:intersects_line(Block, A, B) end, Blocks),
   do_destination_point(A, B, Intersected).
 
--spec do_destination_point(A, B, Intersected) -> [C] when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
+-spec do_destination_point(A, B, Intersected) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Intersected :: [rect:rect()], C :: {number(), number()}.
 do_destination_point(_, B, []) -> [B];
 do_destination_point(A, B, [Block|_]) ->
   Vertices = rect:vertices(Block),
@@ -34,18 +34,18 @@ do_destination_point(A, B, [Block|_]) ->
   end.
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
-  A :: point:point(),
-  B :: point:point(),
+  A :: {number(), number()},
+  B :: {number(), number()},
   Dt :: float(),
   Speed :: float(),
   MapRect :: rect:rect(),
   Blocks :: [rect:rect()],
-  NextPoint :: point:point() | undefined.
+  NextPoint :: {number(), number()} | undefined.
 next_point(A, B, Dt, Speed, MapRect, Blocks) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
-  Suggested = point:translate(A, Offset),
+  Suggested = point_tools:translate(A, Offset),
   case accessible(Suggested, MapRect, Blocks) of
     true -> validate(A, B, Suggested);
     false -> undefined
@@ -57,7 +57,7 @@ accessible(Point, MapRect, Blocks) ->
   InsideMapRect and (not InsideBlock).
 
 validate(A, B, Suggested) ->
-  case point:distance(Suggested, B) < point:distance(A, B) of
+  case point_tools:distance(Suggested, B) < point_tools:distance(A, B) of
     true -> Suggested;
     false -> undefined
   end.

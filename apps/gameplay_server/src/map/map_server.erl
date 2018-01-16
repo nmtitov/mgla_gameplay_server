@@ -30,7 +30,7 @@ enter(Id) ->
 leave(Id) ->
   gen_server:cast(?SERVER, {leave, Id}).
 
--spec input(non_neg_integer(), point:point()) -> ok.
+-spec input(non_neg_integer(), {number(), number()}) -> ok.
 input(Id, P) ->
   gen_server:cast(?SERVER, {input, Id, P}).
 
@@ -40,7 +40,7 @@ start_link() ->
 %% Callbacks
 
 init(_) ->
-  MapRect = rect:rect(point:point(0, 0), size:size(600, 1000)),
+  MapRect = rect:rect({0, 0}, size:size(600, 1000)),
   Players = players:players(),
   Blocks = map_tools:blocks(),
   State = #map_server_state{map_rect = MapRect, players = Players, blocks = Blocks},

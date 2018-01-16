@@ -15,10 +15,10 @@
 -type rect() :: {{float(), float()}, {float(), float()}}.
 -export_type([rect/0]).
 
--spec rect(Origin, Size) -> Rect when Origin :: point:point(), Size :: size:size(), Rect :: rect().
+-spec rect(Origin, Size) -> Rect when Origin :: {number(), number()}, Size :: size:size(), Rect :: rect().
 rect(Origin, Size) -> {Origin, Size}.
 
--spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: point:point().
+-spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: {number(), number()}.
 contains({{OriginX, OriginY}, {W, H}}, {X, Y}) -> ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).
 
 intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
@@ -45,9 +45,9 @@ intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
       end
   end.
 
-%% P0 = point:point(0, 0). S = size:size(10, 10). R = rect:rect(P0, S). PX1 = point:point(0, -5). PX2 = point:point(0, 0). P1 = point:point(5, -5). P2 = point:point(5, 0). A = point:point(-20, -20). B = point:point(20, 20). In = point:point(5,5). Blocks = [R].
+%% P0 = {0, 0). S = size:size(10, 10). R = rect:rect(P0, S). PX1 = {0, -5). PX2 = {0, 0). P1 = {5, -5). P2 = {5, 0). A = {-20, -20). B = {20, 20). In = {5,5). Blocks = [R].
 
--spec calculate_y_for_x(X, A, B) -> Y when X :: float(), A :: point:point(), B :: point:point(), Y :: float().
+-spec calculate_y_for_x(X, A, B) -> Y when X :: float(), A :: {number(), number()}, B :: {number(), number()}, Y :: float().
 calculate_y_for_x(_, {X1, _}, {X1, _}) ->
   error(badarg);
 calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
@@ -56,15 +56,15 @@ calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
 asc(X, Y) when X < Y -> {X, Y};
 asc(X, Y) -> {Y, X}.
 
--spec vertices(R) -> [V] when R :: rect(), V :: point:point().
+-spec vertices(R) -> [V] when R :: rect(), V :: {number(), number()}.
 vertices({{OriginX, OriginY}, {W, H}}) ->
   [
-    point:point(OriginX, OriginY),
-    point:point(OriginX + W, OriginY),
-    point:point(OriginX + W, OriginY + H),
-    point:point(OriginX, OriginY + H)
+    {OriginX, OriginY},
+    {OriginX + W, OriginY},
+    {OriginX + W, OriginY + H},
+    {OriginX, OriginY + H}
   ].
 
--spec visible_vertices(B, From) -> [V] when B :: rect(), From ::point:point(), V :: point:point().
+-spec visible_vertices(B, From) -> [V] when B :: rect(), From :: {number(), number()}, V :: {number(), number()}.
 visible_vertices(B, From) ->
   lists:filter(fun(V) -> not intersects_line(B, From, V) end, vertices(B)).
