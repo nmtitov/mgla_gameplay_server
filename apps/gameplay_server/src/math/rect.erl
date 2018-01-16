@@ -24,24 +24,16 @@ contains({{OriginX, OriginY}, {W, H}}, {X, Y}) -> ((OriginX < X) and (X < (Origi
 intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
   RectMaxX = OriginX + W,
   RectMaxY = OriginY + H,
-  {XMin, XMax} = asc(X1, X2),
-  {YMin, YMax} = asc(Y1, Y2),
+  {LineXMin, LineXMax} = asc(X1, X2),
+  {LineYMin, LineYMax} = asc(Y1, Y2),
   if
-    (OriginX > XMax) or (RectMaxX < XMin) -> false;
+    (OriginX > LineXMax) or (RectMaxX < LineXMin) or (OriginY > LineYMax) or (RectMaxY < LineYMin) -> false;
     true ->
+      LineYAtRectOriginX = calculate_y_for_x(OriginX, A, B),
+      LineYAtRectMaxX = calculate_y_for_x(RectMaxX, A, B),
       if
-        (OriginY > YMax) or (RectMaxY < YMin) -> false;
-        true ->
-          YAtRectOrigin = calculate_y_for_x(OriginX, A, B),
-          YAtRectMax = calculate_y_for_x(RectMaxX, A, B),
-          if
-            (OriginY > YAtRectOrigin) and (OriginY > YAtRectMax) -> false;
-            true ->
-              if
-                (RectMaxY < YAtRectOrigin) and (RectMaxY < YAtRectMax) -> false;
-                true -> true
-              end
-          end
+        ((OriginY > LineYAtRectOriginX) and (OriginY > LineYAtRectMaxX)) or ((RectMaxY < LineYAtRectOriginX) and (RectMaxY < LineYAtRectMaxX)) -> false;
+        true -> true
       end
   end.
 
