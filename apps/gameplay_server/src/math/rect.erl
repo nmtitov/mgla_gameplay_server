@@ -57,6 +57,6 @@ vertices({{OriginX, OriginY}, {W, H}}) ->
     {OriginX, OriginY + H}
   ].
 
--spec visible_vertices(B, From) -> [V] when B :: rect(), From :: {number(), number()}, V :: {number(), number()}.
-visible_vertices(B, From) ->
-  lists:filter(fun(V) -> not intersects_line(B, From, V) end, vertices(B)).
+-spec visible_vertices(R, A) -> [V] when R :: rect(), A :: {number(), number()}, V :: {number(), number()}.
+visible_vertices(R, A) ->
+  lists:filter(fun(V) -> not intersects_line(R, A, V) end, vertices(R)).
