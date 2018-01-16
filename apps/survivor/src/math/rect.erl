@@ -27,18 +27,18 @@ intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
   {XMin, XMax} = asc(X1, X2),
   {YMin, YMax} = asc(Y1, Y2),
   if
-    (OriginX >= XMax) or (RectMaxX =< XMin) -> false;
+    (OriginX > XMax) or (RectMaxX < XMin) -> false;
     true ->
       if
-        (OriginY >= YMax) or (RectMaxY =< YMin) -> false;
+        (OriginY > YMax) or (RectMaxY < YMin) -> false;
         true ->
           YAtRectOrigin = calculate_y_for_x(OriginX, A, B),
           YAtRectMax = calculate_y_for_x(RectMaxX, A, B),
           if
-            (OriginY >= YAtRectOrigin) and (OriginY >= YAtRectMax) -> false;
+            (OriginY > YAtRectOrigin) and (OriginY > YAtRectMax) -> false;
             true ->
               if
-                (RectMaxY =< YAtRectOrigin) and (RectMaxY =< YAtRectMax) -> false;
+                (RectMaxY < YAtRectOrigin) and (RectMaxY < YAtRectMax) -> false;
                 true -> true
               end
           end
