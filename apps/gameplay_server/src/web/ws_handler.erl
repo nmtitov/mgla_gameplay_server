@@ -22,9 +22,9 @@ websocket_init(_) ->
   gproc:reg(players_broadcast_key()),
   {ok, #state{id = Id}}.
 
-websocket_handle({text, M}, #state{id = Id} = State) ->
-  lager:info("raw id=~p: ~p", [Id, M]),
-  Term = jsx:decode(M),
+websocket_handle({text, Message}, #state{id = Id} = State) ->
+  lager:info("inc id=~p: ~p", [Id, Message]),
+  Term = jsx:decode(Message),
   lager:info("dec id=~p: ~p", [Id, Term]),
   case ws_receive:get_type_and_body(Term) of
     {<<"input">>, Body} ->
@@ -39,7 +39,8 @@ websocket_handle({text, M}, #state{id = Id} = State) ->
 websocket_handle(_Data, State) ->
   {ok, State}.
 
-websocket_info({send, Message}, State) ->
+websocket_info({send, Message}, #state{id = Id} = State) ->
+  lager:info("out id=~p: ~p", [Id, Message]),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
   {ok, State}.
