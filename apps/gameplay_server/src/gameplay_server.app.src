@@ -8,7 +8,8 @@
         stdlib,
         cowboy,
         jsx,
-        gproc
+        gproc,
+        lager
       ]},
     {env,[]},
     {modules, []},
