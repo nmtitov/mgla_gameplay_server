@@ -26,7 +26,7 @@ players() ->
   [].
 
 add(Players, Id) ->
-  P = path:initial_point(),
+  {ok, P} = path_server:initial_point(),
   Player = #player{
     id = Id,
     position = P
@@ -40,7 +40,7 @@ handle_input(Players, Id, T, Blocks) ->
   lists:map(fun(P) ->
     if
       P#player.id == Id ->
-        Path = path:destination_point(P#player.position, T, Blocks),
+        {ok, Path} = path_server:path(P#player.position, T, Blocks),
         P#player{path = Path};
       true -> P
     end
@@ -59,10 +59,10 @@ update(State, Dt, MapRect, Blocks) ->
 move(#player{path = []} = Player, _, _, _) ->
   Player;
 move(#player{position = A, path = [B|Tail], movement_speed = S} = Player, Dt, MapRect, Blocks) ->
-  case path:next_point(A, B, S, Dt, MapRect, Blocks) of
-    undefined ->
+  case path_server:next_point(A, B, S, Dt, MapRect, Blocks) of
+    {ok, undefined} ->
       Player#player{path = Tail};
-    New ->
+    {ok, New} ->
       Player#player{position = New, update_position = true}
   end.
 

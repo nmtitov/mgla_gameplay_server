@@ -3,20 +3,20 @@
 -include("../map/header/block.hrl").
 
 %% API
--export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
+-export([initial_point/0, next_point/6, path/3]).
 
 -spec initial_point() -> point:point().
 initial_point() ->
   {400, 100}.
 
--spec destination_point(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
-destination_point(A, B, Blocks) ->
+-spec path(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
+path(A, B, Blocks) ->
   Intersected = lists:filter(fun(#block{rect = R}) -> rect:intersects_line(R, A, B) end, Blocks),
-  do_destination_point(A, B, Intersected).
+  do_path(A, B, Intersected).
 
--spec do_destination_point(A, B, Intersected) -> [C] when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
-do_destination_point(_, B, []) -> [B];
-do_destination_point(A, B, [Block|_]) ->
+-spec do_path(A, B, Intersected) -> [C] when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
+do_path(_, B, []) -> [B];
+do_path(A, B, [Block|_]) ->
   Vertices = Block#block.graph_vertices,
   VisibleFromA = rect:visible_vertices(Block, A),
   VisibleFromB = rect:visible_vertices(Block, B),
