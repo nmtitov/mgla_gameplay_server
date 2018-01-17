@@ -14,11 +14,12 @@ blocks() ->
 
 -spec block(A) -> B when A :: rect:rect(), B :: block().
 block({{X, Y}, {W, H}} = R) ->
+  Offset = 2,
   #block{rect = R, graph_vertices = [
-    {X - 1, Y - 1},
-    {X + W + 1, Y - 1},
-    {X + W + 1, Y + H + 1},
-    {X - 1, Y + H + 1}
+    {X - Offset, Y - Offset},
+    {X + W + Offset, Y - Offset},
+    {X + W + Offset, Y + H + Offset},
+    {X - Offset, Y + H + Offset}
   ]}.
 
 map() ->
