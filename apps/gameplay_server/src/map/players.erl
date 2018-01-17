@@ -47,24 +47,37 @@ handle_input(Players, Id, T, Blocks) ->
   end, Players).
 
 update(State, Dt, MapRect, Blocks) ->
-  Moved = lists:map(fun(P) -> move(P, Dt, MapRect, Blocks) end, State),
-  Update = lists:filter(fun(#player{update_position = Update}) ->
-    Update == true
-  end, Moved),
-  lists:foreach(fun(#player{id = Id, position = P}) ->
-    ws_send:broadcast_update(Id, P)
-  end, Update),
-  lists:map(fun(P) -> clean(P) end, Moved).
+  NewState = lists:map(fun(P) -> move(P, Dt, MapRect, Blocks) end, State),
+  Updated = lists:filter(fun(#player{update_position = UpdatePosition, update_state = UpdateState}) ->
+    (UpdatePosition == true) or (UpdateState == true)
+  end, NewState),
+  lists:foreach(fun(#player{id = Id, position = P, update_position = UpdatePosition, state = State, update_state = UpdateState}) ->
+    State2 = if
+               UpdateState == true -> State;
+               true -> undefined
+             end,
+    ws_send:broadcast_update(Id, P, State2)
+  end, Updated),
+  lists:map(fun(P) -> clean(P) end, NewState).
 
-move(#player{path = []} = Player, _, _, _) ->
-  Player;
-move(#player{position = A, path = [B|Tail], movement_speed = S} = Player, Dt, MapRect, Blocks) ->
+move(#player{path = [], state = State} = Player, _, _, _) ->
+  case State of
+    walk -> Player#player{state = idle, update_state = true};
+    _ -> Player
+  end;
+move(#player{position = A, path = [B|Tail], movement_speed = S, state = State} = Player, Dt, MapRect, Blocks) ->
   case path_server:next_point(A, B, S, Dt, MapRect, Blocks) of
     {ok, undefined} ->
       Player#player{path = Tail};
     {ok, New} ->
-      Player#player{position = New, update_position = true}
+      case State of
+        idle -> Player#player{position = New, update_position = true, state = walk, update_state = true};
+        _ -> Player#player{position = New, update_position = true}
+      end
   end.
 
 clean(Player) ->
-  Player#player{update_position = false}.
+  Player#player{
+    update_position = false,
+    update_state = false
+  }.

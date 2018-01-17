@@ -1,10 +1,10 @@
 -module(ws_send).
 -author("nt").
+-include("../map/header/player_state.hrl").
+-export([broadcast_enter/1, send_map/1, broadcast_leave/1, broadcast_update/3]).
 
--export([broadcast_enter/1, send_map/1, broadcast_leave/1, broadcast_update/2]).
-
--spec broadcast_update(id_server:id(), point:point()) -> ok.
-broadcast_update(Id, {X, Y}) ->
+-spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: player_state().
+broadcast_update(Id, {X, Y}, State) ->
   M = jsx:encode(#{
     type => teleport,
     body => #{
@@ -12,7 +12,11 @@ broadcast_update(Id, {X, Y}) ->
       point => #{
         x => X,
         y => Y
-      }
+      },
+      new_state => if
+                 State == undefined -> null;
+                 true -> State
+      end
     }
   }),
   gproc:send(ws_handler:players_broadcast_key(), {send, M}).
