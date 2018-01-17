@@ -10,7 +10,7 @@
 
 -record(block, {
   rect :: rect:rect(),
-  graph_vertices :: [{number(), number()}]
+  graph_vertices :: [point:point()]
 }).
 
 -type block() :: #block{}.

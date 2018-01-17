@@ -5,16 +5,16 @@
 %% API
 -export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
 
--spec initial_point() -> {number(), number()}.
+-spec initial_point() -> point:point().
 initial_point() ->
   {400, 100}.
 
--spec destination_point(A, B, Blocks) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Blocks :: [rect:rect()], C :: {number(), number()}.
+-spec destination_point(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
 destination_point(A, B, Blocks) ->
   Intersected = lists:filter(fun(#block{rect = R}) -> rect:intersects_line(R, A, B) end, Blocks),
   do_destination_point(A, B, Intersected).
 
--spec do_destination_point(A, B, Intersected) -> [C] when A :: {number(), number()}, B :: {number(), number()}, Intersected :: [rect:rect()], C :: {number(), number()}.
+-spec do_destination_point(A, B, Intersected) -> [C] when A :: point:point(), B :: point:point(), Intersected :: [rect:rect()], C :: point:point().
 do_destination_point(_, B, []) -> [B];
 do_destination_point(A, B, [Block|_]) ->
   Vertices = Block#block.graph_vertices,
@@ -35,13 +35,13 @@ do_destination_point(A, B, [Block|_]) ->
   end.
 
 -spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
-  A :: {number(), number()},
-  B :: {number(), number()},
+  A :: point:point(),
+  B :: point:point(),
   Dt :: float(),
   Speed :: float(),
   MapRect :: rect:rect(),
   Blocks :: [rect:rect()],
-  NextPoint :: {number(), number()} | undefined.
+  NextPoint :: point:point() | undefined.
 next_point(A, B, Dt, Speed, MapRect, Blocks) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),

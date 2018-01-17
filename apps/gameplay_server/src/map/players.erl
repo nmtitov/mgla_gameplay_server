@@ -5,9 +5,9 @@
 
 -record(player, {
   id :: integer(),
-  position :: {number(), number()},
+  position :: point:point(),
   movement_speed :: float(),
-  path :: [{number(), number()}],
+  path :: [point:point()],
   update_position = false :: boolean(),
   health = 0 :: integer(),
   health_regen = 0 :: non_neg_integer(),

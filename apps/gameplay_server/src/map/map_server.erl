@@ -30,7 +30,7 @@ enter(Id) ->
 leave(Id) ->
   gen_server:cast(?SERVER, {leave, Id}).
 
--spec input(non_neg_integer(), {number(), number()}) -> ok.
+-spec input(non_neg_integer(), point:point()) -> ok.
 input(Id, P) ->
   gen_server:cast(?SERVER, {input, Id, P}).
 
