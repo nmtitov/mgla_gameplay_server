@@ -6,5 +6,5 @@
 get_type_and_body([{<<"type">>, Type}, {<<"body">>, Body}]) when is_bitstring(Type) ->
   {Type, Body}.
 
-get_input([{<<"y">>, Y}, {<<"x">>, X}]) when is_float(X), is_float(Y) ->
+get_input([{<<"y">>, Y}, {<<"x">>, X}]) when is_number(X), is_number(Y) ->
   {X, Y}.
