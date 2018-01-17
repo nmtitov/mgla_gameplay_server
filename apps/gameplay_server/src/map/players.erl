@@ -6,16 +6,18 @@
 -record(player, {
   id :: integer(),
   position :: point:point(),
-  movement_speed :: float(),
-  path :: [point:point()],
-  update_position = false :: boolean(),
+  movement_speed = 100 :: float(),
+  path = [] :: [point:point()],
+  update_position = true :: boolean(),
   health = 0 :: integer(),
   health_regen = 0 :: non_neg_integer(),
   mana = 0 :: integer(),
   mana_regen = 0 :: non_neg_integer(),
   attack_speed = 0.0 :: float(),
   attack_range = 0.0 :: float(),
-  attack_damage = 0 :: integer()
+  attack_damage = 0 :: integer(),
+  state = idle :: idle | walk,
+  update_state = true :: boolean()
 }).
 -opaque player() :: #player{}.
 -export_type([player/0]).
@@ -27,10 +29,7 @@ add(Players, Id) ->
   P = path:initial_point(),
   Player = #player{
     id = Id,
-    position = P,
-    movement_speed = 100.0,
-    path = [],
-    update_position = true
+    position = P
   },
   [Player | Players].
 
