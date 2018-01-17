@@ -17,15 +17,15 @@ init(Req, Opts) ->
 
 websocket_init(_) ->
   {ok, Id} = id_server:id(),
-  io:format("Client connected: {Id=~p}~n", [Id]),
+  lager:info("[client_connected] id=~p", [Id]),
   gproc:reg(players_key(Id)),
   gproc:reg(players_broadcast_key()),
   {ok, #state{id = Id}}.
 
 websocket_handle({text, Message}, #state{id = Id} = State) ->
-  lager:info("inc id=~p: ~p", [Id, Message]),
+  lager:info("[inc] id=~p: ~p", [Id, Message]),
   Term = jsx:decode(Message),
-  lager:info("dec id=~p: ~p", [Id, Term]),
+  lager:info("[dec] id=~p: ~p", [Id, Term]),
   case ws_receive:get_type_and_body(Term) of
     {<<"input">>, Body} ->
       P = ws_receive:get_input(Body),
@@ -40,13 +40,13 @@ websocket_handle(_Data, State) ->
   {ok, State}.
 
 websocket_info({send, Message}, #state{id = Id} = State) ->
-  lager:info("out id=~p: ~p", [Id, Message]),
+  lager:info("[out] id=~p: ~p", [Id, Message]),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
   {ok, State}.
 
 terminate({error, closed}, _Req, #state{id = Id}) ->
-  io:format("Client disconnected: {Id=~p}~n", [Id]),
+  lager:info("[client_disconnected] id=~p", [Id]),
   gproc:unreg(players_key(Id)),
   gproc:unreg(players_broadcast_key()),
   map_server:leave(Id),
