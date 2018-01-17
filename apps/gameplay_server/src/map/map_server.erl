@@ -51,17 +51,17 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({enter, Id}, #map_server_state{players = Players} = MapServerState) ->
   NewPlayers = players:add(Players, Id),
-  ws_send:map(Id),
-  ws_send:enter(Id),
+  ws_send:send_map(Id),
+  ws_send:broadcast_enter(Id),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast({leave, Id}, #map_server_state{players = Players} = MapServerState) ->
   NewPlayers = players:remove(Players, Id),
-  ws_send:leave(Id),
+  ws_send:broadcast_leave(Id),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast({input, Id, T}, #map_server_state{players = Players, blocks = Blocks} = MapServerState) ->
-  NewPlayers = players:input(Players, Id, T, Blocks),
+  NewPlayers = players:handle_input(Players, Id, T, Blocks),
   NewState = MapServerState#map_server_state{players = NewPlayers},
   {noreply, NewState};
 handle_cast(_Request, State) ->

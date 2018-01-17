@@ -1,6 +1,6 @@
 -module(map_tools).
 -author("nt").
--include("block.hrl").
+-include("header/block.hrl").
 -export([blocks/0, map/0]).
 
 -spec blocks() -> Blocks when Blocks :: [block()].

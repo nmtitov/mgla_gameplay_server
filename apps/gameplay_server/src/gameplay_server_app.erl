@@ -19,7 +19,7 @@ start(_StartType, _StartArgs) ->
 
   {ok, _} = cowboy:start_clear(gameplay_server_cowboy_listener, TransOpts, ProtoOpts),
   id_server:start_link(),
-  map_server:start_link(),
+  map_sup:start_link(),
   gameplay_server_sup:start_link().
 
 stop(_State) ->
