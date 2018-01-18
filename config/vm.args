@@ -1,6 +1,0 @@
--sname gameplay_server
-
--setcookie gameplay_server_cookie
-
-+K true
-+A30

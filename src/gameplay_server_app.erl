@@ -1,5 +1,4 @@
 -module(gameplay_server_app).
--compile([{parse_transform, lager_transform}]).
 -behaviour(application).
 
 -export([start/2, stop/1]).
@@ -18,8 +17,6 @@ start(_StartType, _StartArgs) ->
   ProtoOpts = #{env => #{dispatch => Dispatch}},
 
   {ok, _} = cowboy:start_clear(gameplay_server_cowboy_listener, TransOpts, ProtoOpts),
-  id_server:start_link(),
-  map_server:start_link(),
   gameplay_server_sup:start_link().
 
 stop(_State) ->

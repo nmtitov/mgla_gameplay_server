@@ -1,16 +1,16 @@
 -module(path).
 -author("nt").
--include("../map/block.hrl").
+-include("../include/block.hrl").
 
 %% API
--export([initial_point/0, next_point/6, destination_point/3, do_destination_point/3]).
+-export([initial_point/0, next_point/6, path/3]).
 
 -spec initial_point() -> point:point().
 initial_point() ->
   {400, 100}.
 
--spec destination_point(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
-destination_point(A, B, Blocks) ->
+-spec path(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
+path(A, B, Blocks) ->
   Intersected = lists:filter(fun(#block{rect = R}) -> rect:intersects_line(R, A, B) end, Blocks),
   do_destination_point(A, B, Intersected).
 
