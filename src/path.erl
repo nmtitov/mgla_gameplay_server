@@ -1,6 +1,6 @@
 -module(path).
 -author("nt").
--include("../map/header/block.hrl").
+-include("../include/block.hrl").
 
 %% API
 -export([initial_point/0, next_point/6, path/3]).

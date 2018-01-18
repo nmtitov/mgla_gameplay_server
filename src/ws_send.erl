@@ -1,6 +1,6 @@
 -module(ws_send).
 -author("nt").
--include("../map/header/player_state.hrl").
+-include("../include/player_state.hrl").
 -export([broadcast_enter/1, send_map/1, broadcast_leave/1, broadcast_update/3]).
 
 -spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: player_state().

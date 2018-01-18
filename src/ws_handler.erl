@@ -1,6 +1,5 @@
 -module(ws_handler).
 -author("nt").
--compile([{parse_transform, lager_transform}]).
 
 -export([players_key/1, players_broadcast_key/0]).
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).

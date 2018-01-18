@@ -1,6 +1,6 @@
 -module(players).
 -author("nt").
--include("header/player_state.hrl").
+-include("../include/player_state.hrl").
 -export([players/0, add/2, remove/2, update/4, handle_input/4]).
 
 -record(player, {
@@ -51,12 +51,12 @@ update(State, Dt, MapRect, Blocks) ->
   Updated = lists:filter(fun(#player{update_position = UpdatePosition, update_state = UpdateState}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, NewState),
-  lists:foreach(fun(#player{id = Id, position = P, update_position = UpdatePosition, state = State, update_state = UpdateState}) ->
-    State2 = if
-               UpdateState == true -> State;
+  lists:foreach(fun(#player{id = Id, position = P, update_position = _, state = PlayerState, update_state = UpdateState}) ->
+    PlayerState2 = if
+               UpdateState == true -> PlayerState;
                true -> undefined
              end,
-    ws_send:broadcast_update(Id, P, State2)
+    ws_send:broadcast_update(Id, P, PlayerState2)
   end, Updated),
   lists:map(fun(P) -> clean(P) end, NewState).
 
