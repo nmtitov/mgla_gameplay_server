@@ -25,11 +25,9 @@ start() ->
   ok = application:start(syntax_tools),
   ok = application:start(goldrush),
   ok = application:start(lager),
-  ok = application:start(gameplay_server),
-  lager:info("[start]").
+  ok = application:start(gameplay_server).
 
 stop() ->
-  lager:info("[stop]"),
   ok = application:stop(gameplay_server),
   ok = application:stop(lager),
   ok = application:stop(goldrush),

@@ -20,15 +20,12 @@ init([]) ->
     intensity => 0,
     period => 1
   },
-  Children = [#{
-    id => map_server,
-    start => {map_server, start_link, []},
-    shutdown => brutal_kill,
-    modules => [map_server]
-  }, #{
-    id => path_server,
-    start => {path_server, start_link, []},
-    shutdown => brutal_kill,
-    modules => [path_server]
-  }],
+  Children = [
+    #{
+      id => map_server,
+      start => {map_server, start_link, []},
+      shutdown => brutal_kill,
+      modules => [map_server]
+    }
+  ],
   {ok, {RestartStrategy, Children}}.

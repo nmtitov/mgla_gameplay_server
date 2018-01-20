@@ -6,18 +6,18 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-  IdServer = {
-    id_server, {id_server, start_link, []},
-    permanent, 2000, worker, [id_server]
-  },
-  MapSup = {
-    map_sup, {map_sup, start_link, []},
-    permanent, 2000, worker, [map_sup]
-  },
-  PathSup = {
-    path_sup, {path_sup, start_link, []},
-    permanent, 2000, worker, [path_sup]
-  },
-  Children = [IdServer, MapSup, PathSup],
-  RestartStrategy = {one_for_one, 0, 1},
-  {ok, {RestartStrategy, Children}}.
+  SupFlags = {one_for_one, 0, 1},
+  ChildSpecs = [#{
+    id => id_server,
+    start => {id_server, start_link, []},
+    shutdown => brutal_kill
+  }, #{
+    id => map_sup,
+    start => {map_sup, start_link, []},
+    shutdown => brutal_kill
+  }, #{
+    id => factory_sup,
+    start => {factory_sup, start_link, []},
+    shutdown => brutal_kill
+  }],
+  {ok, {SupFlags, ChildSpecs}}.

@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(rect).
 -author("nt").
--include("../include/block.hrl").
+-include("../../include/block.hrl").
 
 %% API
 -export([contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
