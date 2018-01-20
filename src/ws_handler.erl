@@ -15,7 +15,7 @@ init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 websocket_init(_) ->
-  {ok, Id} = id_server:id(),
+  Id = id_server:id(),
   lager:info("[client_connected] id=~p", [Id]),
   gproc:reg(players_key(Id)),
   gproc:reg(players_broadcast_key()),
