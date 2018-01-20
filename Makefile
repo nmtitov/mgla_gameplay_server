@@ -1,7 +1,7 @@
 all: clean compile run
 
 compile:
-	erlc "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -v -o ebin/ -I src/* && cp src/gameplay_server.app.src ebin/gameplay_server.app
+	erlc "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -v -o ebin/ -I src/*.erl && cp src/gameplay_server.app.src ebin/gameplay_server.app
 
 clean:
 	rm -rf ebin/*
