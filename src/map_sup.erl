@@ -15,10 +15,20 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-  Server = {
-    map_server, {map_server, start_link, []},
-    permanent, 2000, worker, [map_server]
+  RestartStrategy = #{
+    strategy => one_for_one,
+    intensity => 0,
+    period => 1
   },
-  Children = [Server],
-  RestartStrategy = {one_for_one, 0, 1},
+  Children = [#{
+    id => map_server,
+    start => {map_server, start_link, []},
+    shutdown => brutal_kill,
+    modules => [map_server]
+  }, #{
+    id => path_server,
+    start => {path_server, start_link, []},
+    shutdown => brutal_kill,
+    modules => [path_server]
+  }],
   {ok, {RestartStrategy, Children}}.
