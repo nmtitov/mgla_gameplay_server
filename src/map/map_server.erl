@@ -42,9 +42,11 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({enter, Id}, #{players := PlayerIds} = State) ->
+handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
+  lager:info("~p:~p ~p:~p/~p", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewState = State#{players => [Id| PlayerIds]},
   ws_send:send_map(Id),
+  lager:info("id=~p", [Id]),
   ws_send:broadcast_enter(Id),
   {noreply, NewState};
 handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
@@ -55,8 +57,9 @@ handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info({timeout, _Ref, update}, #{rect := MapRect, players := PlayerIds, blocks := Blocks} = State) ->
-%%  lager:info("handle_info({timeout, _Ref, update}"),
+handle_info({timeout, _Ref, update} = Message, #{rect := MapRect, players := PlayerIds, blocks := Blocks} = State) ->
+%%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
+
   TimeA = erlang:system_time(),
 
   Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),

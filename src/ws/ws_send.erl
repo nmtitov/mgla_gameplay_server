@@ -5,7 +5,8 @@
 
 -spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: player_state().
 broadcast_update(Id, {X, Y} = Point, State) ->
-  lager:info("ws_send:broadcast_update(~p, ~p, ~p)", [Id, Point, State]),
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  lager:info("(~p, ~p, ~p)", [Id, Point, State]),
   M = jsx:encode(#{
     type => teleport,
     body => #{
@@ -23,6 +24,7 @@ broadcast_update(Id, {X, Y} = Point, State) ->
   gproc:send(ws_handler:broadcast_property(), {send, M}).
 
 broadcast_enter(Id) ->
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   M = jsx:encode(#{
     type => enter,
     body => #{
@@ -32,9 +34,11 @@ broadcast_enter(Id) ->
   gproc:send(ws_handler:broadcast_property(), {send, M}).
 
 send_map(Id) ->
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   gproc:send(ws_handler:name(Id), {send, map_tools:map()}).
 
 broadcast_leave(Id) ->
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   M = jsx:encode(#{
     type => leave,
     body => #{
