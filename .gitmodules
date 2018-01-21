@@ -4,3 +4,6 @@
 [submodule "lib/cowlib"]
 	path = lib/cowlib
 	url = https://github.com/ninenines/cowlib.git
+[submodule "lib/gproc"]
+	path = lib/gproc
+	url = https://github.com/uwiger/gproc.git
