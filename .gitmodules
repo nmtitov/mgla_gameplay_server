@@ -1,3 +1,6 @@
 [submodule "lib/cowboy"]
 	path = lib/cowboy
 	url = https://github.com/ninenines/cowboy
+[submodule "lib/cowlib"]
+	path = lib/cowlib
+	url = https://github.com/ninenines/cowlib.git
