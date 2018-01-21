@@ -68,7 +68,8 @@ init([Id]) ->
     attack_range => 0,
     attack_damage => 0,
     state => idle,
-    update_state => true
+    update_state => true,
+    xp => 0
   },
   {ok, State, 0}.
 
