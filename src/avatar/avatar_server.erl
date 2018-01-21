@@ -62,7 +62,7 @@ init([Id]) ->
     update_position => true,
     health => 100,
     health_regen => 0,
-    mana => 0,
+    mana => 100,
     mana_regen => 0,
     attack_speed => 0,
     attack_range => 0,
