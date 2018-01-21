@@ -60,7 +60,7 @@ init([Id]) ->
     movement_speed => 100,
     path => [],
     update_position => true,
-    health => 0,
+    health => 100,
     health_regen => 0,
     mana => 0,
     mana_regen => 0,
