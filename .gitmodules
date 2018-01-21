@@ -16,3 +16,6 @@
 [submodule "lib/jsx"]
 	path = lib/jsx
 	url = https://github.com/talentdeficit/jsx
+[submodule "lib/lager"]
+	path = lib/lager
+	url = https://github.com/erlang-lager/lager
