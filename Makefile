@@ -2,7 +2,7 @@ all: clean compile run
 
 cowlib:
 	rm -rf lib/cowlib/ebin/*.erl
-	erlc -o lib/cowlib/ebin -I lib/cowlib/include lib/cowlib/src/*.erl
+	erlc -o lib/cowlib/ebin lib/cowlib/src/*.erl
 
 cowboy:
 	rm -rf lib/cowboy/ebin/*.erl
