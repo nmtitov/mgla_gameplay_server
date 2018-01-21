@@ -12,24 +12,24 @@ goldrush:
 	rm -rf lib/goldrush/ebin
 	mkdir -p lib/goldrush/ebin
 	erlc -o lib/goldrush/ebin lib/goldrush/src/*.erl
-	cp lib/goldrush/src/goldrush.app.src lib/goldrush/ebin/goldrush.app.src
+	cp lib/goldrush/src/goldrush.app.src lib/goldrush/ebin/goldrush.app
 
 gproc:
 	rm -rf lib/gproc/ebin/*
 	erlc -o lib/gproc/ebin -I lib/gproc/include lib/gproc/src/*.erl
-	cp lib/gproc/src/gproc.app.src lib/gproc/ebin/gproc.app.src
+	cp lib/gproc/src/gproc.app.src lib/gproc/ebin/gproc.app
 
 jsx:
 	rm -rf lib/jsx/ebin
 	mkdir -p lib/jsx/ebin
 	erlc -o lib/jsx/ebin lib/jsx/src/*.erl
-	cp lib/jsx/src/jsx.app.src lib/jsx/ebin/jsx.app.src
+	cp lib/jsx/src/jsx.app.src lib/jsx/ebin/jsx.app
 
 lager:
 	rm -rf lib/lager/ebin
 	mkdir -p lib/lager/ebin
 	erlc -o lib/lager/ebin -I lib/lager/include lib/lager/src/*.erl
-	cp lib/lager/src/lager.app.src lib/lager/ebin/lager.app.src
+	cp lib/lager/src/lager.app.src lib/lager/ebin/lager.app
 
 ranch:
 	rm -rf lib/ranch/ebin/*.erl
