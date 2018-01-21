@@ -22,7 +22,7 @@ gproc:
 jsx:
 	rm -rf lib/jsx/ebin
 	mkdir -p lib/jsx/ebin
-	erlc -o lib/jsx/ebin lib/jsx/src/*.erl
+	erlc -Dmaps_support=true -o lib/jsx/ebin lib/jsx/src/*.erl
 	cp lib/jsx/src/jsx.app.src lib/jsx/ebin/jsx.app
 
 lager:
