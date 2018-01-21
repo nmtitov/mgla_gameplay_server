@@ -30,7 +30,7 @@ start_link() ->
 %% Callbacks
 
 init(Params) ->
-  lager:info("map_server:init(~p)", [Params]),
+  lager:info("~p:~p ~p:~p/~p(~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Params]),
   Blocks = map_tools:blocks(),
   State = #{
     rect => {{0, 0}, {600, 1000}},
@@ -72,11 +72,11 @@ handle_info({timeout, _Ref, update}, #{rect := MapRect, players := PlayerIds, bl
   schedule_update(),
   {noreply, State};
 handle_info(timeout, State) ->
-  lager:info("map_server:handle_info(timeout)"),
+  lager:info("~p:~p ~p:~p/~p(~p, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
   schedule_update(),
   {noreply, State};
-handle_info(_Info, State) ->
-  lager:info("map_server:handle_info(_Info)"),
+handle_info(Info, State) ->
+  lager:info("~p:~p ~p:~p/~p(~p = Info, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
   {noreply, State}.
 
 terminate(_Reason, _State) ->
