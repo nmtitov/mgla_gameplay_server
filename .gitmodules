@@ -13,3 +13,6 @@
 [submodule "lib/ranch"]
 	path = lib/ranch
 	url = https://github.com/ninenines/ranch
+[submodule "lib/jsx"]
+	path = lib/jsx
+	url = https://github.com/talentdeficit/jsx
