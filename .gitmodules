@@ -1,21 +1,28 @@
 [submodule "lib/cowboy"]
 	path = lib/cowboy
 	url = https://github.com/ninenines/cowboy
+	ignore = dirty
 [submodule "lib/cowlib"]
 	path = lib/cowlib
 	url = https://github.com/ninenines/cowlib.git
+	ignore = dirty
 [submodule "lib/gproc"]
 	path = lib/gproc
 	url = https://github.com/uwiger/gproc.git
+	ignore = dirty
 [submodule "lib/goldrush"]
 	path = lib/goldrush
 	url = https://github.com/DeadZen/goldrush
+	ignore = dirty
 [submodule "lib/ranch"]
 	path = lib/ranch
 	url = https://github.com/ninenines/ranch
+	ignore = dirty
 [submodule "lib/jsx"]
 	path = lib/jsx
 	url = https://github.com/talentdeficit/jsx
+	ignore = dirty
 [submodule "lib/lager"]
 	path = lib/lager
 	url = https://github.com/erlang-lager/lager
+	ignore = dirty
