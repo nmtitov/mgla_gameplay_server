@@ -10,3 +10,6 @@
 [submodule "lib/goldrush"]
 	path = lib/goldrush
 	url = https://github.com/DeadZen/goldrush
+[submodule "lib/ranch"]
+	path = lib/ranch
+	url = https://github.com/ninenines/ranch
