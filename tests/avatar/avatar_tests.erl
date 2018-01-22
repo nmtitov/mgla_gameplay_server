@@ -52,6 +52,13 @@ set_position_value_test_() ->
     ?_assert(NewPositionUpdate =:= true)
   ].
 
+get_path_test_() ->
+  Data = avatar:new(0, {0, 0}),
+  Path = avatar:get_path(Data),
+  [
+    ?_assert(Path =:= [])
+  ].
+
 set_path_test_() ->
   Data = avatar:new(0, {0, 0}),
   Path = [{0, 0}, {1, 1}, {2, 2}],
