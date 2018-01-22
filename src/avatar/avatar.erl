@@ -8,10 +8,14 @@
 %%%-------------------------------------------------------------------
 -module(avatar).
 -author("nt").
+-include("../../include/avatar_state.hrl").
+
+-type avatar() :: map().
 
 %% API
--export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
+-export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, should_move/1, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
 
+-spec new(Id, Position) -> Data when Id :: non_neg_integer(), Position :: point:point(), Data :: avatar().
 new(Id, Position) ->
   #{
     id => Id,
@@ -52,35 +56,52 @@ new(Id, Position) ->
     }
   }.
 
+-spec get_id(Data) -> X when Data :: avatar(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
 
+-spec get_position_value(Data) -> X when Data :: avatar(), X :: point:point().
 get_position_value(#{position := #{value := X}}) -> X.
-set_position_value(X, #{position := Nested} = Map) ->
-  Map#{
+
+-spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: avatar(), NewData :: avatar().
+set_position_value(X, #{position := Nested} = Data) ->
+  Data#{
     position := Nested#{
       value := X,
       update := true
     }
   }.
 
+-spec get_position_update(Data) -> X when Data :: avatar(), X :: boolean().
 get_position_update(#{position := #{update := X}}) -> X.
 
+-spec get_path(Data) -> X when Data :: avatar(), X :: [point:point()].
 get_path(#{path := X}) -> X.
-set_path(X, Map) -> Map#{path := X}.
 
+-spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: avatar(), NewData :: avatar().
+set_path(X, Data) -> Data#{path := X}.
+
+-spec should_move(Data) -> X when Data :: avatar(), X :: boolean().
+should_move(#{path := []}) -> false;
+should_move(#{path := _}) -> true.
+
+-spec get_state_value(Data) -> X when Data :: avatar(), X :: avatar_state().
 get_state_value(#{state := #{value := X}}) -> X.
-set_state_value(Value, #{state := Nested} = Map) ->
-  Map#{
+
+-spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: avatar(), NewData :: avatar().
+set_state_value(Value, #{state := Nested} = Data) ->
+  Data#{
     state := Nested#{
       value := Value,
       update := true
     }
   }.
 
+-spec get_state_update(Data) -> X when Data :: avatar(), X :: boolean().
 get_state_update(#{state := #{update := X}}) -> X.
 
-clear_update_flags(#{position := Position, state := State} = Map) ->
-  Map#{
+-spec clear_update_flags(Data) -> NewData when Data :: avatar(), NewData :: avatar().
+clear_update_flags(#{position := Position, state := State} = Data) ->
+  Data#{
     position := Position#{
       update := false
     },
