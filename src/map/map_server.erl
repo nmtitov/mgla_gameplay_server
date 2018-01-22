@@ -119,7 +119,6 @@ schedule_update() ->
   erlang:start_timer(?UPDATE_RATE, self(), update).
 
 update(Players, Dt, MapRect, Blocks) ->
-%%  PlayersToMove = lists:filter(fun(Player) -> m
   MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
