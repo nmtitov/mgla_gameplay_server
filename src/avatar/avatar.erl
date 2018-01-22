@@ -10,7 +10,7 @@
 -author("nt").
 
 %% API
--export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_id_position_value/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
+-export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
 
 new(Id, Position) ->
   #{
@@ -63,8 +63,9 @@ set_position_value(X, #{position := Nested} = Map) ->
     }
   }.
 
-get_id_position_value(Map) -> {get_id(Map), get_position_value(Map)}.
+get_position_update(#{position := #{update := X}}) -> X.
 
+get_path(#{path := X}) -> X.
 set_path(X, Map) -> Map#{path := X}.
 
 get_state_value(#{state := #{value := X}}) -> X.
