@@ -84,7 +84,8 @@ handle_info({timeout, _Ref, update} = Message, #{rect := MapRect, players := Pla
   TimeA = erlang:system_time(),
 
   Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
-  NewPlayers = update(Players, ?UPDATE_RATE / 1000.0, MapRect, Blocks),
+  Dt = ?UPDATE_RATE / 1000.0,
+  NewPlayers = update(Players, Dt, MapRect, Blocks),
 
   lists:foreach(fun(#{id := Id} = Player) ->
     avatar_server:set_state(Id, Player)
