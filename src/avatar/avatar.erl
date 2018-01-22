@@ -61,8 +61,8 @@ get_id(#{id := X}) -> X.
 get_position_value(#{position := #{value := X}}) -> X.
 
 -spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: map(), NewData :: map().
-set_position_value(X, #{position := Nested} = Map) ->
-  Map#{
+set_position_value(X, #{position := Nested} = Data) ->
+  Data#{
     position := Nested#{
       value := X,
       update := true
@@ -76,7 +76,7 @@ get_position_update(#{position := #{update := X}}) -> X.
 get_path(#{path := X}) -> X.
 
 -spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: map(), NewData :: map().
-set_path(X, Map) -> Map#{path := X}.
+set_path(X, Data) -> Data#{path := X}.
 
 -spec should_move(Data) -> X when Data :: map(), X :: boolean().
 should_move(#{path := []}) -> false;
@@ -86,8 +86,8 @@ should_move(#{path := _}) -> true.
 get_state_value(#{state := #{value := X}}) -> X.
 
 -spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: map(), NewData :: map().
-set_state_value(Value, #{state := Nested} = Map) ->
-  Map#{
+set_state_value(Value, #{state := Nested} = Data) ->
+  Data#{
     state := Nested#{
       value := Value,
       update := true
@@ -98,8 +98,8 @@ set_state_value(Value, #{state := Nested} = Map) ->
 get_state_update(#{state := #{update := X}}) -> X.
 
 -spec clear_update_flags(Data) -> NewData when Data :: map(), NewData :: map().
-clear_update_flags(#{position := Position, state := State} = Map) ->
-  Map#{
+clear_update_flags(#{position := Position, state := State} = Data) ->
+  Data#{
     position := Position#{
       update := false
     },
