@@ -58,10 +58,12 @@ get_id_position(#{id := Id, position := #{value := Position}}) -> {Id, Position}
 
 set_path(Path, State) -> State#{path := Path}.
 
-clear_update_flags(#{position := Position, state := State} = A) ->
-  NewPosition = Position#{update := false},
-  NewState = State#{update := false},
-  A#{
-    position := NewPosition,
-    state := NewState
+clear_update_flags(#{position := Position, state := State} = Map) ->
+  Map#{
+    position := Position#{
+      update := false
+    },
+    state := State#{
+      update := false
+    }
   }.
