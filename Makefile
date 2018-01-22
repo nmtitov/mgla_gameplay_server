@@ -41,6 +41,7 @@ compile:
 	erlc "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ \
 	src/*.erl		\
 	src/avatar/*.erl	\
+	src/bot/*.erl		\
 	src/math/*.erl		\
 	src/ws/*.erl		\
 	src/map/*.erl		\
