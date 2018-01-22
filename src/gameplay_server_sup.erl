@@ -12,6 +12,10 @@ init([]) ->
     start => {id_server, start_link, []},
     shutdown => brutal_kill
   }, #{
+    id => bot_sup,
+    start => {bot_sup, start_link, []},
+    shutdown => brutal_kill
+  }, #{
     id => factory_sup,
     start => {factory_sup, start_link, []},
     shutdown => brutal_kill

@@ -23,7 +23,7 @@ start_link(Id) ->
 
 initial_point(Id) ->
   case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:call(Pid, {initial_point});
+    Pid when is_pid(Pid) -> gen_server:call(Pid, initial_point);
     _ -> undefined
   end.
 
@@ -46,8 +46,9 @@ init([Id]) ->
   gproc:reg(name(Id)),
   {ok, Id}.
 
-handle_call({initial_point}, _From, State) ->
-  InitialPoint = path:initial_point(),
+handle_call(initial_point, _From, State) ->
+  R = {{0, 0}, {600, 1000}},
+  InitialPoint = path:initial_point(R),
   {reply, InitialPoint, State};
 handle_call({path, A, B, Blocks}, _From, State) ->
   DestinationPoint = path:path(A, B, Blocks),

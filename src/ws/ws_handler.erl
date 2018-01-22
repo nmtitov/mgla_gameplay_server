@@ -38,11 +38,11 @@ websocket_handle(_Data, State) ->
   {ok, State}.
 
 websocket_info({send, Message} = Info, #{id := Id} = State) ->
-  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
-  lager:info(">>id=~p", [Id]),
+%%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
+%%  lager:info(">>id=~p", [Id]),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+%%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   {ok, State}.
 
 terminate({error, closed} = Info, _Req, #{id := Id} = State) ->
