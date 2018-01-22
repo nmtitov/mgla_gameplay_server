@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(avatar).
 -author("nt").
--include("../../include/player_state.hrl").
+-include("../../include/avatar_state.hrl").
 
 %% API
 -export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
@@ -78,10 +78,10 @@ get_path(#{path := X}) -> X.
 -spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: map(), NewData :: map().
 set_path(X, Map) -> Map#{path := X}.
 
--spec get_state_value(Data) -> X when Data :: map(), X :: player_state().
+-spec get_state_value(Data) -> X when Data :: map(), X :: avatar_state().
 get_state_value(#{state := #{value := X}}) -> X.
 
--spec set_state_value(X, Data) -> NewData when X :: player_state(), Data :: map(), NewData :: map().
+-spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: map(), NewData :: map().
 set_state_value(Value, #{state := Nested} = Map) ->
   Map#{
     state := Nested#{

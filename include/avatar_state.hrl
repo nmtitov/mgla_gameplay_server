@@ -8,4 +8,4 @@
 %%%-------------------------------------------------------------------
 -author("nt").
 
--type player_state() :: idle | walk.
+-type avatar_state() :: idle | walk.
