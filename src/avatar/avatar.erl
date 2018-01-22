@@ -8,10 +8,12 @@
 %%%-------------------------------------------------------------------
 -module(avatar).
 -author("nt").
+-include("../../include/player_state.hrl").
 
 %% API
 -export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
 
+-spec new(Id, Position) -> Data when Id :: non_neg_integer(), Position :: point:point(), Data :: map().
 new(Id, Position) ->
   #{
     id => Id,
@@ -52,9 +54,13 @@ new(Id, Position) ->
     }
   }.
 
+-spec get_id(Data) -> X when Data :: map(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
 
+-spec get_position_value(Data) -> X when Data :: map(), X :: point:point().
 get_position_value(#{position := #{value := X}}) -> X.
+
+-spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: map(), NewData :: map().
 set_position_value(X, #{position := Nested} = Map) ->
   Map#{
     position := Nested#{
@@ -63,12 +69,19 @@ set_position_value(X, #{position := Nested} = Map) ->
     }
   }.
 
+-spec get_position_update(Data) -> X when Data :: map(), X :: boolean().
 get_position_update(#{position := #{update := X}}) -> X.
 
+-spec get_path(Data) -> X when Data :: map(), X :: [point:point()].
 get_path(#{path := X}) -> X.
+
+-spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: map(), NewData :: map().
 set_path(X, Map) -> Map#{path := X}.
 
+-spec get_state_value(Data) -> X when Data :: map(), X :: player_state().
 get_state_value(#{state := #{value := X}}) -> X.
+
+-spec set_state_value(X, Data) -> NewData when X :: player_state(), Data :: map(), NewData :: map().
 set_state_value(Value, #{state := Nested} = Map) ->
   Map#{
     state := Nested#{
@@ -77,8 +90,10 @@ set_state_value(Value, #{state := Nested} = Map) ->
     }
   }.
 
+-spec get_state_update(Data) -> X when Data :: map(), X :: boolean().
 get_state_update(#{state := #{update := X}}) -> X.
 
+-spec clear_update_flags(Data) -> NewData when Data :: map(), NewData :: map().
 clear_update_flags(#{position := Position, state := State} = Map) ->
   Map#{
     position := Position#{
