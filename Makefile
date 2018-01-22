@@ -43,13 +43,20 @@ compile:
 	src/avatar/*.erl	\
 	src/math/*.erl		\
 	src/ws/*.erl		\
-	src/map/*.erl
+	src/map/*.erl		\
+	tests/avatar/*.erl	
 	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
 clean:
 	rm -rf ebin/*
 
 run: compile shell
+
+eunit:
+	erl -noshell -pa ebin/		\
+	-eval "eunit:test(avatar, [verbose])" -s init stop
+
+test: compile eunit
 
 shell:
 	erl -pa ebin/			\
@@ -64,3 +71,6 @@ shell:
 
 noshell:
 	erl -pa ebin/ lib/cowboy/ebin/ lib/cowlib/ebin/ lib/goldrush/ebin/ lib/gproc/ebin/ lib/jsx/ebin/ lib/lager/ebin/ lib/ranch/ebin/ -noshell -s gameplay_server
+
+dialyzer:
+	dialyzer --no_check_plt --src src/ src/avatar/ src/map/ src/math/ src/ws/ tests/avatar/
