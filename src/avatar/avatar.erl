@@ -52,11 +52,9 @@ new(Id, Position) ->
     }
   }.
 
-get_id(#{id := X}) ->
-  X.
+get_id(#{id := X}) -> X.
 
-get_position_value(#{position := #{value := X}}) ->
-  X.
+get_position_value(#{position := #{value := X}}) -> X.
 set_position_value(X, #{position := Nested} = Map) ->
   Map#{
     position := Nested#{
@@ -65,13 +63,11 @@ set_position_value(X, #{position := Nested} = Map) ->
     }
   }.
 
-get_id_position_value(Map) ->
-  {get_id(Map), get_position_value(Map)}.
+get_id_position_value(Map) -> {get_id(Map), get_position_value(Map)}.
 
 set_path(X, Map) -> Map#{path := X}.
 
-get_state_value(#{state := #{value := X}}) ->
-  X.
+get_state_value(#{state := #{value := X}}) -> X.
 set_state_value(Value, #{state := Nested} = Map) ->
   Map#{
     state := Nested#{
@@ -80,8 +76,7 @@ set_state_value(Value, #{state := Nested} = Map) ->
     }
   }.
 
-get_state_update(#{state := #{update := X}}) ->
-  X.
+get_state_update(#{state := #{update := X}}) -> X.
 
 clear_update_flags(#{position := Position, state := State} = Map) ->
   Map#{
