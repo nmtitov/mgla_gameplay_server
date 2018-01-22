@@ -11,7 +11,7 @@
 -include("../../include/avatar_state.hrl").
 
 %% API
--export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
+-export([new/2, get_id/1, get_position_value/1, set_position_value/2, get_position_update/1, get_path/1, set_path/2, should_move/1, get_state_value/1, set_state_value/2, get_state_update/1, clear_update_flags/1]).
 
 -spec new(Id, Position) -> Data when Id :: non_neg_integer(), Position :: point:point(), Data :: map().
 new(Id, Position) ->
@@ -77,6 +77,10 @@ get_path(#{path := X}) -> X.
 
 -spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: map(), NewData :: map().
 set_path(X, Map) -> Map#{path := X}.
+
+-spec should_move(Data) -> X when Data :: map(), X :: boolean().
+should_move(#{path := []}) -> false;
+should_move(#{path := _}) -> true.
 
 -spec get_state_value(Data) -> X when Data :: map(), X :: avatar_state().
 get_state_value(#{state := #{value := X}}) -> X.

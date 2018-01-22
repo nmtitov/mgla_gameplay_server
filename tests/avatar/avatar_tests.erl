@@ -68,6 +68,16 @@ set_path_test_() ->
     ?_assert(NewPath =:= Path)
   ].
 
+should_move_test_() ->
+  Data = avatar:new(0, {0, 0}),
+  NewData = avatar:set_path([{1, 1}], Data),
+  ShouldMoveBefore = avatar:should_move(Data),
+  ShouldMoveAfter = avatar:should_move(NewData),
+  [
+    ?_assert(ShouldMoveBefore =:= false),
+    ?_assert(ShouldMoveAfter =:= true)
+  ].
+
 get_state_value_test_() ->
   Id = 0,
   Position = {0, 0},
