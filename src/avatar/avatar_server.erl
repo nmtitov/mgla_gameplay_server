@@ -54,38 +54,23 @@ init([Id]) ->
   gproc:reg(name(Id)),
   Position = pathfinder_server:initial_point(Id),
   lager:info("Position = ~p", [Position]),
-  State = #{
-    id => Id,
-    position => Position,
-    movement_speed => 100,
-    path => [],
-    update_position => true,
-    health => 100,
-    health_regen => 0,
-    mana => 100,
-    mana_regen => 0,
-    attack_speed => 0,
-    attack_range => 0,
-    attack_damage => 0,
-    state => idle,
-    update_state => true,
-    xp => 0
-  },
+  State = avatar:new(Id, Position),
   {ok, State, 0}.
 
 handle_call(get_state, _From, State) ->
   {reply, State, State};
-handle_call(get_position, _From, #{position := Position} = State) ->
+handle_call(get_position, _From, #{position := #{value := Position}} = State) ->
   {reply, Position, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({handle_input, Point}, #{id := Id, position := Position} = State) ->
+handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
   Blocks = map_tools:blocks(),
+  {Id, Position} = avatar:get_id_position(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
   lager:info("avatar_server:handle_cast/Path = ~p", [Path]),
-  NewState = State#{path => Path},
+  NewState = avatar:set_path(Path, State),
   {noreply, NewState};
 handle_cast({set_state, NewState}, _) ->
   {noreply, NewState};
@@ -93,7 +78,8 @@ handle_cast(Request, State) ->
   lager:info("avatar_server:handle_info(~p = Request, State)", [Request]),
   {noreply, State}.
 
-handle_info(timeout, #{id := Id} = State) ->
+handle_info(timeout, State) ->
+  Id = avatar:get_id(State),
   lager:info("avatar_server:handle_info(timeout)"),
   map_server:enter(Id),
   {noreply, State};
@@ -101,7 +87,8 @@ handle_info(Info, State) ->
   lager:info("avatar_server:handle_info(~p = Info, State)", [Info]),
   {noreply, State}.
 
-terminate(Reason, #{id := Id} = State) ->
+terminate(Reason, State) ->
+  Id = avatar:get_id(State),
   lager:info("avatar_server:terminate(~p = Reason, ~p = State)", [Reason, State]),
   map_server:leave(Id),
   gproc:unreg(name(Id)),

@@ -95,36 +95,70 @@ schedule_update() ->
 
 update(Players, Dt, MapRect, Blocks) ->
   MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
-  Updated = lists:filter(fun(#{update_position := UpdatePosition, update_state := UpdateState}) ->
+  Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedPlayers),
-  lists:foreach(fun(#{id := Id, position := P, update_position := _, state := State, update_state := UpdateState}) ->
+  lists:foreach(fun(#{id := Id, position := #{value := P}, state := #{value := State, update := UpdateState}}) ->
     PlayerState2 = if
       UpdateState == true -> State;
       true -> undefined
     end,
     ws_send:broadcast_update(Id, P, PlayerState2)
   end, Updated),
-  lists:map(fun(P) -> clean(P) end, MovedPlayers).
+  lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedPlayers).
 
-move(#{path := [], state := State} = Player, _, _, _) ->
+move(#{path := [], state := #{value := State}} = Player, _, _, _) ->
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   case State of
-    walk -> Player#{state => idle, update_state => true};
+    walk ->
+      #{position := State} = Player,
+      NewState = State#{
+        value := idle,
+        update := true
+      },
+      Player#{
+        state := NewState
+      };
     _ -> Player
   end;
-move(#{id := Id, position := A, path := [B|Rest], movement_speed := S, state := State} = Player, Dt, MapRect, Blocks) ->
+move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Player, Dt, MapRect, Blocks) ->
+  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  lager:info("~p", [Player]),
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
+      lager:info("Next point is undefined"),
       Player#{path => Rest};
     New ->
+      lager:info("Next point is = ~p", [New]),
+      lager:info("State is = ~p", [State]),
       case State of
-        idle -> Player#{position => New, update_position => true, state => walk, update_state => true};
-        _ -> Player#{position => New, update_position => true}
+        idle ->
+          #{position := Position} = Player,
+          #{state := StateMap} = Player,
+          NewPosition = Position#{
+            value := New,
+            update := true
+          },
+          NewState = StateMap#{
+            value := walk,
+            update := true
+          },
+          NewPlayer = Player#{
+            position := NewPosition,
+            state := NewState
+          },
+          lager:info("New player (state, position updated) = ~p", [NewPlayer]),
+          NewPlayer;
+        _ ->
+          #{position := Position} = Player,
+          NewPosition = Position#{
+            value := New,
+            update := true
+          },
+          NewPlayer = Player#{
+            position := NewPosition
+          },
+          lager:info("New player (position updated) = ~p", [NewPlayer]),
+          NewPlayer
       end
   end.
-
-clean(Player) ->
-  Player#{
-    update_position => false,
-    update_state => false
-  }.
