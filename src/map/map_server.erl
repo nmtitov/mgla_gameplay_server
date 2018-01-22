@@ -98,7 +98,11 @@ update(Players, Dt, MapRect, Blocks) ->
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedPlayers),
-  lists:foreach(fun(#{id := Id, position := #{value := P}, state := #{value := State, update := UpdateState}}) ->
+  lists:foreach(fun(Player) ->
+    Id = avatar:get_id(Player),
+    P = avatar:get_position_value(Player),
+    State = avatar:get_state_value(Player),
+    UpdateState = avatar:get_state_update(Player),
     PlayerState2 = if
       UpdateState == true -> State;
       true -> undefined
@@ -110,16 +114,8 @@ update(Players, Dt, MapRect, Blocks) ->
 move(#{path := [], state := #{value := State}} = Player, _, _, _) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   case State of
-    walk ->
-      #{position := State} = Player,
-      NewState = State#{
-        value := idle,
-        update := true
-      },
-      Player#{
-        state := NewState
-      };
-    _ -> Player
+    walk -> avatar:set_state_value(idle, Player);
+    _    -> Player
   end;
 move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Player, Dt, MapRect, Blocks) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -127,37 +123,18 @@ move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := 
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
       lager:info("Next point is undefined"),
-      Player#{path => Rest};
+      avatar:set_path(Rest, Player);
     New ->
       lager:info("Next point is = ~p", [New]),
       lager:info("State is = ~p", [State]),
       case State of
         idle ->
-          #{position := Position} = Player,
-          #{state := StateMap} = Player,
-          NewPosition = Position#{
-            value := New,
-            update := true
-          },
-          NewState = StateMap#{
-            value := walk,
-            update := true
-          },
-          NewPlayer = Player#{
-            position := NewPosition,
-            state := NewState
-          },
-          lager:info("New player (state, position updated) = ~p", [NewPlayer]),
-          NewPlayer;
+          NewPlayer = avatar:set_position_value(New, Player),
+          NewPlayer2 = avatar:set_state_value(walk, NewPlayer),
+          lager:info("New player (state, position updated) = ~p", [NewPlayer2]),
+          NewPlayer2;
         _ ->
-          #{position := Position} = Player,
-          NewPosition = Position#{
-            value := New,
-            update := true
-          },
-          NewPlayer = Player#{
-            position := NewPosition
-          },
+          NewPlayer = avatar:set_position_value(New, Player),
           lager:info("New player (position updated) = ~p", [NewPlayer]),
           NewPlayer
       end

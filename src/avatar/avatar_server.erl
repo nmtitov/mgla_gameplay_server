@@ -67,7 +67,7 @@ handle_call(_Request, _From, State) ->
 handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
   Blocks = map_tools:blocks(),
-  {Id, Position} = avatar:get_id_position(State),
+  {Id, Position} = avatar:get_id_position_value(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
   lager:info("avatar_server:handle_cast/Path = ~p", [Path]),
   NewState = avatar:set_path(Path, State),
