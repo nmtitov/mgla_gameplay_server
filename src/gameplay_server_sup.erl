@@ -12,12 +12,12 @@ init([]) ->
     start => {id_server, start_link, []},
     shutdown => brutal_kill
   }, #{
-    id => map_sup,
-    start => {map_sup, start_link, []},
-    shutdown => brutal_kill
-  }, #{
     id => factory_sup,
     start => {factory_sup, start_link, []},
+    shutdown => brutal_kill
+  }, #{
+    id => map_sup,
+    start => {map_sup, start_link, []},
     shutdown => brutal_kill
   }],
   {ok, {SupFlags, ChildSpecs}}.
