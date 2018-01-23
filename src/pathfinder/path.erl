@@ -36,20 +36,20 @@ do_destination_point(A, B, [Block|_]) ->
     [_|Tail] -> Tail
   end.
 
--spec next_point(A, B, Dt, Speed, MapRect, Blocks) -> NextPoint when
+-spec next_point(A, B, Dt, Speed, InRect, Blocks) -> NextPoint when
   A :: point:point(),
   B :: point:point(),
   Dt :: float(),
   Speed :: float(),
-  MapRect :: rect:rect(),
+  InRect :: rect:rect(),
   Blocks :: [rect:rect()],
   NextPoint :: point:point() | undefined.
-next_point(A, B, Dt, Speed, MapRect, Blocks) ->
+next_point(A, B, Dt, Speed, InRect, Blocks) ->
   Distance = Dt * Speed,
   Unit = vec:unit(vec:vec_from_points(A, B)),
   Offset = vec:scale(Unit, Distance),
   Suggested = point:translate(A, Offset),
-  case accessible(Suggested, MapRect, Blocks) of
+  case accessible(Suggested, InRect, Blocks) of
     true -> validate(A, B, Suggested);
     false -> undefined
   end.
