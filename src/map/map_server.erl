@@ -92,7 +92,8 @@ handle_info({timeout, _Ref, update} = Message, #{rect := MapRect, players := Pla
   end, NewPlayers),
 
   Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
-  update(Bots),
+  NewBots = update(Bots),
+  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
 
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
