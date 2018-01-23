@@ -61,6 +61,7 @@ handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
 handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewPlayers = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
+  factory_sup:stop_child(Id),
   ws_send:broadcast_leave(Id),
   NewState = State#{players := NewPlayers},
   {noreply, NewState};
