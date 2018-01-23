@@ -13,7 +13,7 @@ start(_StartType, _StartArgs) ->
   } ],
   Dispatch = cowboy_router:compile(Routes),
 
-  TransOpts = [{ip, {0,0,0,0}}, {port, 8080}],
+  TransOpts = [{ip, {0,0,0,0}}, {port, 9000}],
   ProtoOpts = #{env => #{dispatch => Dispatch}},
 
   {ok, _} = cowboy:start_clear(gameplay_server_cowboy_listener, TransOpts, ProtoOpts),
