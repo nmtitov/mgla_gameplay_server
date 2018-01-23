@@ -17,7 +17,8 @@
 -export_type([rect/0]).
 
 -spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: point:point().
-contains({{OriginX, OriginY}, {W, H}}, {X, Y}) -> ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).
+contains({{OriginX, OriginY}, {W, H}}, {X, Y}) ->
+  ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).
 
 intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
   RectMaxX = OriginX + W,
