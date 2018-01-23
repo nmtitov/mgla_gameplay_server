@@ -11,7 +11,7 @@ init(Req, Opts) ->
   {cowboy_websocket, Req, Opts}.
 
 websocket_init(Params) ->
-  Id = id_server:id(),
+  Id = id_server:get_id(),
   lager:info("~p:~p ~p:~p/~p(~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Params]),
   lager:info("connect id=~p", [Id]),
   gproc:reg(name(Id)),

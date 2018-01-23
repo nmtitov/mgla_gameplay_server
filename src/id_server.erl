@@ -11,12 +11,16 @@
 
 -behaviour(gen_server).
 
--export([start_link/0, id/0]).
+-export([start_link/0, get_id/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
 
-id() ->
+-type id() :: non_neg_integer().
+-export_type([id/0]).
+
+-spec get_id() -> Id when Id :: id().
+get_id() ->
   gen_server:call(?SERVER, id).
 
 start_link() ->
