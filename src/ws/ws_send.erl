@@ -5,8 +5,8 @@
 
 -spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: avatar_state().
 broadcast_update(Id, {X, Y} = Point, State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  lager:info("(~p, ~p, ~p)", [Id, Point, State]),
+%%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+%%  lager:info("(~p, ~p, ~p)", [Id, Point, State]),
   M = jsx:encode(#{
     type => teleport,
     body => #{
