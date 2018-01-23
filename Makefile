@@ -42,9 +42,10 @@ compile:
 	src/*.erl		\
 	src/avatar/*.erl	\
 	src/bot/*.erl		\
-	src/math/*.erl		\
-	src/ws/*.erl		\
 	src/map/*.erl		\
+	src/math/*.erl		\
+	src/pathfinder/*.erl	\
+	src/ws/*.erl		\
 	tests/avatar/*.erl	
 	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
