@@ -51,13 +51,16 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({add_avatar, Id} = Message, #{players := PlayerIds} = State) ->
+handle_cast({add_avatar, Id}, #{players := PlayerIds, bots := BotIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   lager:info("id=~p", [Id]),
   NewPlayerIds = [Id| PlayerIds],
   NewState = State#{players := NewPlayerIds},
   ws_send:send_map(Id),
   ws_send:broadcast_enter(Id),
+  lists:foreach(fun(BotId) ->
+    ws_send:send_enter(Id, BotId)
+  end, BotIds),
   {noreply, NewState};
 handle_cast({remove_avatar, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -114,7 +117,7 @@ update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks
 
   lists:foreach(fun(#{id := Id} = Player) ->
     avatar_server:set_state(Id, Player)
-                end, NewPlayers),
+  end, NewPlayers),
 
   Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
   NewBots = update_bots(Bots),
