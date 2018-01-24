@@ -5,7 +5,7 @@
 
 -define(UPDATE_RATE, 33).
 
--export([start_link/0, enter/1, leave/1, add_bot/1, remove_bot/1]).
+-export([start_link/0, add_avatar/1, remove_avatar/1, add_bot/1, remove_bot/1]).
 
 -export([init/1,
   handle_call/3,
@@ -16,13 +16,13 @@
 
 -define(SERVER, ?MODULE).
 
--spec enter(non_neg_integer()) -> ok.
-enter(Id) ->
-  gen_server:cast(?SERVER, {enter, Id}).
+-spec add_avatar(non_neg_integer()) -> ok.
+add_avatar(Id) ->
+  gen_server:cast(?SERVER, {add_avatar, Id}).
 
--spec leave(non_neg_integer()) -> ok.
-leave(Id) ->
-  gen_server:cast(?SERVER, {leave, Id}).
+-spec remove_avatar(non_neg_integer()) -> ok.
+remove_avatar(Id) ->
+  gen_server:cast(?SERVER, {remove_avatar, Id}).
 
 -spec add_bot(Id) -> ok when Id :: non_neg_integer().
 add_bot(Id) ->
@@ -51,19 +51,39 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
+handle_cast({add_avatar, Id}, #{players := PlayerIds, bots := BotIds} = PlayerState) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewState = State#{players := [Id| PlayerIds]},
-  ws_send:send_map(Id),
   lager:info("id=~p", [Id]),
+  NewPlayerIds = [Id| PlayerIds],
+  NewState = PlayerState#{players := NewPlayerIds},
+  ws_send:send_map(Id),
   ws_send:broadcast_enter(Id),
+
+  % Send current players state
+  PlayersAvatars = lists:map(fun(PlayerId) -> avatar_server:get_state(PlayerId) end, PlayerIds),
+  lists:foreach(fun(Avatar) ->
+    AvatarId = avatar:get_id(Avatar),
+    AvatarPosition = avatar:get_position_value(Avatar),
+    AvatarState = avatar:get_state_value(Avatar),
+    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+  end, PlayersAvatars),
+
+  % Send current bots state
+  BotsAvatars = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
+  lists:foreach(fun(Avatar) ->
+    AvatarId = avatar:get_id(Avatar),
+    AvatarPosition = avatar:get_position_value(Avatar),
+    AvatarState = avatar:get_state_value(Avatar),
+    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+  end, BotsAvatars),
+
   {noreply, NewState};
-handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
+handle_cast({remove_avatar, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewPlayers = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
   factory_sup:stop_child(Id),
   ws_send:broadcast_leave(Id),
-  NewState = State#{players := NewPlayers},
+  NewPlayerIds = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
+  NewState = State#{players := NewPlayerIds},
   {noreply, NewState};
 handle_cast({add_bot, Id}, #{bots := BotIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -72,39 +92,23 @@ handle_cast({add_bot, Id}, #{bots := BotIds} = State) ->
   {noreply, NewState};
 handle_cast({remove_bot, Id}, #{bots := BotIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  bot_sup:stop_child(Id),
+  ws_send:broadcast_leave(Id),
   NewBotIds = lists:filter(fun(Id2) -> Id =/= Id2 end, BotIds),
   NewState = State#{bots := NewBotIds},
-  ws_send:broadcast_leave(Id),
   {noreply, NewState};
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info({timeout, _Ref, update} = Message, #{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks} = State) ->
+handle_info({timeout, _Ref, update} = Message, State) ->
 %%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
-
-  TimeA = erlang:system_time(),
-
-  Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
-  Dt = ?UPDATE_RATE / 1000.0,
-  NewPlayers = update(Players, Dt, MapRect, Blocks),
-
-  lists:foreach(fun(#{id := Id} = Player) ->
-    avatar_server:set_state(Id, Player)
-  end, NewPlayers),
-
-  Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
-  NewBots = update(Bots),
-  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
-
-  TimeB = erlang:system_time(),
-  _ = TimeB - TimeA,
-%%  lager:info("TimeDelta=~p", [TimeDelta]),
-  schedule_update(),
-  {noreply, State};
+  NewState = update(State),
+  {noreply, NewState};
 handle_info(timeout, State) ->
   lager:info("~p:~p ~p:~p/~p(~p, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
-  schedule_update(),
-  {noreply, State};
+  start_bots(),
+  NewState = update(State),
+  {noreply, NewState};
 handle_info(Info, State) ->
   lager:info("~p:~p ~p:~p/~p(~p = Info, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
   {noreply, State}.
@@ -120,8 +124,30 @@ code_change(_OldVsn, State, _Extra) ->
 schedule_update() ->
   erlang:start_timer(?UPDATE_RATE, self(), update).
 
+update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks} = State) ->
+  TimeA = erlang:system_time(),
+
+  Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
+  Dt = ?UPDATE_RATE / 1000.0,
+  NewPlayers = update(Players, Dt, MapRect, Blocks),
+
+  lists:foreach(fun(#{id := Id} = Player) ->
+    avatar_server:set_state(Id, Player)
+  end, NewPlayers),
+
+  Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
+  NewBots = update_bots(Bots),
+  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
+
+  TimeB = erlang:system_time(),
+  _ = TimeB - TimeA,
+%%  lager:info("TimeDelta=~p", [TimeDelta]),
+  schedule_update(),
+  State.
+
 update(Players, Dt, MapRect, Blocks) ->
   MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
+
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedPlayers),
@@ -136,6 +162,7 @@ update(Players, Dt, MapRect, Blocks) ->
     end,
     ws_send:broadcast_update(Id, P, PlayerState2)
   end, Updated),
+
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedPlayers).
 
 move(#{path := [], state := #{value := State}} = Player, _, _, _) ->
@@ -167,7 +194,7 @@ move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := 
       end
   end.
 
-update(Bots) ->
+update_bots(Bots) ->
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, Bots),
@@ -183,3 +210,41 @@ update(Bots) ->
     ws_send:broadcast_update(Id, P, AState)
   end, Updated),
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, Updated).
+
+start_bots() ->
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()).

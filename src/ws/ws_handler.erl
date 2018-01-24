@@ -12,14 +12,14 @@ init(Req, Opts) ->
 
 websocket_init(Params) ->
   Id = id_server:get_id(),
-  lager:info("~p:~p ~p:~p/~p(~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Params]),
+  lager:info("~p:~p/~p(~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Params]),
   lager:info("connect id=~p", [Id]),
   gproc:reg(name(Id)),
   gproc:reg(broadcast_property()),
   {ok, #{id => Id}}.
 
 websocket_handle({text, Message} = Info, #{id := Id} = State) ->
-  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
+  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
   lager:info("<<id=~p", [Id]),
   Term = jsx:decode(Message),
   lager:info("[decoded] id=~p: ~p", [Id, Term]),
@@ -30,7 +30,7 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
     {<<"enter">>, _} ->
       factory_sup:start_child(Id);
     {<<"leave">>, _} ->
-      map_server:leave(Id)
+      map_server:remove_avatar(Id)
   end,
   {ok, State};
 websocket_handle(_Data, State) ->
@@ -38,7 +38,7 @@ websocket_handle(_Data, State) ->
   {ok, State}.
 
 websocket_info({send, Message} = Info, #{id := Id} = State) ->
-%%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
+%%  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
 %%  lager:info(">>id=~p", [Id]),
   {reply, {text, Message}, State};
 websocket_info(_Info, State) ->

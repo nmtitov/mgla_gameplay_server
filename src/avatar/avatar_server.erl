@@ -55,44 +55,6 @@ init([Id]) ->
   Position = pathfinder_server:initial_point(Id),
   lager:info("Position = ~p", [Position]),
   State = avatar:new(Id, Position),
-
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-  bot_sup:start_child(id_server:get_id()),
-
   {ok, State, 0}.
 
 handle_call(get_state, _From, State) ->
@@ -120,7 +82,7 @@ handle_cast(Request, State) ->
 handle_info(timeout, State) ->
   Id = avatar:get_id(State),
   lager:info("avatar_server:handle_info(timeout)"),
-  map_server:enter(Id),
+  map_server:add_avatar(Id),
   {noreply, State};
 handle_info(Info, State) ->
   lager:info("avatar_server:handle_info(~p = Info, State)", [Info]),
@@ -129,7 +91,7 @@ handle_info(Info, State) ->
 terminate(Reason, State) ->
   Id = avatar:get_id(State),
   lager:info("avatar_server:terminate(~p = Reason, ~p = State)", [Reason, State]),
-  map_server:leave(Id),
+  map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
 
