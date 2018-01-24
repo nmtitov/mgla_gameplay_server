@@ -5,7 +5,7 @@
 
 -define(UPDATE_RATE, 33).
 
--export([start_link/0, enter/1, leave/1, add_bot/1, remove_bot/1]).
+-export([start_link/0, add_avatar/1, remove_avatar/1, add_bot/1, remove_bot/1]).
 
 -export([init/1,
   handle_call/3,
@@ -16,13 +16,13 @@
 
 -define(SERVER, ?MODULE).
 
--spec enter(non_neg_integer()) -> ok.
-enter(Id) ->
-  gen_server:cast(?SERVER, {enter, Id}).
+-spec add_avatar(non_neg_integer()) -> ok.
+add_avatar(Id) ->
+  gen_server:cast(?SERVER, {add_avatar, Id}).
 
--spec leave(non_neg_integer()) -> ok.
-leave(Id) ->
-  gen_server:cast(?SERVER, {leave, Id}).
+-spec remove_avatar(non_neg_integer()) -> ok.
+remove_avatar(Id) ->
+  gen_server:cast(?SERVER, {remove_avatar, Id}).
 
 -spec add_bot(Id) -> ok when Id :: non_neg_integer().
 add_bot(Id) ->
@@ -51,7 +51,7 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
+handle_cast({add_avatar, Id} = Message, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   lager:info("id=~p", [Id]),
   NewPlayerIds = [Id| PlayerIds],
@@ -59,7 +59,7 @@ handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
   ws_send:send_map(Id),
   ws_send:broadcast_enter(Id),
   {noreply, NewState};
-handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
+handle_cast({remove_avatar, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   factory_sup:stop_child(Id),
   ws_send:broadcast_leave(Id),

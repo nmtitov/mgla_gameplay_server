@@ -30,7 +30,7 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
     {<<"enter">>, _} ->
       factory_sup:start_child(Id);
     {<<"leave">>, _} ->
-      map_server:leave(Id)
+      map_server:remove_avatar(Id)
   end,
   {ok, State};
 websocket_handle(_Data, State) ->
