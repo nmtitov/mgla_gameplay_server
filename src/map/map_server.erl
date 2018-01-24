@@ -79,32 +79,15 @@ handle_cast({remove_bot, Id}, #{bots := BotIds} = State) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-handle_info({timeout, _Ref, update} = Message, #{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks} = State) ->
+handle_info({timeout, _Ref, update} = Message, State) ->
 %%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
-
-  TimeA = erlang:system_time(),
-
-  Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
-  Dt = ?UPDATE_RATE / 1000.0,
-  NewPlayers = update(Players, Dt, MapRect, Blocks),
-
-  lists:foreach(fun(#{id := Id} = Player) ->
-    avatar_server:set_state(Id, Player)
-  end, NewPlayers),
-
-  Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
-  NewBots = update(Bots),
-  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
-
-  TimeB = erlang:system_time(),
-  _ = TimeB - TimeA,
-%%  lager:info("TimeDelta=~p", [TimeDelta]),
-  schedule_update(),
-  {noreply, State};
+  NewState = update(State),
+  {noreply, NewState};
 handle_info(timeout, State) ->
   lager:info("~p:~p ~p:~p/~p(~p, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
-  schedule_update(),
-  {noreply, State};
+  start_bots(),
+  NewState = update(State),
+  {noreply, NewState};
 handle_info(Info, State) ->
   lager:info("~p:~p ~p:~p/~p(~p = Info, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
   {noreply, State}.
@@ -119,6 +102,27 @@ code_change(_OldVsn, State, _Extra) ->
 
 schedule_update() ->
   erlang:start_timer(?UPDATE_RATE, self(), update).
+
+update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks} = State) ->
+  TimeA = erlang:system_time(),
+
+  Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
+  Dt = ?UPDATE_RATE / 1000.0,
+  NewPlayers = update(Players, Dt, MapRect, Blocks),
+
+  lists:foreach(fun(#{id := Id} = Player) ->
+    avatar_server:set_state(Id, Player)
+                end, NewPlayers),
+
+  Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
+  NewBots = update_bots(Bots),
+  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
+
+  TimeB = erlang:system_time(),
+  _ = TimeB - TimeA,
+%%  lager:info("TimeDelta=~p", [TimeDelta]),
+  schedule_update(),
+  State.
 
 update(Players, Dt, MapRect, Blocks) ->
   MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
@@ -167,7 +171,7 @@ move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := 
       end
   end.
 
-update(Bots) ->
+update_bots(Bots) ->
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, Bots),
@@ -183,3 +187,41 @@ update(Bots) ->
     ws_send:broadcast_update(Id, P, AState)
   end, Updated),
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, Updated).
+
+start_bots() ->
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()),
+  bot_sup:start_child(id_server:get_id()).
