@@ -53,17 +53,18 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({enter, Id} = Message, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewState = State#{players := [Id| PlayerIds]},
-  ws_send:send_map(Id),
   lager:info("id=~p", [Id]),
+  NewPlayerIds = [Id| PlayerIds],
+  NewState = State#{players := NewPlayerIds},
+  ws_send:send_map(Id),
   ws_send:broadcast_enter(Id),
   {noreply, NewState};
 handle_cast({leave, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewPlayers = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
   factory_sup:stop_child(Id),
   ws_send:broadcast_leave(Id),
-  NewState = State#{players := NewPlayers},
+  NewPlayerIds = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
+  NewState = State#{players := NewPlayerIds},
   {noreply, NewState};
 handle_cast({add_bot, Id}, #{bots := BotIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -72,9 +73,10 @@ handle_cast({add_bot, Id}, #{bots := BotIds} = State) ->
   {noreply, NewState};
 handle_cast({remove_bot, Id}, #{bots := BotIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  bot_sup:stop_child(Id),
+  ws_send:broadcast_leave(Id),
   NewBotIds = lists:filter(fun(Id2) -> Id =/= Id2 end, BotIds),
   NewState = State#{bots := NewBotIds},
-  ws_send:broadcast_leave(Id),
   {noreply, NewState};
 handle_cast(_Request, State) ->
   {noreply, State}.
