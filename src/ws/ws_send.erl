@@ -10,10 +10,11 @@ broadcast_update(Id, Point, State) ->
 
 send_update(ToId, Id, Point, State) ->
   Message = update_message(Id, Point, State),
-  gproc:send(ws_handler:name(ToId), Message).
+  gproc:send(ws_handler:name(ToId), {send, Message}).
 
+-spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: map().
 update_message(Id, {X, Y}, State) ->
-  M = jsx:encode(#{
+  jsx:encode(#{
     type => teleport,
     body => #{
       id => Id,

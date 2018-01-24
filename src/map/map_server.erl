@@ -51,16 +51,32 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({add_avatar, Id}, #{players := PlayerIds, bots := BotIds} = State) ->
+handle_cast({add_avatar, Id}, #{players := PlayerIds, bots := BotIds} = PlayerState) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   lager:info("id=~p", [Id]),
   NewPlayerIds = [Id| PlayerIds],
-  NewState = State#{players := NewPlayerIds},
+  NewState = PlayerState#{players := NewPlayerIds},
   ws_send:send_map(Id),
   ws_send:broadcast_enter(Id),
-  lists:foreach(fun(BotId) ->
-    ws_send:send_enter(Id, BotId)
-  end, BotIds),
+
+  % Send current players state
+  PlayersAvatars = lists:map(fun(PlayerId) -> avatar_server:get_state(PlayerId) end, PlayerIds),
+  lists:foreach(fun(Avatar) ->
+    AvatarId = avatar:get_id(Avatar),
+    AvatarPosition = avatar:get_position_value(Avatar),
+    AvatarState = avatar:get_state_value(Avatar),
+    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+  end, PlayersAvatars),
+
+  % Send current bots state
+  BotsAvatars = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
+  lists:foreach(fun(Avatar) ->
+    AvatarId = avatar:get_id(Avatar),
+    AvatarPosition = avatar:get_position_value(Avatar),
+    AvatarState = avatar:get_state_value(Avatar),
+    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+  end, BotsAvatars),
+
   {noreply, NewState};
 handle_cast({remove_avatar, Id}, #{players := PlayerIds} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -131,6 +147,7 @@ update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks
 
 update(Players, Dt, MapRect, Blocks) ->
   MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
+
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedPlayers),
@@ -145,6 +162,7 @@ update(Players, Dt, MapRect, Blocks) ->
     end,
     ws_send:broadcast_update(Id, P, PlayerState2)
   end, Updated),
+
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedPlayers).
 
 move(#{path := [], state := #{value := State}} = Player, _, _, _) ->
