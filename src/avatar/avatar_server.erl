@@ -56,7 +56,8 @@ init([Id]) ->
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   lager:info("Position = ~p", [Position]),
-  State = avatar:new(Id, Position),
+  Name = <<"Name">>,
+  State = avatar:new(Id, Name, Position),
   {ok, State, 0}.
 
 handle_call(get_state, _From, State) ->

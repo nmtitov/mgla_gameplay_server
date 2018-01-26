@@ -15,8 +15,10 @@
 %% API
 -export([
   zero/0,
-  new/2,
+  new/3,
   get_id/1,
+  get_name/1,
+
   get_position_value/1,
   set_position_value/2,
   get_position_update/1,
@@ -36,12 +38,13 @@
   clear_update_flags/1
 ]).
 
-zero() -> new(0, {0, 0}).
+zero() -> new(0, <<"Zero">>, {0, 0}).
 
--spec new(Id, Position) -> Data when Id :: non_neg_integer(), Position :: point:point(), Data :: avatar().
-new(Id, Position) ->
+-spec new(Id, Name, Position) -> Data when Id :: non_neg_integer(), Name :: binary(), Position :: point:point(), Data :: avatar().
+new(Id, Name, Position) ->
   #{
     id => Id,
+    name => Name,
     position => #{
       value => Position,
       update => true
@@ -81,6 +84,9 @@ new(Id, Position) ->
 
 -spec get_id(Data) -> X when Data :: avatar(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
+
+-spec get_name(Data) -> X when Data ::avatar(), X :: binary().
+get_name(#{name := X}) -> X.
 
 -spec get_position_value(Data) -> X when Data :: avatar(), X :: point:point().
 get_position_value(#{position := #{value := X}}) -> X.
