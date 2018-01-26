@@ -52,7 +52,9 @@ get_position(Id) ->
 init([Id]) ->
   lager:info("avatar_server:init(~p)", [Id]),
   gproc:reg(name(Id)),
-  Position = pathfinder_server:initial_point(Id),
+  R = {{0, 0}, {600, 1000}},
+  Blocks = map_tools:blocks(),
+  Position = pathfinder_server:initial_point(Id, R, Blocks),
   lager:info("Position = ~p", [Position]),
   State = avatar:new(Id, Position),
   {ok, State, 0}.

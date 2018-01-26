@@ -3,13 +3,16 @@
 -include("../../include/block.hrl").
 
 %% API
--export([initial_point/1, next_point/6, path/3]).
+-export([initial_point/2, next_point/6, path/3]).
 
--spec initial_point(R) -> P when R :: rect:rect(), P :: point:point().
-initial_point({{OriginX, OriginY}, {W, H}}) ->
-  X = rand:uniform(W) + OriginX,
-  Y = rand:uniform(H) + OriginY,
-  {X, Y}.
+-spec initial_point(R, Blocks) -> P when R :: rect:rect(), Blocks :: [rect:rect()], P :: point:point().
+initial_point({{X, Y}, {W, H}} = Rect, Blocks) ->
+  P = {rand:uniform(W) + X, rand:uniform(H) + Y},
+  Out = not lists:any(fun(#block{rect = BlockRect}) -> rect:contains(BlockRect, P) end, Blocks),
+  case Out of
+    true -> P;
+    _    -> initial_point(Rect, Blocks)
+  end.
 
 -spec path(A, B, Blocks) -> [C] when A :: point:point(), B :: point:point(), Blocks :: [rect:rect()], C :: point:point().
 path(A, B, Blocks) ->
