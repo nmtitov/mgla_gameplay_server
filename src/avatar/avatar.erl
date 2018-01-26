@@ -22,6 +22,13 @@
   get_path/1,
   set_path/2,
   should_move/1,
+
+  get_health_percent/1,
+  update_health_by/2,
+
+  get_mana_percent/1,
+  update_mana_by/2,
+
   get_state_value/1,
   set_state_value/2,
   get_state_update/1,
@@ -96,6 +103,50 @@ set_path(X, Data) -> Data#{path := X}.
 -spec should_move(Data) -> X when Data :: avatar(), X :: boolean().
 should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
+
+get_health(#{health := #{value := X}}) -> X.
+set_health(X, #{health := N} = Data) ->
+  Data#{
+    health := N#{
+      value := X,
+      update := true
+    }
+  }.
+
+get_health_max(#{health_max := #{value := X}}) -> X.
+set_health_max(X, #{health_max := N} = Data) ->
+  Data#{
+    health_max := N#{
+      value := X,
+      update := true
+    }
+  }.
+
+get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
+
+update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
+
+get_mana(#{mana := #{value := X}}) -> X.
+set_mana(X, #{mana := N} = Data) ->
+  Data#{
+    mana := N#{
+      value := X,
+      update := true
+    }
+  }.
+
+get_mana_max(#{mana_max := #{value := X}}) -> X.
+set_mana_max(X, #{mana_max := N} = Data) ->
+  Data#{
+    mana_max := N#{
+      value := X,
+      update := true
+    }
+  }.
+
+get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
+
+update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
 
 -spec get_state_value(Data) -> X when Data :: avatar(), X :: avatar_state().
 get_state_value(#{state := #{value := X}}) -> X.
