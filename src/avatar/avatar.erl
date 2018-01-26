@@ -8,16 +8,18 @@
 %%%-------------------------------------------------------------------
 -module(avatar).
 -author("nt").
--include("../../include/avatar_state.hrl").
+-include("../../include/avatar.hrl").
 
 -type avatar() :: map().
 
 %% API
 -export([
   zero/0,
-  new/3,
+  new/4,
+
   get_id/1,
   get_name/1,
+  get_type/1,
 
   get_position_value/1,
   set_position_value/2,
@@ -38,12 +40,13 @@
   clear_update_flags/1
 ]).
 
-zero() -> new(0, <<"Zero">>, {0, 0}).
+zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
--spec new(Id, Name, Position) -> Data when Id :: non_neg_integer(), Name :: binary(), Position :: point:point(), Data :: avatar().
-new(Id, Name, Position) ->
+-spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: avatar_type(), Name :: binary(), Position :: point:point(), Data :: avatar().
+new(Id, Type, Name, Position) ->
   #{
     id => Id,
+    type => Type,
     name => Name,
     position => #{
       value => Position,
@@ -84,6 +87,9 @@ new(Id, Name, Position) ->
 
 -spec get_id(Data) -> X when Data :: avatar(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
+
+-spec get_type(Data) -> X when Data :: avatar(), X :: avatar_type().
+get_type(#{type := X}) -> X.
 
 -spec get_name(Data) -> X when Data ::avatar(), X :: binary().
 get_name(#{name := X}) -> X.

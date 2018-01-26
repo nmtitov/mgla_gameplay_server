@@ -15,9 +15,11 @@ zero_test_() ->
   Position = {0, 0},
   Data = avatar:zero(),
   NewId = avatar:get_id(Data),
+  Type = avatar:get_type(Data),
   NewPosition = avatar:get_position_value(Data),
   [
     ?_assertEqual(NewId, Id),
+    ?_assertEqual(bot, Type),
     ?_assertEqual(<<"Zero">>, avatar:get_name(Data)),
     ?_assertEqual(NewPosition, Position),
     ?_assertEqual(1.0, avatar:get_health_percent(Data)),
@@ -28,7 +30,7 @@ new_test_() ->
   Id = 0,
   Position = {0, 0},
   Name = <<"New">>,
-  Data = avatar:new(Id, Name, Position),
+  Data = avatar:new(Id, player, Name, Position),
   NewId = avatar:get_id(Data),
   NewPosition = avatar:get_position_value(Data),
   NewName = avatar:get_name(Data),
@@ -40,21 +42,30 @@ new_test_() ->
 
 get_id_test_() ->
   Id = 0,
-  Data = avatar:new(Id, <<"Test">>, {0, 0}),
+  Data = avatar:new(Id, player, <<"Test">>, {0, 0}),
   NewId = avatar:get_id(Data),
   [
     ?_assertEqual(NewId, Id)
   ].
 
+get_type_test_() ->
+  Id = 0,
+  Type = player,
+  Data = avatar:new(Id, Type, <<"Test">>, {0, 0}),
+  NewType = avatar:get_type(Data),
+  [
+    ?_assertEqual(NewType, Type)
+  ].
+
 get_name_test_() ->
   [
-    ?_assertEqual(<<"Test">>, avatar:get_name(avatar:new(0, <<"Test">>, {0, 0})))
+    ?_assertEqual(<<"Test">>, avatar:get_name(avatar:new(0, player, <<"Test">>, {0, 0})))
   ].
 
 
 get_position_value_test_() ->
   Position = {0, 0},
-  Data = avatar:new(0, <<"Test">>, Position),
+  Data = avatar:new(0, player, <<"Test">>, Position),
   NewPosition = avatar:get_position_value(Data),
   [
     ?_assertEqual(NewPosition, Position)

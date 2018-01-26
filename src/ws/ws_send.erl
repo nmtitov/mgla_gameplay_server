@@ -1,6 +1,6 @@
 -module(ws_send).
 -author("nt").
--include("../../include/avatar_state.hrl").
+-include("../../include/avatar.hrl").
 -export([send_update/4, broadcast_update/3, send_enter/2, broadcast_enter/1, send_map/1, broadcast_leave/1]).
 
 -spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: avatar_state().
