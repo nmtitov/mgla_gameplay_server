@@ -108,9 +108,6 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Private
 
-schedule_update() ->
-  erlang:start_timer(?UPDATE_RATE, self(), update).
-
 update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
 
@@ -133,7 +130,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
 %%  lager:info("TimeDelta=~p", [TimeDelta]),
-  schedule_update(),
+  erlang:start_timer(?UPDATE_RATE, self(), update),
   State.
 
 update(Avatars, Dt, MapRect, Blocks) ->
