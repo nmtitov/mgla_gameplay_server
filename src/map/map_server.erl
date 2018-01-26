@@ -157,30 +157,22 @@ update(Avatars, Dt, MapRect, Blocks) ->
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedAvatars).
 
 move(#{path := [], state := #{value := State}} = Avatar, _, _, _) ->
-%%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   case State of
     walk -> avatar:set_state_value(idle, Avatar);
     _    -> Avatar
   end;
 move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Avatar, Dt, MapRect, Blocks) ->
-%%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-%%  lager:info("~p", [Player]),
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-%%      lager:info("Next point is undefined"),
       avatar:set_path(Rest, Avatar);
     New ->
-%%      lager:info("Next point is = ~p", [New]),
-%%      lager:info("State is = ~p", [State]),
       case State of
         idle ->
           NewPlayer = avatar:set_position_value(New, Avatar),
           NewPlayer2 = avatar:set_state_value(walk, NewPlayer),
-%%          lager:info("New player (state, position updated) = ~p", [NewPlayer2]),
           NewPlayer2;
         _ ->
           NewPlayer = avatar:set_position_value(New, Avatar),
-%%          lager:info("New player (position updated) = ~p", [NewPlayer]),
           NewPlayer
       end
   end.
