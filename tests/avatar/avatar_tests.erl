@@ -78,6 +78,12 @@ should_move_test_() ->
     ?_assert(ShouldMoveAfter =:= true)
   ].
 
+get_health_percent_test_() -> [].
+update_health_by_test_() -> [].
+
+get_mana_percent_test_() -> [].
+update_mana_by_test_() -> [].
+
 get_state_value_test_() ->
   Id = 0,
   Position = {0, 0},
