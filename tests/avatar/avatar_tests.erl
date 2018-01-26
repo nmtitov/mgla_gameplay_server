@@ -10,6 +10,19 @@
 -author("nt").
 -include_lib("eunit/include/eunit.hrl").
 
+zero_test_() ->
+  Id = 0,
+  Position = {0, 0},
+  Data = avatar:zero(),
+  NewId = avatar:get_id(Data),
+  NewPosition = avatar:get_position_value(Data),
+  [
+    ?_assert(NewId =:= Id),
+    ?_assert(NewPosition =:= Position),
+    ?_assert(1.0 =:= avatar:get_health_percent(Data)),
+    ?_assert(1.0 =:= avatar:get_mana_percent(Data))
+  ].
+
 new_test_() ->
   Id = 0,
   Position = {0, 0},
@@ -76,6 +89,38 @@ should_move_test_() ->
   [
     ?_assert(ShouldMoveBefore =:= false),
     ?_assert(ShouldMoveAfter =:= true)
+  ].
+
+get_health_percent_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assert(1.0 =:= avatar:get_health_percent(Data))
+  ].
+
+update_health_by_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assertEqual(1.0, avatar:get_health_percent(avatar:update_health_by(50, Data))),
+    ?_assertEqual(1.0, avatar:get_health_percent(avatar:update_health_by(0, Data))),
+    ?_assertEqual(0.5, avatar:get_health_percent(avatar:update_health_by(-50, Data))),
+    ?_assertEqual(0.0, avatar:get_health_percent(avatar:update_health_by(-100, Data))),
+    ?_assertEqual(0.0, avatar:get_health_percent(avatar:update_health_by(-150, Data)))
+  ].
+
+get_mana_percent_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assert(1.0 =:= avatar:get_mana_percent(Data))
+  ].
+
+update_mana_by_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assertEqual(1.0, avatar:get_mana_percent(avatar:update_mana_by(50, Data))),
+    ?_assertEqual(1.0, avatar:get_mana_percent(avatar:update_mana_by(0, Data))),
+    ?_assertEqual(0.5, avatar:get_mana_percent(avatar:update_mana_by(-50, Data))),
+    ?_assertEqual(0.0, avatar:get_mana_percent(avatar:update_mana_by(-100, Data))),
+    ?_assertEqual(0.0, avatar:get_mana_percent(avatar:update_mana_by(-150, Data)))
   ].
 
 get_state_value_test_() ->
