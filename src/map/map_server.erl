@@ -5,7 +5,7 @@
 
 -define(UPDATE_RATE, 33).
 
--export([start_link/0, add_avatar/1, remove_avatar/1, add_bot/1, remove_bot/1]).
+-export([start_link/0, add_avatar/2, remove_avatar/1]).
 
 -export([init/1,
   handle_call/3,
@@ -16,21 +16,13 @@
 
 -define(SERVER, ?MODULE).
 
--spec add_avatar(non_neg_integer()) -> ok.
-add_avatar(Id) ->
-  gen_server:cast(?SERVER, {add_avatar, Id}).
+-spec add_avatar(Type, Id) -> ok when Type :: atom(), Id :: id_server:id().
+add_avatar(Type, Id) ->
+  gen_server:cast(?SERVER, {add_avatar, Type, Id}).
 
--spec remove_avatar(non_neg_integer()) -> ok.
+-spec remove_avatar(id_server:id()) -> ok.
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
-
--spec add_bot(Id) -> ok when Id :: non_neg_integer().
-add_bot(Id) ->
-  gen_server:cast(?SERVER, {add_bot, Id}).
-
--spec remove_bot(Id) -> ok when Id :: non_neg_integer().
-remove_bot(Id) ->
-  gen_server:cast(?SERVER, {remove_bot, Id}).
 
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -42,8 +34,7 @@ init(Params) ->
   Blocks = map_tools:blocks(),
   State = #{
     rect => {{0, 0}, {600, 1000}},
-    players => [],
-    bots => [],
+    avatars => [],
     blocks => Blocks
   },
   {ok, State, 0}.
@@ -51,93 +42,93 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({add_avatar, Id}, #{players := PlayerIds, bots := BotIds} = PlayerState) ->
+
+handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  lager:info("id=~p", [Id]),
-  NewPlayerIds = [Id| PlayerIds],
-  NewState = PlayerState#{players := NewPlayerIds},
-  ws_send:send_map(Id),
+  NewAvatarsMeta = [{Type, Id}| AvatarsMeta],
+  NewState = State#{avatars := NewAvatarsMeta},
+
+  case Type of
+    player ->
+      ws_send:send_map(Id),
+      Avatars = lists:map(fun({Type, Id2}) ->
+        case Type of
+          bot  -> bot_server:get_state(Id2);
+          player -> avatar_server:get_state(Id2)
+        end
+      end, AvatarsMeta),
+      lists:foreach(fun(A) ->
+        AvatarId = avatar:get_id(A),
+        AvatarPosition = avatar:get_position_value(A),
+        AvatarState = avatar:get_state_value(A),
+        ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+      end, Avatars);
+    _ -> ok
+  end,
+
   ws_send:broadcast_enter(Id),
 
-  % Send current players state
-  PlayersAvatars = lists:map(fun(PlayerId) -> avatar_server:get_state(PlayerId) end, PlayerIds),
-  lists:foreach(fun(Avatar) ->
-    AvatarId = avatar:get_id(Avatar),
-    AvatarPosition = avatar:get_position_value(Avatar),
-    AvatarState = avatar:get_state_value(Avatar),
-    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
-  end, PlayersAvatars),
-
-  % Send current bots state
-  BotsAvatars = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
-  lists:foreach(fun(Avatar) ->
-    AvatarId = avatar:get_id(Avatar),
-    AvatarPosition = avatar:get_position_value(Avatar),
-    AvatarState = avatar:get_state_value(Avatar),
-    ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
-  end, BotsAvatars),
-
   {noreply, NewState};
-handle_cast({remove_avatar, Id}, #{players := PlayerIds} = State) ->
+
+handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  NewAvatarsMeta = lists:filter(fun({_, Id2}) -> Id =/= Id2 end, AvatarsMeta),
+  NewState = State#{avatars := NewAvatarsMeta},
   factory_sup:stop_child(Id),
   ws_send:broadcast_leave(Id),
-  NewPlayerIds = lists:filter(fun(Id2) -> Id =/= Id2 end, PlayerIds),
-  NewState = State#{players := NewPlayerIds},
   {noreply, NewState};
-handle_cast({add_bot, Id}, #{bots := BotIds} = State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewState = State#{bots := [Id| BotIds]},
-  ws_send:broadcast_enter(Id),
-  {noreply, NewState};
-handle_cast({remove_bot, Id}, #{bots := BotIds} = State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  bot_sup:stop_child(Id),
-  ws_send:broadcast_leave(Id),
-  NewBotIds = lists:filter(fun(Id2) -> Id =/= Id2 end, BotIds),
-  NewState = State#{bots := NewBotIds},
-  {noreply, NewState};
+
 handle_cast(_Request, State) ->
   {noreply, State}.
 
+
 handle_info({timeout, _Ref, update} = Message, State) ->
-%%  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
+%%  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
   NewState = update(State),
   {noreply, NewState};
+
 handle_info(timeout, State) ->
-  lager:info("~p:~p ~p:~p/~p(~p, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
+  lager:info("~p:~p/~p(~p, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
   start_bots(),
   NewState = update(State),
   {noreply, NewState};
+
 handle_info(Info, State) ->
-  lager:info("~p:~p ~p:~p/~p(~p = Info, State)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
+  lager:info("~p:~p/~p(~p = Info, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info]),
   {noreply, State}.
+
 
 terminate(_Reason, _State) ->
   ok.
 
+
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
 
 %% Private
 
 schedule_update() ->
   erlang:start_timer(?UPDATE_RATE, self(), update).
 
-update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks} = State) ->
+update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
 
-  Players = lists:map(fun(Id) -> avatar_server:get_state(Id) end, PlayerIds),
+  Avatars = lists:map(fun({Type, Id}) ->
+    case Type of
+      bot  -> bot_server:get_state(Id);
+      player -> avatar_server:get_state(Id)
+    end
+  end, AvatarsMeta),
   Dt = ?UPDATE_RATE / 1000.0,
-  NewPlayers = update(Players, Dt, MapRect, Blocks),
+  NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
-  lists:foreach(fun(#{id := Id} = Player) ->
-    avatar_server:set_state(Id, Player)
-  end, NewPlayers),
-
-  Bots = lists:map(fun(Id) -> bot_server:get_state(Id) end, BotIds),
-  NewBots = update_bots(Bots),
-  lists:foreach(fun(#{id := Id} = Bot) -> bot_server:set_state(Id, Bot) end, NewBots),
+  lists:foreach(fun(#{id := Id, type := Type} = Avatar) ->
+    case Type of
+      bot  -> bot_server:set_state(Id, Avatar);
+      player -> avatar_server:set_state(Id, Avatar)
+    end
+  end, NewAvatars),
 
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
@@ -145,17 +136,17 @@ update(#{rect := MapRect, players := PlayerIds, bots := BotIds, blocks := Blocks
   schedule_update(),
   State.
 
-update(Players, Dt, MapRect, Blocks) ->
-  MovedPlayers = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Players),
+update(Avatars, Dt, MapRect, Blocks) ->
+  MovedAvatars = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Avatars),
 
   Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
     (UpdatePosition == true) or (UpdateState == true)
-  end, MovedPlayers),
-  lists:foreach(fun(Player) ->
-    Id = avatar:get_id(Player),
-    P = avatar:get_position_value(Player),
-    State = avatar:get_state_value(Player),
-    UpdateState = avatar:get_state_update(Player),
+  end, MovedAvatars),
+  lists:foreach(fun(Avatar) ->
+    Id = avatar:get_id(Avatar),
+    P = avatar:get_position_value(Avatar),
+    State = avatar:get_state_value(Avatar),
+    UpdateState = avatar:get_state_update(Avatar),
     PlayerState2 = if
       UpdateState == true -> State;
       true -> undefined
@@ -163,53 +154,36 @@ update(Players, Dt, MapRect, Blocks) ->
     ws_send:broadcast_update(Id, P, PlayerState2)
   end, Updated),
 
-  lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedPlayers).
+  lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedAvatars).
 
-move(#{path := [], state := #{value := State}} = Player, _, _, _) ->
+move(#{path := [], state := #{value := State}} = Avatar, _, _, _) ->
 %%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   case State of
-    walk -> avatar:set_state_value(idle, Player);
-    _    -> Player
+    walk -> avatar:set_state_value(idle, Avatar);
+    _    -> Avatar
   end;
-move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Player, Dt, MapRect, Blocks) ->
+move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Avatar, Dt, MapRect, Blocks) ->
 %%  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
 %%  lager:info("~p", [Player]),
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
 %%      lager:info("Next point is undefined"),
-      avatar:set_path(Rest, Player);
+      avatar:set_path(Rest, Avatar);
     New ->
 %%      lager:info("Next point is = ~p", [New]),
 %%      lager:info("State is = ~p", [State]),
       case State of
         idle ->
-          NewPlayer = avatar:set_position_value(New, Player),
+          NewPlayer = avatar:set_position_value(New, Avatar),
           NewPlayer2 = avatar:set_state_value(walk, NewPlayer),
 %%          lager:info("New player (state, position updated) = ~p", [NewPlayer2]),
           NewPlayer2;
         _ ->
-          NewPlayer = avatar:set_position_value(New, Player),
+          NewPlayer = avatar:set_position_value(New, Avatar),
 %%          lager:info("New player (position updated) = ~p", [NewPlayer]),
           NewPlayer
       end
   end.
-
-update_bots(Bots) ->
-  Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
-    (UpdatePosition == true) or (UpdateState == true)
-  end, Bots),
-  lists:foreach(fun(A) ->
-    Id = avatar:get_id(A),
-    P = avatar:get_position_value(A),
-    State = avatar:get_state_value(A),
-    UpdateState = avatar:get_state_update(A),
-    AState = if
-     UpdateState == true -> State;
-     true -> undefined
-    end,
-    ws_send:broadcast_update(Id, P, AState)
-  end, Updated),
-  lists:map(fun(P) -> avatar:clear_update_flags(P) end, Updated).
 
 start_bots() ->
   bot_sup:start_child(id_server:get_id()),

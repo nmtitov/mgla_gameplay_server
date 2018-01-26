@@ -57,7 +57,7 @@ init([Id]) ->
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   lager:info("Position = ~p", [Position]),
   Name = <<"Name">>,
-  State = avatar:new(Id, Name, Position),
+  State = avatar:new(Id, player, Name, Position),
   {ok, State, 0}.
 
 handle_call(get_state, _From, State) ->
@@ -85,7 +85,7 @@ handle_cast(Request, State) ->
 handle_info(timeout, State) ->
   Id = avatar:get_id(State),
   lager:info("avatar_server:handle_info(timeout)"),
-  map_server:add_avatar(Id),
+  map_server:add_avatar(player, Id),
   {noreply, State};
 handle_info(Info, State) ->
   lager:info("avatar_server:handle_info(~p = Info, State)", [Info]),

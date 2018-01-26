@@ -12,7 +12,6 @@
 -export([start/0, stop/0]).
 
 start() ->
-  ok = application:start(sasl),
   ok = application:start(crypto),
   ok = application:start(cowlib),
   ok = application:start(asn1),
@@ -42,5 +41,4 @@ stop() ->
   ok = application:stop(public_key),
   ok = application:stop(ranch),
   ok = application:stop(cowlib),
-  ok = application:stop(crypto),
-  ok = application:start(sasl).
+  ok = application:stop(crypto).

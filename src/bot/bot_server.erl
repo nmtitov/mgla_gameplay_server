@@ -45,9 +45,8 @@ init([Id]) ->
   R = {{0, 0}, {600, 1000}},
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
-  lager:info("Position = ~p", [Position]),
   Name = <<"Name">>,
-  State = avatar:new(Id, Name, Position),
+  State = avatar:new(Id, bot, Name, Position),
   {ok, State, 0}.
 
 handle_call(get_state, _From, State) ->
@@ -61,17 +60,17 @@ handle_cast(_Request, State) ->
   {noreply, State}.
 
 handle_info(timeout, State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  lager:info("~p:~p/~p(timeout, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   Id = avatar:get_id(State),
-  map_server:add_bot(Id),
+  map_server:add_avatar(bot, Id),
   {noreply, State};
 handle_info(_Info, State) ->
   {noreply, State}.
 
-terminate(_Reason, State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+terminate(Reason, State) ->
+  lager:info("~p:~p/~p(~p=Reason, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Reason]),
   Id = avatar:get_id(State),
-  map_server:remove_bot(Id),
+  map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
 

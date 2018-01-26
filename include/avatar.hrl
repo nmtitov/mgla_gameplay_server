@@ -9,3 +9,4 @@
 -author("nt").
 
 -type avatar_state() :: idle | walk.
+-type avatar_type() :: player | bot.
