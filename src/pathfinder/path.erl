@@ -8,8 +8,7 @@
 -spec initial_point(R, Blocks) -> P when R :: rect:rect(), Blocks :: [rect:rect()], P :: point:point().
 initial_point({{X, Y}, {W, H}} = Rect, Blocks) ->
   P = {rand:uniform(W) + X, rand:uniform(H) + Y},
-  lager:info("initial_point ~p", [P]),
-  Out = lists:all(fun(#block{rect = BlockRect}) -> not rect:contains(BlockRect, P) end, Blocks),
+  Out = not lists:any(fun(#block{rect = BlockRect}) -> rect:contains(BlockRect, P) end, Blocks),
   case Out of
     true -> P;
     _    -> initial_point(Rect, Blocks)
