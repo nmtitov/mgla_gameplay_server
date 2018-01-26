@@ -17,45 +17,51 @@ zero_test_() ->
   NewId = avatar:get_id(Data),
   NewPosition = avatar:get_position_value(Data),
   [
-    ?_assert(NewId =:= Id),
-    ?_assert(NewPosition =:= Position),
-    ?_assert(1.0 =:= avatar:get_health_percent(Data)),
-    ?_assert(1.0 =:= avatar:get_mana_percent(Data))
+    ?_assertEqual(NewId, Id),
+    ?_assertEqual(<<"Zero">>, avatar:get_name(Data)),
+    ?_assertEqual(NewPosition, Position),
+    ?_assertEqual(1.0, avatar:get_health_percent(Data)),
+    ?_assertEqual(1.0, avatar:get_mana_percent(Data))
   ].
 
 new_test_() ->
   Id = 0,
   Position = {0, 0},
-  Data = avatar:new(Id, Position),
+  Name = <<"New">>,
+  Data = avatar:new(Id, Name, Position),
   NewId = avatar:get_id(Data),
   NewPosition = avatar:get_position_value(Data),
+  NewName = avatar:get_name(Data),
   [
-    ?_assert(NewId =:= Id),
-    ?_assert(NewPosition =:= Position)
+    ?_assertEqual(NewId, Id),
+    ?_assertEqual(NewPosition, Position),
+    ?_assertEqual(Name, NewName)
   ].
 
-get_id_test() ->
+get_id_test_() ->
   Id = 0,
-  Position = {0, 0},
-  Data = avatar:new(Id, Position),
+  Data = avatar:new(Id, <<"Test">>, {0, 0}),
   NewId = avatar:get_id(Data),
   [
-    ?_assert(NewId =:= Id)
+    ?_assertEqual(NewId, Id)
   ].
+
+get_name_test_() ->
+  [
+    ?_assertEqual(<<"Test">>, avatar:get_name(avatar:new(0, <<"Test">>, {0, 0})))
+  ].
+
 
 get_position_value_test_() ->
-  Id = 0,
   Position = {0, 0},
-  Data = avatar:new(Id, Position),
+  Data = avatar:new(0, <<"Test">>, Position),
   NewPosition = avatar:get_position_value(Data),
   [
-    ?_assert(NewPosition =:= Position)
+    ?_assertEqual(NewPosition, Position)
   ].
 
 set_position_value_test_() ->
-  Id = 0,
-  Position = {0, 0},
-  Data = avatar:new(Id, Position),
+  Data = avatar:zero(),
   NewPosition = {1, 1},
   NewData = avatar:set_position_value(NewPosition, Data),
   NewPosition2 = avatar:get_position_value(NewData),
@@ -66,14 +72,14 @@ set_position_value_test_() ->
   ].
 
 get_path_test_() ->
-  Data = avatar:new(0, {0, 0}),
+  Data = avatar:zero(),
   Path = avatar:get_path(Data),
   [
     ?_assert(Path =:= [])
   ].
 
 set_path_test_() ->
-  Data = avatar:new(0, {0, 0}),
+  Data = avatar:zero(),
   Path = [{0, 0}, {1, 1}, {2, 2}],
   NewData = avatar:set_path(Path, Data),
   NewPath = avatar:get_path(NewData),
@@ -82,7 +88,7 @@ set_path_test_() ->
   ].
 
 should_move_test_() ->
-  Data = avatar:new(0, {0, 0}),
+  Data = avatar:zero(),
   NewData = avatar:set_path([{1, 1}], Data),
   ShouldMoveBefore = avatar:should_move(Data),
   ShouldMoveAfter = avatar:should_move(NewData),
@@ -124,16 +130,14 @@ update_mana_by_test_() ->
   ].
 
 get_state_value_test_() ->
-  Id = 0,
-  Position = {0, 0},
-  Data = avatar:new(Id, Position),
+  Data = avatar:zero(),
   State = avatar:get_state_value(Data),
   [
     ?_assert(State =:= idle)
   ].
 
 set_state_value_test_() ->
-  Data = avatar:new(0, {0, 0}),
+  Data = avatar:zero(),
   State = walk,
   NewData = avatar:set_state_value(State, Data),
   NewState = avatar:get_state_value(NewData),
@@ -144,7 +148,7 @@ set_state_value_test_() ->
   ].
 
 clear_update_flags_test() ->
-  Data = avatar:new(0, {0, 0}),
+  Data = avatar:zero(),
   State = walk,
   NewData = avatar:set_state_value(State, Data),
   NewData2 = avatar:clear_update_flags(NewData),
