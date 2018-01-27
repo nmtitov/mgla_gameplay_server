@@ -1,11 +1,21 @@
 -module(ws_handler).
 -author("nt").
 
--export([name/1, broadcast_property/0]).
+-export([send/2, broadcast/1]).
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
 name(Id) -> {n, l, {ws_handler, Id}}.
 broadcast_property() -> {p, l, {ws_handler, broadcast}}.
+
+
+%% API
+
+send(Id, Message) ->
+  gproc:send(name(Id), {send, Message}).
+
+broadcast(Message) ->
+  gproc:send(broadcast_property(), {send, Message}).
+
 
 %% Callbacks
 

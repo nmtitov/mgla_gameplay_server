@@ -50,7 +50,7 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
 
   case Type of
     player ->
-      ws_send:send_map(Id),
+      ws_handler:send(Id, map_tools:map()),
       Avatars = lists:map(fun({Type, Id2}) ->
         case Type of
           bot  -> bot_server:get_state(Id2);
@@ -61,12 +61,12 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
         AvatarId = avatar:get_id(A),
         AvatarPosition = avatar:get_position_value(A),
         AvatarState = avatar:get_state_value(A),
-        ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
+        ws_handler:send(Id, ws_send:update_message(AvatarId, AvatarPosition, AvatarState))
       end, Avatars);
     _ -> ok
   end,
 
-  ws_send:broadcast_enter(Id),
+  ws_handler:broadcast(ws_send:enter_message(Id)),
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
@@ -74,7 +74,7 @@ handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   NewAvatarsMeta = lists:filter(fun({_, Id2}) -> Id =/= Id2 end, AvatarsMeta),
   NewState = State#{avatars := NewAvatarsMeta},
   factory_sup:stop_child(Id),
-  ws_send:broadcast_leave(Id),
+  ws_handler:broadcast(ws_send:leave_message(Id)),
   {noreply, NewState};
 
 handle_cast(_Request, State) ->
@@ -147,7 +147,7 @@ update(Avatars, Dt, MapRect, Blocks) ->
       UpdateState == true -> State;
       true -> undefined
     end,
-    ws_send:broadcast_update(Id, P, PlayerState2)
+    ws_handler:broadcast(ws_send:update_message(Id, P, PlayerState2))
   end, Updated),
 
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedAvatars).
