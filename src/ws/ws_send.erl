@@ -1,10 +1,16 @@
 -module(ws_send).
 -author("nt").
 -include("../../include/avatar.hrl").
--export([init/5, deinit/1, enter_message/1, leave_message/1, update_message/3]).
+-export([init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
 
--spec init(Id, Name, Position, HealthPercent, ManaPercent) -> Message when Id :: id_server:id(), Name :: binary(), Position :: point:point(), HealthPercent :: float(), ManaPercent :: float(), Message :: jsx:json_text().
-init(Id, Name, {X, Y}, HealthPercent, ManaPercent) ->
+-spec init(Avatar) -> Message when Avatar :: avatar:avatar(), Message :: jsx:json_text().
+init(A) ->
+  Id = avatar:get_id(A),
+  Name = avatar:get_name(A),
+  {X, Y} = avatar:get_position_value(A),
+  HealthPercent = avatar:get_health_percent(A),
+  ManaPercent = avatar:get_mana_percent(A),
+  State = avatar:get_state_value(A),
   jsx:encode(#{
     type => init,
     body => #{
@@ -15,7 +21,8 @@ init(Id, Name, {X, Y}, HealthPercent, ManaPercent) ->
         y => Y
       },
       health_percent => HealthPercent,
-      mana_percent => ManaPercent
+      mana_percent => ManaPercent,
+      state => State
     }
   }).
 

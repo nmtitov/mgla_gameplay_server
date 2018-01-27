@@ -42,31 +42,23 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
+get_state({Type, Id}) ->
+  case Type of
+    bot  -> bot_server:get_state(Id);
+    player -> avatar_server:get_state(Id)
+  end.
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewAvatarsMeta = [{Type, Id}| AvatarsMeta],
   NewState = State#{avatars := NewAvatarsMeta},
-
+  ws_handler:broadcast(ws_send:enter_message(Id)),
   case Type of
     player ->
       ws_handler:send(Id, map_tools:map()),
-      Avatars = lists:map(fun({Type, Id2}) ->
-        case Type of
-          bot  -> bot_server:get_state(Id2);
-          player -> avatar_server:get_state(Id2)
-        end
-      end, AvatarsMeta),
-      lists:foreach(fun(A) ->
-        AvatarId = avatar:get_id(A),
-        AvatarPosition = avatar:get_position_value(A),
-        AvatarState = avatar:get_state_value(A),
-        ws_handler:send(Id, ws_send:update_message(AvatarId, AvatarPosition, AvatarState))
-      end, Avatars);
+      lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, AvatarsMeta);
     _ -> ok
   end,
-
-  ws_handler:broadcast(ws_send:enter_message(Id)),
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
@@ -81,10 +73,8 @@ handle_cast(_Request, State) ->
   {noreply, State}.
 
 
-handle_info({timeout, _Ref, update} = Message, State) ->
-%%  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
-  NewState = update(State),
-  {noreply, NewState};
+handle_info({timeout, _Ref, update}, State) ->
+  {noreply, update(State)};
 
 handle_info(timeout, State) ->
   lager:info("~p:~p/~p(~p, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),

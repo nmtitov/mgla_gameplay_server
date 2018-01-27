@@ -53,7 +53,7 @@ websocket_handle(_Data, State) ->
   {ok, State}.
 
 
-websocket_info({send, Message} = Info, #{id := Id} = State) ->
+websocket_info({send, Message} = _Info, #{id := _Id} = State) ->
 %%  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
 %%  lager:info(">>id=~p", [Id]),
   {reply, {text, Message}, State};
