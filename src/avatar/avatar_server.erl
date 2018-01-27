@@ -53,7 +53,8 @@ init([Id]) ->
 handle_call(get_state, _From, State) ->
   {reply, State, State};
 
-handle_call(get_position, _From, #{position := #{value := Position}} = State) ->
+handle_call(get_position, _From, State) ->
+  Position= avatar:get_position_value(State),
   {reply, Position, State};
 
 handle_call(_Request, _From, State) ->
