@@ -130,6 +130,17 @@ update_health_by_test_() ->
     ?_assertEqual(0.0, avatar:get_health_percent(avatar:update_health_by(-150, Data)))
   ].
 
+set_health_max_test_() ->
+  Data = avatar:zero(),
+  Data2 = avatar:set_health_max(50, Data),
+  Data3 = avatar:set_health_max(100, Data2),
+  Data4 = avatar:set_health(100, Data3),
+  [
+    ?_assertEqual(50.0, avatar:get_health(Data2)),
+    ?_assertEqual(50.0, avatar:get_health(Data3)),
+    ?_assertEqual(100.0, avatar:get_health(Data4))
+  ].
+
 get_mana_test_() ->
   Data = avatar:zero(),
   [

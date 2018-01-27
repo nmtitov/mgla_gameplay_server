@@ -126,7 +126,8 @@ should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
 
 get_health(#{health := #{value := X}}) -> X.
-set_health(X, #{health := N} = Data) ->
+set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
+  X = float(RawX),
   MaxValue = get_health_max(Data),
   Data#{
     health := N#{
@@ -140,7 +141,8 @@ set_health(X, #{health := N} = Data) ->
   }.
 
 get_health_max(#{health_max := #{value := X}}) -> X.
-set_health_max(XMax, #{health := N, health_max := NMax} = Data) ->
+set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) ->
+  XMax = float(RawXMax),
   X = get_health(Data),
   Data#{
     health := N#{
