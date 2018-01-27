@@ -78,8 +78,8 @@ set_position_value_test_() ->
   NewPosition2 = avatar:get_position_value(NewData),
   NewPositionUpdate = avatar:get_position_update(NewData),
   [
-    ?_assert(NewPosition2 =:= NewPosition),
-    ?_assert(NewPositionUpdate =:= true)
+    ?_assertEqual(NewPosition2, NewPosition),
+    ?_assertEqual(NewPositionUpdate, true)
   ].
 
 get_path_test_() ->
@@ -167,7 +167,7 @@ get_state_value_test_() ->
   Data = avatar:zero(),
   State = avatar:get_state_value(Data),
   [
-    ?_assert(State =:= idle)
+    ?_assertEqual(State, idle)
   ].
 
 set_state_value_test_() ->
@@ -177,8 +177,8 @@ set_state_value_test_() ->
   NewState = avatar:get_state_value(NewData),
   NewStateUpdate = avatar:get_state_update(NewData),
   [
-    ?_assert(NewState =:= State),
-    ?_assert(NewStateUpdate =:= true)
+    ?_assertEqual(NewState, State),
+    ?_assertEqual(NewStateUpdate, true)
   ].
 
 clear_update_flags_test() ->
@@ -189,6 +189,6 @@ clear_update_flags_test() ->
   PositionUpdate = avatar:get_position_update(NewData2),
   StateUpdate = avatar:get_state_update(NewData2),
   [
-    ?_assert(PositionUpdate =:= false),
-    ?_assert(StateUpdate =:= false)
+    ?_assertEqual(PositionUpdate, false),
+    ?_assertEqual(StateUpdate, false)
   ].
