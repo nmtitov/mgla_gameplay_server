@@ -42,31 +42,24 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
+get_state({Type, Id}) ->
+  case Type of
+    player -> avatar_server:get_state(Id);
+    bot    -> bot_server:get_state(Id)
+  end.
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewAvatarsMeta = [{Type, Id}| AvatarsMeta],
   NewState = State#{avatars := NewAvatarsMeta},
-
+  ws_handler:broadcast(ws_send:enter_message(Id)),
   case Type of
     player ->
-      ws_send:send_map(Id),
-      Avatars = lists:map(fun({Type, Id2}) ->
-        case Type of
-          bot  -> bot_server:get_state(Id2);
-          player -> avatar_server:get_state(Id2)
-        end
-      end, AvatarsMeta),
-      lists:foreach(fun(A) ->
-        AvatarId = avatar:get_id(A),
-        AvatarPosition = avatar:get_position_value(A),
-        AvatarState = avatar:get_state_value(A),
-        ws_send:send_update(Id, AvatarId, AvatarPosition, AvatarState)
-      end, Avatars);
+      ws_handler:send(Id, map_tools:map()),
+      ws_handler:send(Id, ws_send:id(Id)),
+      lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, NewAvatarsMeta);
     _ -> ok
   end,
-
-  ws_send:broadcast_enter(Id),
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
@@ -74,17 +67,15 @@ handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   NewAvatarsMeta = lists:filter(fun({_, Id2}) -> Id =/= Id2 end, AvatarsMeta),
   NewState = State#{avatars := NewAvatarsMeta},
   factory_sup:stop_child(Id),
-  ws_send:broadcast_leave(Id),
+  ws_handler:broadcast(ws_send:leave_message(Id)),
   {noreply, NewState};
 
 handle_cast(_Request, State) ->
   {noreply, State}.
 
 
-handle_info({timeout, _Ref, update} = Message, State) ->
-%%  lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Message, State]),
-  NewState = update(State),
-  {noreply, NewState};
+handle_info({timeout, _Ref, update}, State) ->
+  {noreply, update(State)};
 
 handle_info(timeout, State) ->
   lager:info("~p:~p/~p(~p, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
@@ -147,7 +138,7 @@ update(Avatars, Dt, MapRect, Blocks) ->
       UpdateState == true -> State;
       true -> undefined
     end,
-    ws_send:broadcast_update(Id, P, PlayerState2)
+    ws_handler:broadcast(ws_send:update_message(Id, P, PlayerState2))
   end, Updated),
 
   lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedAvatars).

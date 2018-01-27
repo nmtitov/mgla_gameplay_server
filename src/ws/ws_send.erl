@@ -1,18 +1,68 @@
 -module(ws_send).
 -author("nt").
 -include("../../include/avatar.hrl").
--export([send_update/4, broadcast_update/3, send_enter/2, broadcast_enter/1, send_map/1, broadcast_leave/1]).
+-export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
 
--spec broadcast_update(Id, Point, State) -> ok when Id :: id_server:id(), Point :: point:point(), State :: avatar_state().
-broadcast_update(Id, Point, State) ->
-  Message = update_message(Id, Point, State),
-  gproc:send(ws_handler:broadcast_property(), {send, Message}).
+-spec id(Id::id_server:id()) -> jsx:json_text().
+id(Id) ->
+  jsx:encode(#{
+    type => id,
+    body => #{
+      id => Id
+    }
+  }).
 
-send_update(ToId, Id, Point, State) ->
-  Message = update_message(Id, Point, State),
-  gproc:send(ws_handler:name(ToId), {send, Message}).
+-spec init(Avatar) -> Message when Avatar :: avatar:avatar(), Message :: jsx:json_text().
+init(A) ->
+  Id = avatar:get_id(A),
+  Name = avatar:get_name(A),
+  {X, Y} = avatar:get_position_value(A),
+  HealthPercent = avatar:get_health_percent(A),
+  ManaPercent = avatar:get_mana_percent(A),
+  State = avatar:get_state_value(A),
+  jsx:encode(#{
+    type => init,
+    body => #{
+      id => Id,
+      name => Name,
+      position => #{
+        x => X,
+        y => Y
+      },
+      health_percent => HealthPercent,
+      mana_percent => ManaPercent,
+      state => State
+    }
+  }).
 
--spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: map().
+-spec deinit(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+deinit(Id) ->
+  jsx:encode(#{
+    type => deinit,
+    body => #{
+      id => Id
+    }
+  }).
+
+-spec enter_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+enter_message(Id) ->
+  jsx:encode(#{
+    type => enter,
+    body => #{
+      id => Id
+    }
+  }).
+
+-spec leave_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+leave_message(Id) ->
+  jsx:encode(#{
+    type => leave,
+    body => #{
+      id => Id
+    }
+  }).
+
+-spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
     type => teleport,
@@ -28,35 +78,3 @@ update_message(Id, {X, Y}, State) ->
                    end
     }
   }).
-
-send_enter(ToId, Id) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  Message = enter_message(Id),
-  gproc:send(ws_handler:name(ToId), {send, Message}).
-
-broadcast_enter(Id) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  Message = enter_message(Id),
-  gproc:send(ws_handler:broadcast_property(), {send, Message}).
-
-enter_message(Id) ->
-  jsx:encode(#{
-    type => enter,
-    body => #{
-      id => Id
-    }
-  }).
-
-send_map(Id) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  gproc:send(ws_handler:name(Id), {send, map_tools:map()}).
-
-broadcast_leave(Id) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  M = jsx:encode(#{
-    type => leave,
-    body => #{
-      id => Id
-    }
-  }),
-  gproc:send(ws_handler:broadcast_property(), {send, M}).
