@@ -141,7 +141,7 @@ set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
   }.
 
 get_health_max(#{health_max := #{value := X}}) -> X.
-set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) ->
+set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) when is_number(RawXMax) ->
   XMax = float(RawXMax),
   X = get_health(Data),
   Data#{
@@ -163,34 +163,34 @@ get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
 update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
 get_mana(#{mana := #{value := X}}) -> X.
-set_mana(X, #{mana := N} = Data) ->
-  X2 = float(X),
+set_mana(RawX, #{mana := N} = Data) when is_number(RawX) ->
+  X = float(RawX),
   MaxValue = get_mana_max(Data),
   Data#{
     mana := N#{
       value := if
                  X > MaxValue -> MaxValue;
                  X < 0        -> 0;
-                 true         -> X2
+                 true         -> X
                end,
       update := true
     }
   }.
 
 get_mana_max(#{mana_max := #{value := X}}) -> X.
-set_mana_max(XMax, #{mana := N, mana_max := NMax} = Data) ->
-  XMax2 = float(XMax),
+set_mana_max(RawXMax, #{mana := N, mana_max := NMax} = Data) when is_number(RawXMax) ->
+  XMax = float(RawXMax),
   X = get_mana(Data),
   Data#{
     mana := N#{
       value := if
-                 X > XMax2 -> XMax2;
+                 X > XMax -> XMax;
                  true     -> X
                end,
       update := true
     },
     mana_max := NMax#{
-      value := XMax2,
+      value := XMax,
       update := true
     }
   }.
