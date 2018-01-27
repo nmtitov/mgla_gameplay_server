@@ -22,22 +22,16 @@ start_link(Id) ->
   gen_server:start_link(?MODULE, [Id], []).
 
 initial_point(Id, Rect, Blocks) ->
-  case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:call(Pid, {initial_point, Rect, Blocks});
-    _ -> undefined
-  end.
+  {ok, Val} = gproc_tools:call(name(Id), {initial_point, Rect, Blocks}),
+  Val.
 
 path(Id, A, B, Blocks) ->
-  case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:call(Pid, {path, A, B, Blocks});
-    _ -> undefined
-  end.
+  {ok, Val} = gproc_tools:call(name(Id), {path, A, B, Blocks}),
+  Val.
 
 next_point(Id, A, B, Dt, Speed, MapRect, Blocks) ->
-  case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:call(Pid, {next_point, A, B, Dt, Speed, MapRect, Blocks});
-    _ -> undefined
-  end.
+  {ok, Val} = gproc_tools:call(name(Id), {next_point, A, B, Dt, Speed, MapRect, Blocks}),
+  Val.
 
 %% Callbacks
 
