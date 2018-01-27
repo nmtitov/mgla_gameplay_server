@@ -135,7 +135,7 @@ set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
                  X > MaxValue -> MaxValue;
                  X < 0        -> 0;
                  true         -> X
-      end,
+               end,
       update := true
     }
   }.
