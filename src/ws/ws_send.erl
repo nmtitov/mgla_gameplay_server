@@ -3,7 +3,7 @@
 -include("../../include/avatar.hrl").
 -export([update_message/3, enter_message/1, leave_message/1]).
 
--spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: map().
+-spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
     type => teleport,
@@ -20,6 +20,7 @@ update_message(Id, {X, Y}, State) ->
     }
   }).
 
+-spec enter_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
 enter_message(Id) ->
   jsx:encode(#{
     type => enter,
@@ -28,6 +29,7 @@ enter_message(Id) ->
     }
   }).
 
+-spec leave_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
 leave_message(Id) ->
   jsx:encode(#{
     type => leave,
