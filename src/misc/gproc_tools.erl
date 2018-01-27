@@ -10,4 +10,16 @@
 -author("nt").
 
 %% API
--export([]).
+-export([call/2, cast/2]).
+
+call(Name, Message) ->
+  case gproc:where(Name) of
+    Pid when is_pid(Pid) -> {ok, gen_server:call(Pid, Message)};
+    _                    -> {error, undefined}
+  end.
+
+cast(Name, Message) ->
+  case gproc:where(Name) of
+    Pid when is_pid(Pid) -> gen_server:cast(Pid, Message);
+    _                    -> {error, undefined}
+  end.
