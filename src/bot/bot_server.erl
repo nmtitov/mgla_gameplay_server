@@ -26,16 +26,11 @@ start_link(Id) ->
   gen_server:start_link(?MODULE, [Id], []).
 
 get_state(Id) ->
-  case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:call(Pid, get_state);
-    _ -> undefined
-  end.
+  {ok, State} = gproc_tools:call(name(Id), get_state),
+  State.
 
 set_state(Id, State) ->
-  case gproc:where(name(Id)) of
-    Pid when is_pid(Pid) -> gen_server:cast(Pid, {set_state, State});
-    _ -> undefined
-  end.
+  ok = gproc_tools:cast(name(Id), {set_state, State}).
 
 %% Callback
 
