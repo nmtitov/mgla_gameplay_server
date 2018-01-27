@@ -28,10 +28,14 @@
   set_path/2,
   should_move/1,
 
+  get_health/1,
+  set_health/2,
   get_health_percent/1,
   update_health_by/2,
   set_health_max/2,
 
+  get_mana/1,
+  set_mana/2,
   get_mana_percent/1,
   update_mana_by/2,
   set_mana_max/2,
@@ -158,13 +162,14 @@ update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
 get_mana(#{mana := #{value := X}}) -> X.
 set_mana(X, #{mana := N} = Data) ->
+  X2 = float(X),
   MaxValue = get_mana_max(Data),
   Data#{
     mana := N#{
       value := if
                  X > MaxValue -> MaxValue;
                  X < 0        -> 0;
-                 true         -> X
+                 true         -> X2
                end,
       update := true
     }
@@ -172,17 +177,18 @@ set_mana(X, #{mana := N} = Data) ->
 
 get_mana_max(#{mana_max := #{value := X}}) -> X.
 set_mana_max(XMax, #{mana := N, mana_max := NMax} = Data) ->
+  XMax2 = float(XMax),
   X = get_mana(Data),
   Data#{
     mana := N#{
       value := if
-                 X > XMax -> XMax;
+                 X > XMax2 -> XMax2;
                  true     -> X
                end,
       update := true
     },
     mana_max := NMax#{
-      value := XMax,
+      value := XMax2,
       update := true
     }
   }.

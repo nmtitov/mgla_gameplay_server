@@ -86,7 +86,7 @@ get_path_test_() ->
   Data = avatar:zero(),
   Path = avatar:get_path(Data),
   [
-    ?_assert(Path =:= [])
+    ?_assertEqual(Path, [])
   ].
 
 set_path_test_() ->
@@ -95,7 +95,7 @@ set_path_test_() ->
   NewData = avatar:set_path(Path, Data),
   NewPath = avatar:get_path(NewData),
   [
-    ?_assert(NewPath =:= Path)
+    ?_assertEqual(NewPath, Path)
   ].
 
 should_move_test_() ->
@@ -104,14 +104,20 @@ should_move_test_() ->
   ShouldMoveBefore = avatar:should_move(Data),
   ShouldMoveAfter = avatar:should_move(NewData),
   [
-    ?_assert(ShouldMoveBefore =:= false),
-    ?_assert(ShouldMoveAfter =:= true)
+    ?_assertEqual(ShouldMoveBefore, false),
+    ?_assertEqual(ShouldMoveAfter, true)
+  ].
+
+get_health_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assertEqual(100.0, avatar:get_health(Data))
   ].
 
 get_health_percent_test_() ->
   Data = avatar:zero(),
   [
-    ?_assert(1.0 =:= avatar:get_health_percent(Data))
+    ?_assertEqual(1.0, avatar:get_health_percent(Data))
   ].
 
 update_health_by_test_() ->
@@ -124,10 +130,16 @@ update_health_by_test_() ->
     ?_assertEqual(0.0, avatar:get_health_percent(avatar:update_health_by(-150, Data)))
   ].
 
+get_mana_test_() ->
+  Data = avatar:zero(),
+  [
+    ?_assertEqual(100.0, avatar:get_mana(Data))
+  ].
+
 get_mana_percent_test_() ->
   Data = avatar:zero(),
   [
-    ?_assert(1.0 =:= avatar:get_mana_percent(Data))
+    ?_assertEqual(1.0, avatar:get_mana_percent(Data))
   ].
 
 update_mana_by_test_() ->
@@ -138,6 +150,17 @@ update_mana_by_test_() ->
     ?_assertEqual(0.5, avatar:get_mana_percent(avatar:update_mana_by(-50, Data))),
     ?_assertEqual(0.0, avatar:get_mana_percent(avatar:update_mana_by(-100, Data))),
     ?_assertEqual(0.0, avatar:get_mana_percent(avatar:update_mana_by(-150, Data)))
+  ].
+
+set_mana_max_test_() ->
+  Data = avatar:zero(),
+  Data2 = avatar:set_mana_max(50, Data),
+  Data3 = avatar:set_mana_max(100, Data2),
+  Data4 = avatar:set_mana(100, Data3),
+  [
+    ?_assertEqual(50.0, avatar:get_mana(Data2)),
+    ?_assertEqual(50.0, avatar:get_mana(Data3)),
+    ?_assertEqual(100.0, avatar:get_mana(Data4))
   ].
 
 get_state_value_test_() ->
