@@ -44,6 +44,7 @@ compile:
 	src/bot/*.erl		\
 	src/map/*.erl		\
 	src/math/*.erl		\
+	src/misc/*.erl		\
 	src/pathfinder/*.erl	\
 	src/ws/*.erl		\
 	tests/avatar/*.erl	
@@ -75,4 +76,4 @@ noshell:
 	erl -pa ebin/ lib/cowboy/ebin/ lib/cowlib/ebin/ lib/goldrush/ebin/ lib/gproc/ebin/ lib/jsx/ebin/ lib/lager/ebin/ lib/ranch/ebin/ -noshell -s gameplay_server
 
 dialyzer:
-	dialyzer --no_check_plt --src src/ src/avatar/ src/bot src/map/ src/math/ src/pathfinder src/ws/ tests/avatar/
+	dialyzer --no_check_plt --src src/ src/avatar/ src/bot src/map/ src/math/ src/misc src/pathfinder src/ws/ tests/avatar/
