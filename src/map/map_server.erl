@@ -44,8 +44,8 @@ handle_call(_Request, _From, State) ->
 
 get_state({Type, Id}) ->
   case Type of
-    bot  -> bot_server:get_state(Id);
-    player -> avatar_server:get_state(Id)
+    player -> avatar_server:get_state(Id);
+    bot    -> bot_server:get_state(Id)
   end.
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
