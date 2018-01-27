@@ -1,7 +1,32 @@
 -module(ws_send).
 -author("nt").
 -include("../../include/avatar.hrl").
--export([enter_message/1, leave_message/1, update_message/3]).
+-export([init/5, deinit/1, enter_message/1, leave_message/1, update_message/3]).
+
+-spec init(Id, Name, Position, HealthPercent, ManaPercent) -> Message when Id :: id_server:id(), Name :: binary(), Position :: point:point(), HealthPercent :: float(), ManaPercent :: float(), Message :: jsx:json_text().
+init(Id, Name, {X, Y}, HealthPercent, ManaPercent) ->
+  jsx:encode(#{
+    type => init,
+    body => #{
+      id => Id,
+      name => Name,
+      position => #{
+        x => X,
+        y => Y
+      },
+      health_percent => HealthPercent,
+      mana_percent => ManaPercent
+    }
+  }).
+
+-spec deinit(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+deinit(Id) ->
+  jsx:encode(#{
+    type => deinit,
+    body => #{
+      id => Id
+    }
+  }).
 
 -spec enter_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
 enter_message(Id) ->
