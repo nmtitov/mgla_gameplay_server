@@ -45,7 +45,6 @@ init([Id]) ->
   R = {{0, 0}, {600, 1000}},
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
-  lager:info("Position = ~p", [Position]),
   Name = <<"Name">>,
   State = avatar:new(Id, player, Name, Position),
   {ok, State, 0}.
@@ -67,7 +66,6 @@ handle_cast({handle_input, Point}, State) ->
   Id = avatar:get_id(State),
   Position = avatar:get_position_value(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
-  lager:info("avatar_server:handle_cast/Path = ~p", [Path]),
   NewState = avatar:set_path(Path, State),
   {noreply, NewState};
 
