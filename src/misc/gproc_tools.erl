@@ -12,12 +12,14 @@
 %% API
 -export([call/2, cast/2]).
 
+-spec call(Name, Message) -> Result when Name :: term(), Message :: term(), Result :: {ok, term()} | {error, undefined}.
 call(Name, Message) ->
   case gproc:where(Name) of
     Pid when is_pid(Pid) -> {ok, gen_server:call(Pid, Message)};
     _                    -> {error, undefined}
   end.
 
+-spec cast(Name, Message) -> Result when Name :: term(), Message :: term(), Result :: ok | {error, undefined}.
 cast(Name, Message) ->
   case gproc:where(Name) of
     Pid when is_pid(Pid) -> gen_server:cast(Pid, Message);
