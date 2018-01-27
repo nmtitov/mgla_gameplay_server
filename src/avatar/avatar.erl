@@ -30,9 +30,11 @@
 
   get_health_percent/1,
   update_health_by/2,
+  set_health_max/2,
 
   get_mana_percent/1,
   update_mana_by/2,
+  set_mana_max/2,
 
   get_state_value/1,
   set_state_value/2,
@@ -134,10 +136,18 @@ set_health(X, #{health := N} = Data) ->
   }.
 
 get_health_max(#{health_max := #{value := X}}) -> X.
-set_health_max(X, #{health_max := N} = Data) ->
+set_health_max(XMax, #{health := N, health_max := NMax} = Data) ->
+  X = get_health(Data),
   Data#{
-    health_max := N#{
-      value := X,
+    health := N#{
+      value := if
+                 X > XMax -> XMax;
+                 true     -> X
+               end,
+      update := true
+    },
+    health_max := NMax#{
+      value := XMax,
       update := true
     }
   }.
@@ -161,10 +171,18 @@ set_mana(X, #{mana := N} = Data) ->
   }.
 
 get_mana_max(#{mana_max := #{value := X}}) -> X.
-set_mana_max(X, #{mana_max := N} = Data) ->
+set_mana_max(XMax, #{mana := N, mana_max := NMax} = Data) ->
+  X = get_mana(Data),
   Data#{
-    mana_max := N#{
-      value := X,
+    mana := N#{
+      value := if
+                 X > XMax -> XMax;
+                 true     -> X
+               end,
+      update := true
+    },
+    mana_max := NMax#{
+      value := XMax,
       update := true
     }
   }.
