@@ -1,7 +1,16 @@
 -module(ws_send).
 -author("nt").
 -include("../../include/avatar.hrl").
--export([init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
+-export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
+
+-spec id(Id::id_server:id()) -> jsx:json_text().
+id(Id) ->
+  jsx:encode(#{
+    type => id,
+    body => #{
+      id => Id
+    }
+  }).
 
 -spec init(Avatar) -> Message when Avatar :: avatar:avatar(), Message :: jsx:json_text().
 init(A) ->
