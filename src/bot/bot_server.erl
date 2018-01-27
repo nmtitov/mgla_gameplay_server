@@ -44,23 +44,28 @@ init([Id]) ->
   State = avatar:new(Id, bot, Name, Position),
   {ok, State, 0}.
 
+
 handle_call(get_state, _From, State) ->
   {reply, State, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
+
 
 handle_cast({set_state, NewState}, _) ->
   {noreply, NewState};
 handle_cast(_Request, State) ->
   {noreply, State}.
 
+
 handle_info(timeout, State) ->
   lager:info("~p:~p/~p(timeout, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   Id = avatar:get_id(State),
   map_server:add_avatar(bot, Id),
   {noreply, State};
+
 handle_info(_Info, State) ->
   {noreply, State}.
+
 
 terminate(Reason, State) ->
   lager:info("~p:~p/~p(~p=Reason, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Reason]),
@@ -68,6 +73,7 @@ terminate(Reason, State) ->
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
+
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
