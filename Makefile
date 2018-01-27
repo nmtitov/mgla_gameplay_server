@@ -38,7 +38,7 @@ ranch:
 deps: cowboy cowlib goldrush gproc jsx lager ranch
 
 compile:
-	erlc "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ \
+	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ \
 	src/*.erl		\
 	src/avatar/*.erl	\
 	src/bot/*.erl		\
@@ -76,4 +76,4 @@ noshell:
 	erl -pa ebin/ lib/cowboy/ebin/ lib/cowlib/ebin/ lib/goldrush/ebin/ lib/gproc/ebin/ lib/jsx/ebin/ lib/lager/ebin/ lib/ranch/ebin/ -noshell -s gameplay_server
 
 dialyzer:
-	dialyzer --no_check_plt --src src/ src/avatar/ src/bot src/map/ src/math/ src/misc src/pathfinder src/ws/ tests/avatar/
+	dialyzer --no_check_plt --src src src/avatar src/bot src/map src/math src/misc src/pathfinder src/ws tests/avatar
