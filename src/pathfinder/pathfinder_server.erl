@@ -40,28 +40,36 @@ init([Id]) ->
   gproc:reg(name(Id)),
   {ok, Id}.
 
+
 handle_call({initial_point, Rect, Blocks}, _From, State) ->
   InitialPoint = path:initial_point(Rect, Blocks),
   {reply, InitialPoint, State};
+
 handle_call({path, A, B, Blocks}, _From, State) ->
   DestinationPoint = path:path(A, B, Blocks),
   {reply, DestinationPoint, State};
+
 handle_call({next_point, A, B, Dt, Speed, MapRect, Blocks}, _From, State) ->
   NextPoint = path:next_point(A, B, Dt, Speed, MapRect, Blocks),
   {reply, NextPoint, State};
+
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
+
 
 handle_cast(_Request, State) ->
   {noreply, State}.
 
+
 handle_info(_Info, State) ->
   {noreply, State}.
+
 
 terminate(Reason, Id) ->
   lager:info("pathfinder_server:terminate(~p = Reason, ~p = Id)", [Reason, Id]),
   gproc:unreg(name(Id)),
   ok.
+
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
