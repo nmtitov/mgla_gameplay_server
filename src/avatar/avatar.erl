@@ -28,11 +28,17 @@
   set_path/2,
   should_move/1,
 
+  get_health/1,
+  set_health/2,
   get_health_percent/1,
   update_health_by/2,
+  set_health_max/2,
 
+  get_mana/1,
+  set_mana/2,
   get_mana_percent/1,
   update_mana_by/2,
+  set_mana_max/2,
 
   get_state_value/1,
   set_state_value/2,
@@ -120,7 +126,8 @@ should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
 
 get_health(#{health := #{value := X}}) -> X.
-set_health(X, #{health := N} = Data) ->
+set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
+  X = float(RawX),
   MaxValue = get_health_max(Data),
   Data#{
     health := N#{
@@ -134,10 +141,19 @@ set_health(X, #{health := N} = Data) ->
   }.
 
 get_health_max(#{health_max := #{value := X}}) -> X.
-set_health_max(X, #{health_max := N} = Data) ->
+set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) when is_number(RawXMax) ->
+  XMax = float(RawXMax),
+  X = get_health(Data),
   Data#{
-    health_max := N#{
-      value := X,
+    health := N#{
+      value := if
+                 X > XMax -> XMax;
+                 true     -> X
+               end,
+      update := true
+    },
+    health_max := NMax#{
+      value := XMax,
       update := true
     }
   }.
@@ -147,7 +163,8 @@ get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
 update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
 get_mana(#{mana := #{value := X}}) -> X.
-set_mana(X, #{mana := N} = Data) ->
+set_mana(RawX, #{mana := N} = Data) when is_number(RawX) ->
+  X = float(RawX),
   MaxValue = get_mana_max(Data),
   Data#{
     mana := N#{
@@ -161,10 +178,19 @@ set_mana(X, #{mana := N} = Data) ->
   }.
 
 get_mana_max(#{mana_max := #{value := X}}) -> X.
-set_mana_max(X, #{mana_max := N} = Data) ->
+set_mana_max(RawXMax, #{mana := N, mana_max := NMax} = Data) when is_number(RawXMax) ->
+  XMax = float(RawXMax),
+  X = get_mana(Data),
   Data#{
-    mana_max := N#{
-      value := X,
+    mana := N#{
+      value := if
+                 X > XMax -> XMax;
+                 true     -> X
+               end,
+      update := true
+    },
+    mana_max := NMax#{
+      value := XMax,
       update := true
     }
   }.
