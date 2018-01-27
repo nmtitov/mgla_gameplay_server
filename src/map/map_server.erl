@@ -67,7 +67,6 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   end,
 
   ws_send:broadcast_enter(Id),
-
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
