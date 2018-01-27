@@ -50,12 +50,16 @@ init([Id]) ->
   State = avatar:new(Id, player, Name, Position),
   {ok, State, 0}.
 
+
 handle_call(get_state, _From, State) ->
   {reply, State, State};
+
 handle_call(get_position, _From, #{position := #{value := Position}} = State) ->
   {reply, Position, State};
+
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
+
 
 handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
@@ -66,20 +70,25 @@ handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast/Path = ~p", [Path]),
   NewState = avatar:set_path(Path, State),
   {noreply, NewState};
+
 handle_cast({set_state, NewState}, _) ->
   {noreply, NewState};
+
 handle_cast(Request, State) ->
   lager:info("avatar_server:handle_info(~p = Request, State)", [Request]),
   {noreply, State}.
+
 
 handle_info(timeout, State) ->
   Id = avatar:get_id(State),
   lager:info("avatar_server:handle_info(timeout)"),
   map_server:add_avatar(player, Id),
   {noreply, State};
+
 handle_info(Info, State) ->
   lager:info("avatar_server:handle_info(~p = Info, State)", [Info]),
   {noreply, State}.
+
 
 terminate(Reason, State) ->
   Id = avatar:get_id(State),
@@ -87,6 +96,7 @@ terminate(Reason, State) ->
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
+
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
