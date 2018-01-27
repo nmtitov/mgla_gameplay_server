@@ -55,9 +55,9 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   ws_handler:broadcast(ws_send:enter_message(Id)),
   case Type of
     player ->
-      ws_handler:send(Id, ws_send:id(Id)),
       ws_handler:send(Id, map_tools:map()),
-      lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, AvatarsMeta);
+      ws_handler:send(Id, ws_send:id(Id)),
+      lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, NewAvatarsMeta);
     _ -> ok
   end,
   {noreply, NewState};
