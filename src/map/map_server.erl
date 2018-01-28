@@ -50,7 +50,8 @@ get_state({Type, Id}) ->
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewAvatarsMeta = [{Type, Id}| AvatarsMeta],
+  NewMeta = {Type, Id},
+  NewAvatarsMeta = [NewMeta|AvatarsMeta],
   NewState = State#{avatars := NewAvatarsMeta},
   ws_handler:broadcast(ws_send:enter_message(Id)),
   case Type of
@@ -60,6 +61,10 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
       lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, NewAvatarsMeta);
     _ -> ok
   end,
+
+  PlayersMeta = lists:filter(fun({Type2, _}) -> Type2 =:= player end, AvatarsMeta),
+  lists:foreach(fun({_, Id2}) -> ws_handler:send(Id2, ws_send:init(get_state(NewMeta))) end, PlayersMeta),
+
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
