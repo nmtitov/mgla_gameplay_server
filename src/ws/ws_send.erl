@@ -12,7 +12,7 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar) -> Message when Avatar :: avatar_data:avatar(), Message :: jsx:json_text().
+-spec init(Avatar) -> Message when Avatar :: avatar_data:avatar_data(), Message :: jsx:json_text().
 init(A) ->
   Id = avatar_data:get_id(A),
   Name = avatar_data:get_name(A),

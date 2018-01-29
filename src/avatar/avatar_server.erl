@@ -24,19 +24,23 @@ name(Id) -> {n, l, {avatar, Id}}.
 start_link(Type, Id) ->
   gen_server:start_link(?MODULE, [Type, Id], []).
 
+-spec handle_input(Id :: id_server:id(), Point :: point:point()) -> ok.
 handle_input(Id, Point) ->
   ok = gproc_tools:cast(name(Id), {handle_input, Point}).
 
+-spec get_state(Id :: id_server:id()) -> State :: avatar_data:avatar_data().
 get_state(Id) ->
   {ok, State} = gproc_tools:call(name(Id), get_state),
   State.
 
+-spec set_state(Id :: id_server:id(), State :: avatar_data:avatar_data()) -> ok.
 set_state(Id, State) ->
   ok = gproc_tools:cast(name(Id), {set_state, State}).
 
+-spec get_position(Id :: id_server:id()) -> point:point().
 get_position(Id) ->
-  {ok, State} = gproc_tools:call(name(Id), get_position),
-  State.
+  {ok, Value} = gproc_tools:call(name(Id), get_position),
+  Value.
 
 %% Callbacks
 
