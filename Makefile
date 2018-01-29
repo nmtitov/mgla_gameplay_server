@@ -37,7 +37,7 @@ ranch:
 
 deps: cowboy cowlib goldrush gproc jsx lager ranch
 
-compile:
+build:
 	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ \
 	src/*.erl		\
 	src/avatar/*.erl	\
