@@ -50,6 +50,8 @@ build:
 	tests/avatar/*.erl	
 	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
+compile: build dialyzer
+
 clean:
 	rm -rf ebin/*
 
