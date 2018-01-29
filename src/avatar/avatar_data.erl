@@ -106,6 +106,10 @@ get_position_value(#{position := #{value := X}}) -> X.
 
 -spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: avatar_data(), NewData :: avatar_data().
 set_position_value(X, #{position := Nested} = Data) ->
+  case point:is_point(X) of
+    false  -> error(badarg);
+    _      -> ok
+  end,
   Data#{
     position := Nested#{
       value := X,
