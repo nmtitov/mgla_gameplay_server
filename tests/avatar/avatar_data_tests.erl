@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 22. Jan 2018 13:03
 %%%-------------------------------------------------------------------
--module(avatar_tests).
+-module(avatar_data_tests).
 -author("nt").
 -include_lib("eunit/include/eunit.hrl").
 
