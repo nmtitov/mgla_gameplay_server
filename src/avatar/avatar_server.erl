@@ -12,7 +12,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/2, handle_input/2, get_position/1, get_state/1, set_state/2]).
+-export([start_link/2, handle_input/2, get_position/1, set_position/2, get_state/1, set_state/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% gproc
@@ -41,6 +41,10 @@ set_state(Id, State) ->
 get_position(Id) ->
   {ok, Value} = gproc_tools:call(name(Id), get_position),
   Value.
+
+-spec set_position(Id :: id_server:id(), P :: point:point()) -> ok.
+set_position(Id, P) ->
+  ok = gproc_tools:cast(name(Id), {set_position, P}).
 
 %% Callbacks
 
@@ -74,6 +78,11 @@ handle_cast({handle_input, Point}, State) ->
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
   NewState = avatar_data:set_path(Path, State),
   {noreply, NewState};
+
+handle_cast({set_position, P}, State) ->
+  lager:info("avatar_server:handle_cast({set_position, ~p}", P),
+  State2 = avatar_data:set_position_value(P, State),
+  {noreply, State2};
 
 handle_cast({set_state, NewState}, _) ->
   {noreply, NewState};
