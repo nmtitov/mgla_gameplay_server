@@ -37,7 +37,7 @@ init([Id]) ->
     modules => [pathfinder_server]
   }, #{
     id => avatar_server,
-    start => {avatar_server, start_link, [Id]},
+    start => {avatar_server, start_link, [player, Id]},
     shutdown => brutal_kill,
     modules => [avatar_server]
   }],

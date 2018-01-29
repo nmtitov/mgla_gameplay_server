@@ -37,9 +37,9 @@ init([Id]) ->
     shutdown => brutal_kill,
     modules => [pathfinder_server]
   }, #{
-    id => bot_server,
-    start => {bot_server, start_link, [Id]},
+    id => avatar_server,
+    start => {avatar_server, start_link, [bot, Id]},
     shutdown => brutal_kill,
-    modules => [bot_server]
+    modules => [avatar_server]
   }],
   {ok, {RestartStrategy, Children}}.
