@@ -5,7 +5,7 @@
 
 -define(UPDATE_RATE, 33).
 
--export([start_link/0, add_avatar/2, remove_avatar/1]).
+-export([start_link/0, add_avatar/2, remove_avatar/1, get_avatars_meta/0]).
 
 -export([init/1,
   handle_call/3,
@@ -24,6 +24,10 @@ add_avatar(Type, Id) ->
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
 
+-spec get_avatars_meta() -> [avatar:avatar()].
+get_avatars_meta() ->
+  gen_server:call(?SERVER, get_avatars_meta).
+
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
@@ -39,6 +43,8 @@ init(Params) ->
   },
   {ok, State, 0}.
 
+handle_call(get_avatars_meta, _From, #{avatars := AvatarsMeta} = State) ->
+  {reply, AvatarsMeta, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
