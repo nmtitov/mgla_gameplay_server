@@ -45,27 +45,27 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
-  NewMeta = {Type, Id},
-  NewAvatarsMeta = [NewMeta|AvatarsMeta],
-  NewState = State#{avatars := NewAvatarsMeta},
+
   ws_handler:broadcast(ws_send:enter_message(Id)),
+
   case Type of
     player ->
       ws_handler:send(Id, map_tools:map()),
       ws_handler:send(Id, ws_send:id(Id)),
-      lists:foreach(fun({_, Id2}) ->
-        ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id2)))
-      end, NewAvatarsMeta);
+      ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id))),
+      lists:foreach(fun({_, Id_}) ->
+        ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id_)))
+      end, AvatarsMeta);
     _ -> ok
   end,
 
-  PlayersMeta = lists:filter(fun({Type2, _}) ->
-    Type2 =:= player
-  end, AvatarsMeta),
-  lists:foreach(fun({_, Id2}) ->
-    ws_handler:send(Id2, ws_send:init(avatar_server:get_state(Id)))
-  end, PlayersMeta),
+  lists:foreach(fun({_, Id_}) ->
+    ws_handler:send(Id_, ws_send:init(avatar_server:get_state(Id)))
+  end, lists:filter(fun({Type_, _}) ->
+    Type_ == player
+   end, AvatarsMeta)),
 
+  NewState = State#{avatars := [{Type, Id}|AvatarsMeta]},
   {noreply, NewState};
 
 handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
