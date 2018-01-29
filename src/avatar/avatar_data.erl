@@ -11,8 +11,8 @@
 
 -type data() :: map().
 -type state() :: idle | walk.
--type avatar_type() :: player | bot.
--export_type([data/0, state/0, avatar_type/0]).
+-type type() :: player | bot.
+-export_type([data/0, state/0, type/0]).
 
 %% API
 -export([
@@ -50,7 +50,7 @@
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
--spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: avatar_type(), Name :: binary(), Position :: point:point(), Data :: data().
+-spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: type(), Name :: binary(), Position :: point:point(), Data :: data().
 new(Id, Type, Name, Position) ->
   #{
     id => Id,
@@ -96,7 +96,7 @@ new(Id, Type, Name, Position) ->
 -spec get_id(Data) -> X when Data :: data(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
 
--spec get_type(Data) -> X when Data :: data(), X :: avatar_type().
+-spec get_type(Data) -> X when Data :: data(), X :: type().
 get_type(#{type := X}) -> X.
 
 -spec get_name(Data) -> X when Data :: data(), X :: binary().
