@@ -11,6 +11,7 @@
 -include("../../include/avatar.hrl").
 
 -type avatar() :: map().
+-export_type([avatar/0]).
 
 %% API
 -export([

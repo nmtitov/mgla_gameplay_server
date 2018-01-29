@@ -42,11 +42,6 @@ init(Params) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-get_state({Type, Id}) ->
-  case Type of
-    player -> avatar_server:get_state(Id);
-    bot    -> bot_server:get_state(Id)
-  end.
 
 handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
@@ -58,12 +53,18 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
     player ->
       ws_handler:send(Id, map_tools:map()),
       ws_handler:send(Id, ws_send:id(Id)),
-      lists:foreach(fun(Meta) -> ws_handler:send(Id, ws_send:init(get_state(Meta))) end, NewAvatarsMeta);
+      lists:foreach(fun({_, Id2}) ->
+        ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id2)))
+      end, NewAvatarsMeta);
     _ -> ok
   end,
 
-  PlayersMeta = lists:filter(fun({Type2, _}) -> Type2 =:= player end, AvatarsMeta),
-  lists:foreach(fun({_, Id2}) -> ws_handler:send(Id2, ws_send:init(get_state(NewMeta))) end, PlayersMeta),
+  PlayersMeta = lists:filter(fun({Type2, _}) ->
+    Type2 =:= player
+  end, AvatarsMeta),
+  lists:foreach(fun({_, Id2}) ->
+    ws_handler:send(Id2, ws_send:init(avatar_server:get_state(Id)))
+  end, PlayersMeta),
 
   {noreply, NewState};
 
@@ -106,20 +107,14 @@ code_change(_OldVsn, State, _Extra) ->
 update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
 
-  Avatars = lists:map(fun({Type, Id}) ->
-    case Type of
-      bot  -> bot_server:get_state(Id);
-      player -> avatar_server:get_state(Id)
-    end
+  Avatars = lists:map(fun({_, Id}) ->
+    avatar_server:get_state(Id)
   end, AvatarsMeta),
   Dt = ?UPDATE_RATE / 1000.0,
   NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
-  lists:foreach(fun(#{id := Id, type := Type} = Avatar) ->
-    case Type of
-      bot  -> bot_server:set_state(Id, Avatar);
-      player -> avatar_server:set_state(Id, Avatar)
-    end
+  lists:foreach(fun(#{id := Id} = Avatar) ->
+    avatar_server:set_state(Id, Avatar)
   end, NewAvatars),
 
   TimeB = erlang:system_time(),
