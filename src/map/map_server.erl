@@ -120,7 +120,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
   lists:foreach(fun(#{id := Id} = Avatar) ->
-    avatar_server:set_state(Id, Avatar)
+    avatar_server:set_state(Avatar, Id)
   end, NewAvatars),
 
   TimeB = erlang:system_time(),

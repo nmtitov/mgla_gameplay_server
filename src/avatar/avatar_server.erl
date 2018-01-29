@@ -33,8 +33,8 @@ get_state(Id) ->
   {ok, State} = gproc_tools:call(name(Id), get_state),
   State.
 
--spec set_state(Id :: id_server:id(), State :: avatar_data:avatar_data()) -> ok.
-set_state(Id, State) ->
+-spec set_state(State :: avatar_data:avatar_data(), Id :: id_server:id()) -> ok.
+set_state(State, Id) ->
   ok = gproc_tools:cast(name(Id), {set_state, State}).
 
 -spec get_position(Id :: id_server:id()) -> point:point().
@@ -42,16 +42,16 @@ get_position(Id) ->
   {ok, Value} = gproc_tools:call(name(Id), get_position),
   Value.
 
--spec set_position(Id :: id_server:id(), P :: point:point()) -> ok.
-set_position(Id, P) ->
+-spec set_position(P :: point:point(), Id :: id_server:id()) -> ok.
+set_position(P, Id) ->
   ok = gproc_tools:cast(name(Id), {set_position, P}).
 
--spec dmg_by(Id :: id_server:id(), X :: number()) -> ok.
-dmg_by(Id, X) ->
+-spec dmg_by(X :: number(), Id :: id_server:id()) -> ok.
+dmg_by(X, Id) ->
   ok = gproc_tools:cast(name(Id), {dmg_by, X}).
 
--spec heal_by(Id :: id_server:id(), X :: number()) -> ok.
-heal_by(Id, X) ->
+-spec heal_by(X :: number(), Id :: id_server:id()) -> ok.
+heal_by(X, Id) ->
   ok = gproc_tools:cast(name(Id), {heal_by, X}).
 
 %% Callbacks
