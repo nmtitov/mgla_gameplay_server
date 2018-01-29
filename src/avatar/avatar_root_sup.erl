@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 20. Jan 2018 19:15
 %%%-------------------------------------------------------------------
--module(avatar_sup).
+-module(avatar_root_sup).
 -author("nt").
 
 -behaviour(supervisor).
