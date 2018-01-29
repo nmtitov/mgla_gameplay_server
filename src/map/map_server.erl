@@ -24,7 +24,7 @@ add_avatar(Type, Id) ->
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
 
--spec get_avatars_meta() -> [avatar_data:avatar_data()].
+-spec get_avatars_meta() -> [avatar_data:data()].
 get_avatars_meta() ->
   gen_server:call(?SERVER, get_avatars_meta).
 
