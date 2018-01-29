@@ -4,9 +4,9 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 20. Jan 2018 19:15
+%%% Created : 22. Jan 2018 22:22
 %%%-------------------------------------------------------------------
--module(factory_sup).
+-module(bot_root_sup).
 -author("nt").
 
 -behaviour(supervisor).
@@ -25,7 +25,7 @@ start_child(Id) ->
   supervisor:start_child(?SERVER, [Id]).
 
 stop_child(Id) ->
-  case gproc:where(components_sup:name(Id)) of
+  case gproc:where(bot_components_sup:name(Id)) of
     Pid when is_pid(Pid) -> supervisor:terminate_child(?SERVER, Pid);
     _ -> undefined
   end.
@@ -39,8 +39,8 @@ init([]) ->
     period => 1
   },
   ChildSpecs = [#{
-    id => components_sup,
-    start => {components_sup, start_link, []},
+    id => bot_components_sup,
+    start => {bot_components_sup, start_link, []},
     shutdown => brutal_kill
   }],
   {ok, {SupFlags, ChildSpecs}}.

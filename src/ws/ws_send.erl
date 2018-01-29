@@ -1,6 +1,5 @@
 -module(ws_send).
 -author("nt").
--include("../../include/avatar.hrl").
 -export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
 
 -spec id(Id::id_server:id()) -> jsx:json_text().
@@ -12,7 +11,7 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar) -> Message when Avatar :: avatar_data:avatar_data(), Message :: jsx:json_text().
+-spec init(Avatar) -> Message when Avatar :: avatar_data:data(), Message :: jsx:json_text().
 init(A) ->
   Id = avatar_data:get_id(A),
   Name = avatar_data:get_name(A),
@@ -62,7 +61,7 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_state(), Message :: jsx:json_text().
+-spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state(), Message :: jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
     type => teleport,
