@@ -9,7 +9,46 @@
 -module(avatar_data).
 -author("nt").
 
--type data() :: map().
+-type data() :: #{
+  id := id_server:id(),
+  type := type(),
+  name := binary(),
+  position := #{
+    value := point:point(),
+    update := boolean()
+  },
+  movement_speed := float(),
+  path := [point:point()],
+  health := #{
+    value := float(),
+    update := boolean()
+  },
+  health_max := #{
+    value := float(),
+    update := boolean()
+  },
+  health_regen := float(),
+  mana := #{
+    value := float(),
+    update := boolean()
+  },
+  mana_max := #{
+    value := float(),
+    update := boolean()
+  },
+  mana_regen := float(),
+  attack_speed := float(),
+  attack_range := float(),
+  attack_damage := float(),
+  state := #{
+    value := state(),
+    update := boolean()
+  },
+  xp := #{
+    value := float(),
+    update := boolean()
+  }
+}.
 -type state() :: idle | walk.
 -type type() :: player | bot.
 -export_type([data/0, state/0, type/0]).
