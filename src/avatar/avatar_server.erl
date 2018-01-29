@@ -12,7 +12,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/2, handle_input/2, get_position/1, set_position/2, add_health/2, subtract_health/2, get_state/1, set_state/2]).
+-export([start_link/2, handle_input/2, get_position/1, set_position/2, add_health/2, subtract_health/2, add_mana/2, subtract_mana/2, get_state/1, set_state/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% gproc
@@ -53,6 +53,14 @@ add_health(X, Id) ->
 -spec subtract_health(X :: number(), Id :: id_server:id()) -> ok.
 subtract_health(X, Id) ->
   ok = gproc_tools:cast(name(Id), {subtract_health, X}).
+
+-spec add_mana(X :: number(), Id :: id_server:id()) -> ok.
+add_mana(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {add_mana, X}).
+
+-spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok.
+subtract_mana(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {subtract_mana, X}).
 
 %% Callbacks
 
@@ -100,6 +108,16 @@ handle_cast({add_health, X} = M, State) ->
 handle_cast({subtract_health, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
   State2 = avatar_data:update_health_by(-X, State),
+  {noreply, State2};
+
+handle_cast({add_mana, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_mana_by(X, State),
+  {noreply, State2};
+
+handle_cast({subtract_mana, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_mana_by(-X, State),
   {noreply, State2};
 
 handle_cast({set_state, NewState}, _) ->
