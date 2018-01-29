@@ -6,12 +6,12 @@
 %%% @end
 %%% Created : 22. Jan 2018 11:51
 %%%-------------------------------------------------------------------
--module(avatar).
+-module(avatar_data).
 -author("nt").
 -include("../../include/avatar.hrl").
 
--type avatar() :: map().
--export_type([avatar/0]).
+-type avatar_data() :: map().
+-export_type([avatar_data/0]).
 
 %% API
 -export([
@@ -49,7 +49,7 @@
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
--spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: avatar_type(), Name :: binary(), Position :: point:point(), Data :: avatar().
+-spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: avatar_type(), Name :: binary(), Position :: point:point(), Data :: avatar_data().
 new(Id, Type, Name, Position) ->
   #{
     id => Id,
@@ -92,20 +92,24 @@ new(Id, Type, Name, Position) ->
     }
   }.
 
--spec get_id(Data) -> X when Data :: avatar(), X :: non_neg_integer().
+-spec get_id(Data) -> X when Data :: avatar_data(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
 
--spec get_type(Data) -> X when Data :: avatar(), X :: avatar_type().
+-spec get_type(Data) -> X when Data :: avatar_data(), X :: avatar_type().
 get_type(#{type := X}) -> X.
 
--spec get_name(Data) -> X when Data ::avatar(), X :: binary().
+-spec get_name(Data) -> X when Data :: avatar_data(), X :: binary().
 get_name(#{name := X}) -> X.
 
--spec get_position_value(Data) -> X when Data :: avatar(), X :: point:point().
+-spec get_position_value(Data) -> X when Data :: avatar_data(), X :: point:point().
 get_position_value(#{position := #{value := X}}) -> X.
 
--spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: avatar(), NewData :: avatar().
+-spec set_position_value(X, Data) -> NewData when X :: point:point(), Data :: avatar_data(), NewData :: avatar_data().
 set_position_value(X, #{position := Nested} = Data) ->
+  case point:is_point(X) of
+    false  -> error(badarg);
+    _      -> ok
+  end,
   Data#{
     position := Nested#{
       value := X,
@@ -113,16 +117,16 @@ set_position_value(X, #{position := Nested} = Data) ->
     }
   }.
 
--spec get_position_update(Data) -> X when Data :: avatar(), X :: boolean().
+-spec get_position_update(Data) -> X when Data :: avatar_data(), X :: boolean().
 get_position_update(#{position := #{update := X}}) -> X.
 
--spec get_path(Data) -> X when Data :: avatar(), X :: [point:point()].
+-spec get_path(Data) -> X when Data :: avatar_data(), X :: [point:point()].
 get_path(#{path := X}) -> X.
 
--spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: avatar(), NewData :: avatar().
+-spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: avatar_data(), NewData :: avatar_data().
 set_path(X, Data) -> Data#{path := X}.
 
--spec should_move(Data) -> X when Data :: avatar(), X :: boolean().
+-spec should_move(Data) -> X when Data :: avatar_data(), X :: boolean().
 should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
 
@@ -200,10 +204,10 @@ get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 
 update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
 
--spec get_state_value(Data) -> X when Data :: avatar(), X :: avatar_state().
+-spec get_state_value(Data) -> X when Data :: avatar_data(), X :: avatar_state().
 get_state_value(#{state := #{value := X}}) -> X.
 
--spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: avatar(), NewData :: avatar().
+-spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: avatar_data(), NewData :: avatar_data().
 set_state_value(Value, #{state := Nested} = Data) ->
   Data#{
     state := Nested#{
@@ -212,10 +216,10 @@ set_state_value(Value, #{state := Nested} = Data) ->
     }
   }.
 
--spec get_state_update(Data) -> X when Data :: avatar(), X :: boolean().
+-spec get_state_update(Data) -> X when Data :: avatar_data(), X :: boolean().
 get_state_update(#{state := #{update := X}}) -> X.
 
--spec clear_update_flags(Data) -> NewData when Data :: avatar(), NewData :: avatar().
+-spec clear_update_flags(Data) -> NewData when Data :: avatar_data(), NewData :: avatar_data().
 clear_update_flags(#{position := Position, state := State} = Data) ->
   Data#{
     position := Position#{

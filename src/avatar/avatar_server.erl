@@ -12,7 +12,26 @@
 
 -behaviour(gen_server).
 
--export([start_link/2, handle_input/2, get_position/1, get_state/1, set_state/2]).
+-export([
+  start_link/2,
+
+  handle_input/2,
+
+  get_data/1,
+  set_data/2,
+
+  get_position/1,
+  set_position/2,
+
+  add_health/2,
+  subtract_health/2,
+
+  add_mana/2,
+  subtract_mana/2,
+
+  get_state/1,
+  set_state/2
+]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% gproc
@@ -24,19 +43,52 @@ name(Id) -> {n, l, {avatar, Id}}.
 start_link(Type, Id) ->
   gen_server:start_link(?MODULE, [Type, Id], []).
 
+-spec handle_input(Id :: id_server:id(), Point :: point:point()) -> ok.
 handle_input(Id, Point) ->
   ok = gproc_tools:cast(name(Id), {handle_input, Point}).
 
-get_state(Id) ->
-  {ok, State} = gproc_tools:call(name(Id), get_state),
-  State.
+-spec get_data(Id :: id_server:id()) -> Data :: avatar_data:avatar_data().
+get_data(Id) ->
+  {ok, Data} = gproc_tools:call(name(Id), get_data),
+  Data.
 
-set_state(Id, State) ->
-  ok = gproc_tools:cast(name(Id), {set_state, State}).
+-spec set_data(Data :: avatar_data:avatar_data(), Id :: id_server:id()) -> ok.
+set_data(Data, Id) ->
+  ok = gproc_tools:cast(name(Id), {set_data, Data}).
 
+-spec get_position(Id :: id_server:id()) -> point:point().
 get_position(Id) ->
-  {ok, State} = gproc_tools:call(name(Id), get_position),
-  State.
+  {ok, Value} = gproc_tools:call(name(Id), get_position),
+  Value.
+
+-spec set_position(P :: point:point(), Id :: id_server:id()) -> ok.
+set_position(P, Id) ->
+  ok = gproc_tools:cast(name(Id), {set_position, P}).
+
+-spec add_health(X :: number(), Id :: id_server:id()) -> ok.
+add_health(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {add_health, X}).
+
+-spec subtract_health(X :: number(), Id :: id_server:id()) -> ok.
+subtract_health(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {subtract_health, X}).
+
+-spec add_mana(X :: number(), Id :: id_server:id()) -> ok.
+add_mana(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {add_mana, X}).
+
+-spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok.
+subtract_mana(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {subtract_mana, X}).
+
+-spec get_state(Id :: id_server:id()) -> avatar_state().
+get_state(Id) ->
+  {ok, X} = gproc_tools:call(name(Id), get_state),
+  X.
+
+-spec set_state(X :: avatar_state(), Id :: id_server:id()) -> ok.
+set_state(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {set_state, X}).
 
 %% Callbacks
 
@@ -47,16 +99,20 @@ init([Type, Id]) ->
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   Name = <<"Name">>,
-  State = avatar:new(Id, Type, Name, Position),
+  State = avatar_data:new(Id, Type, Name, Position),
   {ok, State, 0}.
 
 
-handle_call(get_state, _From, State) ->
+handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position= avatar:get_position_value(State),
+  Position= avatar_data:get_position_value(State),
   {reply, Position, State};
+
+handle_call(get_state, _From, State) ->
+  X = avatar_data:get_state_value(State),
+  {reply, X, State};
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
@@ -65,14 +121,44 @@ handle_call(_Request, _From, State) ->
 handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
   Blocks = map_tools:blocks(),
-  Id = avatar:get_id(State),
-  Position = avatar:get_position_value(State),
+  Id = avatar_data:get_id(State),
+  Position = avatar_data:get_position_value(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
-  NewState = avatar:set_path(Path, State),
+  NewState = avatar_data:set_path(Path, State),
   {noreply, NewState};
 
-handle_cast({set_state, NewState}, _) ->
+handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};
+
+handle_cast({set_position, P}, State) ->
+  lager:info("avatar_server:handle_cast({set_position, ~p}", P),
+  State2 = avatar_data:set_position_value(P, State),
+  {noreply, State2};
+
+handle_cast({add_health, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_health_by(X, State),
+  {noreply, State2};
+
+handle_cast({subtract_health, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_health_by(-X, State),
+  {noreply, State2};
+
+handle_cast({add_mana, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_mana_by(X, State),
+  {noreply, State2};
+
+handle_cast({subtract_mana, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:update_mana_by(-X, State),
+  {noreply, State2};
+
+handle_cast({set_state, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:set_state_value(X, State),
+  {noreply, State2};
 
 handle_cast(Request, State) ->
   lager:info("avatar_server:handle_info(~p = Request, State)", [Request]),
@@ -81,8 +167,8 @@ handle_cast(Request, State) ->
 
 handle_info(timeout, State) ->
   lager:info("avatar_server:handle_info(timeout)"),
-  Id = avatar:get_id(State),
-  Type = avatar:get_type(State),
+  Id = avatar_data:get_id(State),
+  Type = avatar_data:get_type(State),
   map_server:add_avatar(Type, Id),
   {noreply, State};
 
@@ -92,7 +178,7 @@ handle_info(Info, State) ->
 
 
 terminate(Reason, State) ->
-  Id = avatar:get_id(State),
+  Id = avatar_data:get_id(State),
   lager:info("avatar_server:terminate(~p = Reason, ~p = State)", [Reason, State]),
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),

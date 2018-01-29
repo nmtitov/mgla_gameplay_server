@@ -24,7 +24,7 @@ add_avatar(Type, Id) ->
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
 
--spec get_avatars_meta() -> [avatar:avatar()].
+-spec get_avatars_meta() -> [avatar_data:avatar_data()].
 get_avatars_meta() ->
   gen_server:call(?SERVER, get_avatars_meta).
 
@@ -58,15 +58,15 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
     player ->
       ws_handler:send(Id, map_tools:map()),
       ws_handler:send(Id, ws_send:id(Id)),
-      ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id))),
+      ws_handler:send(Id, ws_send:init(avatar_server:get_data(Id))),
       lists:foreach(fun({_, Id_}) ->
-        ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id_)))
+        ws_handler:send(Id, ws_send:init(avatar_server:get_data(Id_)))
       end, AvatarsMeta);
     _ -> ok
   end,
 
   lists:foreach(fun({_, Id_}) ->
-    ws_handler:send(Id_, ws_send:init(avatar_server:get_state(Id)))
+    ws_handler:send(Id_, ws_send:init(avatar_server:get_data(Id)))
   end, lists:filter(fun({Type_, _}) ->
     Type_ == player
    end, AvatarsMeta)),
@@ -114,13 +114,13 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
 
   Avatars = lists:map(fun({_, Id}) ->
-    avatar_server:get_state(Id)
+    avatar_server:get_data(Id)
   end, AvatarsMeta),
   Dt = ?UPDATE_RATE / 1000.0,
   NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
   lists:foreach(fun(#{id := Id} = Avatar) ->
-    avatar_server:set_state(Id, Avatar)
+    avatar_server:set_data(Avatar, Id)
   end, NewAvatars),
 
   TimeB = erlang:system_time(),
@@ -136,10 +136,10 @@ update(Avatars, Dt, MapRect, Blocks) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedAvatars),
   lists:foreach(fun(Avatar) ->
-    Id = avatar:get_id(Avatar),
-    P = avatar:get_position_value(Avatar),
-    State = avatar:get_state_value(Avatar),
-    UpdateState = avatar:get_state_update(Avatar),
+    Id = avatar_data:get_id(Avatar),
+    P = avatar_data:get_position_value(Avatar),
+    State = avatar_data:get_state_value(Avatar),
+    UpdateState = avatar_data:get_state_update(Avatar),
     PlayerState2 = if
       UpdateState == true -> State;
       true -> undefined
@@ -147,25 +147,25 @@ update(Avatars, Dt, MapRect, Blocks) ->
     ws_handler:broadcast(ws_send:update_message(Id, P, PlayerState2))
   end, Updated),
 
-  lists:map(fun(P) -> avatar:clear_update_flags(P) end, MovedAvatars).
+  lists:map(fun(P) -> avatar_data:clear_update_flags(P) end, MovedAvatars).
 
 move(#{path := [], state := #{value := State}} = Avatar, _, _, _) ->
   case State of
-    walk -> avatar:set_state_value(idle, Avatar);
+    walk -> avatar_data:set_state_value(idle, Avatar);
     _    -> Avatar
   end;
 move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Avatar, Dt, MapRect, Blocks) ->
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-      avatar:set_path(Rest, Avatar);
+      avatar_data:set_path(Rest, Avatar);
     New ->
       case State of
         idle ->
-          NewPlayer = avatar:set_position_value(New, Avatar),
-          NewPlayer2 = avatar:set_state_value(walk, NewPlayer),
+          NewPlayer = avatar_data:set_position_value(New, Avatar),
+          NewPlayer2 = avatar_data:set_state_value(walk, NewPlayer),
           NewPlayer2;
         _ ->
-          NewPlayer = avatar:set_position_value(New, Avatar),
+          NewPlayer = avatar_data:set_position_value(New, Avatar),
           NewPlayer
       end
   end.

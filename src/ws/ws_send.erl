@@ -12,14 +12,14 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar) -> Message when Avatar :: avatar:avatar(), Message :: jsx:json_text().
+-spec init(Avatar) -> Message when Avatar :: avatar_data:avatar_data(), Message :: jsx:json_text().
 init(A) ->
-  Id = avatar:get_id(A),
-  Name = avatar:get_name(A),
-  {X, Y} = avatar:get_position_value(A),
-  HealthPercent = avatar:get_health_percent(A),
-  ManaPercent = avatar:get_mana_percent(A),
-  State = avatar:get_state_value(A),
+  Id = avatar_data:get_id(A),
+  Name = avatar_data:get_name(A),
+  {X, Y} = avatar_data:get_position_value(A),
+  HealthPercent = avatar_data:get_health_percent(A),
+  ManaPercent = avatar_data:get_mana_percent(A),
+  State = avatar_data:get_state_value(A),
   jsx:encode(#{
     type => init,
     body => #{
