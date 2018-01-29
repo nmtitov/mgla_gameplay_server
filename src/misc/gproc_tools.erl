@@ -16,12 +16,12 @@
 call(Name, Message) ->
   case gproc:where(Name) of
     Pid when is_pid(Pid) -> {ok, gen_server:call(Pid, Message)};
-    _                    -> {error, undefined}
+    _                    -> {error, not_found}
   end.
 
 -spec cast(Name, Message) -> Result when Name :: term(), Message :: term(), Result :: ok | {error, undefined}.
 cast(Name, Message) ->
   case gproc:where(Name) of
     Pid when is_pid(Pid) -> gen_server:cast(Pid, Message);
-    _                    -> {error, undefined}
+    _                    -> {error, not_found}
   end.
