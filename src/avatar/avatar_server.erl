@@ -27,7 +27,10 @@
   subtract_health/2,
 
   add_mana/2,
-  subtract_mana/2
+  subtract_mana/2,
+
+  get_state/1,
+  set_state/2
 ]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
@@ -78,6 +81,15 @@ add_mana(X, Id) ->
 subtract_mana(X, Id) ->
   ok = gproc_tools:cast(name(Id), {subtract_mana, X}).
 
+-spec get_state(Id :: id_server:id()) -> avatar_state().
+get_state(Id) ->
+  {ok, X} = gproc_tools:call(name(Id), get_state),
+  X.
+
+-spec set_state(X :: avatar_state(), Id :: id_server:id()) -> ok.
+set_state(X, Id) ->
+  ok = gproc_tools:cast(name(Id), {set_state, X}).
+
 %% Callbacks
 
 init([Type, Id]) ->
@@ -97,6 +109,10 @@ handle_call(get_data, _From, State) ->
 handle_call(get_position, _From, State) ->
   Position= avatar_data:get_position_value(State),
   {reply, Position, State};
+
+handle_call(get_state, _From, State) ->
+  X = avatar_data:get_state_value(State),
+  {reply, X, State};
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
@@ -138,6 +154,11 @@ handle_cast({subtract_mana, X} = M, State) ->
 
 handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};
+
+handle_cast({set_state, X} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
+  State2 = avatar_data:set_state_value(X, State),
+  {noreply, State2};
 
 handle_cast(Request, State) ->
   lager:info("avatar_server:handle_info(~p = Request, State)", [Request]),
