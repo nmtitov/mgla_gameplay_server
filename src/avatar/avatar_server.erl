@@ -127,6 +127,9 @@ handle_cast({handle_input, Point}, State) ->
   NewState = avatar_data:set_path(Path, State),
   {noreply, NewState};
 
+handle_cast({set_data, NewState}, _) ->
+  {noreply, NewState};
+
 handle_cast({set_position, P}, State) ->
   lager:info("avatar_server:handle_cast({set_position, ~p}", P),
   State2 = avatar_data:set_position_value(P, State),
@@ -151,9 +154,6 @@ handle_cast({subtract_mana, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
   State2 = avatar_data:update_mana_by(-X, State),
   {noreply, State2};
-
-handle_cast({set_data, NewState}, _) ->
-  {noreply, NewState};
 
 handle_cast({set_state, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
