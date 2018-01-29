@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 22. Jan 2018 22:22
 %%%-------------------------------------------------------------------
--module(bot_sup).
+-module(bot_root_sup).
 -author("nt").
 
 -behaviour(supervisor).
