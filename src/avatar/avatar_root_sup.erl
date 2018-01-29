@@ -26,8 +26,8 @@ start_child(Id) ->
 
 stop_child(Id) ->
   case gproc:where(avatar_components_sup:name(Id)) of
-    Pid when is_pid(Pid) -> supervisor:terminate_child(?SERVER, Pid);
-    _ -> undefined
+    Pid when is_pid(Pid) -> {ok, supervisor:terminate_child(?SERVER, Pid)};
+    _                    -> {error, undefined}
   end.
 
 %% Callback
