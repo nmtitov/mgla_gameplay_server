@@ -94,12 +94,12 @@ handle_cast({set_position, P}, State) ->
 
 handle_cast({dmg_by, X}, State) ->
   lager:info("avatar_server:handle_cast({dmg_by, ~p}", X),
-  State2 = avatar_data:update_health_by(X, State),
+  State2 = avatar_data:update_health_by(-X, State),
   {noreply, State2};
 
 handle_cast({heal_by, X}, State) ->
   lager:info("avatar_server:handle_cast({heal_by, ~p}", X),
-  State2 = avatar_data:update_health_by(-X, State),
+  State2 = avatar_data:update_health_by(X, State),
   {noreply, State2};
 
 handle_cast({set_state, NewState}, _) ->
