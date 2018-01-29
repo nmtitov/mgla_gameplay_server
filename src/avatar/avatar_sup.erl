@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 20. Jan 2018 19:15
 %%%-------------------------------------------------------------------
--module(factory_sup).
+-module(avatar_sup).
 -author("nt").
 
 -behaviour(supervisor).
@@ -25,7 +25,7 @@ start_child(Id) ->
   supervisor:start_child(?SERVER, [Id]).
 
 stop_child(Id) ->
-  case gproc:where(components_sup:name(Id)) of
+  case gproc:where(avatar_components_sup:name(Id)) of
     Pid when is_pid(Pid) -> supervisor:terminate_child(?SERVER, Pid);
     _ -> undefined
   end.
