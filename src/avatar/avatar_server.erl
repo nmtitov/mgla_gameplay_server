@@ -47,7 +47,7 @@ init([Type, Id]) ->
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   Name = <<"Name">>,
-  State = avatar:new(Id, Type, Name, Position),
+  State = avatar_data:new(Id, Type, Name, Position),
   {ok, State, 0}.
 
 
@@ -55,7 +55,7 @@ handle_call(get_state, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position= avatar:get_position_value(State),
+  Position= avatar_data:get_position_value(State),
   {reply, Position, State};
 
 handle_call(_Request, _From, State) ->
@@ -65,10 +65,10 @@ handle_call(_Request, _From, State) ->
 handle_cast({handle_input, Point}, State) ->
   lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
   Blocks = map_tools:blocks(),
-  Id = avatar:get_id(State),
-  Position = avatar:get_position_value(State),
+  Id = avatar_data:get_id(State),
+  Position = avatar_data:get_position_value(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
-  NewState = avatar:set_path(Path, State),
+  NewState = avatar_data:set_path(Path, State),
   {noreply, NewState};
 
 handle_cast({set_state, NewState}, _) ->
@@ -81,8 +81,8 @@ handle_cast(Request, State) ->
 
 handle_info(timeout, State) ->
   lager:info("avatar_server:handle_info(timeout)"),
-  Id = avatar:get_id(State),
-  Type = avatar:get_type(State),
+  Id = avatar_data:get_id(State),
+  Type = avatar_data:get_type(State),
   map_server:add_avatar(Type, Id),
   {noreply, State};
 
@@ -92,7 +92,7 @@ handle_info(Info, State) ->
 
 
 terminate(Reason, State) ->
-  Id = avatar:get_id(State),
+  Id = avatar_data:get_id(State),
   lager:info("avatar_server:terminate(~p = Reason, ~p = State)", [Reason, State]),
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),

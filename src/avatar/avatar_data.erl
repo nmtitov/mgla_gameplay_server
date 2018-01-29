@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 22. Jan 2018 11:51
 %%%-------------------------------------------------------------------
--module(avatar).
+-module(avatar_data).
 -author("nt").
 -include("../../include/avatar.hrl").
 
