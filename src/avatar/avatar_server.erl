@@ -12,7 +12,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/2, handle_input/2, get_position/1, set_position/2, add_health/2, subtract_health/2, add_mana/2, subtract_mana/2, get_state/1, set_state/2]).
+-export([start_link/2, handle_input/2, get_data/1, set_data/2, get_position/1, set_position/2, add_health/2, subtract_health/2, add_mana/2, subtract_mana/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% gproc
@@ -28,14 +28,14 @@ start_link(Type, Id) ->
 handle_input(Id, Point) ->
   ok = gproc_tools:cast(name(Id), {handle_input, Point}).
 
--spec get_state(Id :: id_server:id()) -> State :: avatar_data:avatar_data().
-get_state(Id) ->
-  {ok, State} = gproc_tools:call(name(Id), get_state),
-  State.
+-spec get_data(Id :: id_server:id()) -> Data :: avatar_data:avatar_data().
+get_data(Id) ->
+  {ok, Data} = gproc_tools:call(name(Id), get_data),
+  Data.
 
--spec set_state(State :: avatar_data:avatar_data(), Id :: id_server:id()) -> ok.
-set_state(State, Id) ->
-  ok = gproc_tools:cast(name(Id), {set_state, State}).
+-spec set_data(Data :: avatar_data:avatar_data(), Id :: id_server:id()) -> ok.
+set_data(Data, Id) ->
+  ok = gproc_tools:cast(name(Id), {set_data, Data}).
 
 -spec get_position(Id :: id_server:id()) -> point:point().
 get_position(Id) ->
@@ -75,7 +75,7 @@ init([Type, Id]) ->
   {ok, State, 0}.
 
 
-handle_call(get_state, _From, State) ->
+handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
@@ -120,7 +120,7 @@ handle_cast({subtract_mana, X} = M, State) ->
   State2 = avatar_data:update_mana_by(-X, State),
   {noreply, State2};
 
-handle_cast({set_state, NewState}, _) ->
+handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};
 
 handle_cast(Request, State) ->
