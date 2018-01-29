@@ -8,10 +8,11 @@
 %%%-------------------------------------------------------------------
 -module(avatar_data).
 -author("nt").
--include("../../include/avatar.hrl").
 
 -type avatar_data() :: map().
--export_type([avatar_data/0]).
+-type avatar_state() :: idle | walk.
+-type avatar_type() :: player | bot.
+-export_type([avatar_data/0, avatar_state/0, avatar_type/0]).
 
 %% API
 -export([

@@ -8,7 +8,6 @@
 %%%-------------------------------------------------------------------
 -module(avatar_server).
 -author("nt").
--include("../../include/avatar.hrl").
 
 -behaviour(gen_server).
 
@@ -81,12 +80,12 @@ add_mana(X, Id) ->
 subtract_mana(X, Id) ->
   ok = gproc_tools:cast(name(Id), {subtract_mana, X}).
 
--spec get_state(Id :: id_server:id()) -> avatar_state().
+-spec get_state(Id :: id_server:id()) -> avatar_data:avatar_state().
 get_state(Id) ->
   {ok, X} = gproc_tools:call(name(Id), get_state),
   X.
 
--spec set_state(X :: avatar_state(), Id :: id_server:id()) -> ok.
+-spec set_state(X :: avatar_data:avatar_state(), Id :: id_server:id()) -> ok.
 set_state(X, Id) ->
   ok = gproc_tools:cast(name(Id), {set_state, X}).
 
