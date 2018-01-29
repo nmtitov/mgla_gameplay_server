@@ -89,7 +89,7 @@
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
--spec new(Id, Type, Name, Position) -> Data when Id :: non_neg_integer(), Type :: type(), Name :: binary(), Position :: point:point(), Data :: data().
+-spec new(Id :: non_neg_integer(), Type :: type(), Name :: binary(), Position :: point:point()) -> data().
 new(Id, Type, Name, Position) ->
   #{
     id => Id,
