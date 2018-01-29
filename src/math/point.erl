@@ -1,10 +1,14 @@
 -module(point).
 -author("nt").
 
--export([distance/2, translate/2]).
+-export([is_point/1, distance/2, translate/2]).
 
 -type point() :: {number(), number()}.
 -export_type([point/0]).
+
+-spec is_point(P :: point()) -> boolean().
+is_point({X, Y}) when is_number(X), is_number(Y) -> true;
+is_point(_)                                      -> false.
 
 -spec distance(A, B) -> C when A :: point(), B :: point(), C :: float().
 distance({X1, Y1}, {X2, Y2}) ->
