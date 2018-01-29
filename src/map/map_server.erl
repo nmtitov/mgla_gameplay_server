@@ -53,14 +53,18 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
     player ->
       ws_handler:send(Id, map_tools:map()),
       ws_handler:send(Id, ws_send:id(Id)),
-      lists:foreach(fun({_, Id2}) -> ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id2))) end, NewAvatarsMeta);
+      lists:foreach(fun({_, Id2}) ->
+        ws_handler:send(Id, ws_send:init(avatar_server:get_state(Id2)))
+      end, NewAvatarsMeta);
     _ -> ok
   end,
 
   PlayersMeta = lists:filter(fun({Type2, _}) ->
     Type2 =:= player
   end, AvatarsMeta),
-  lists:foreach(fun({_, Id2}) -> ws_handler:send(Id2, ws_send:init(avatar_server:get_state(Id))) end, PlayersMeta),
+  lists:foreach(fun({_, Id2}) ->
+    ws_handler:send(Id2, ws_send:init(avatar_server:get_state(Id)))
+  end, PlayersMeta),
 
   {noreply, NewState};
 
