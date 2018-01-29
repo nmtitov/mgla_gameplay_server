@@ -40,7 +40,7 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
   case ws_receive:get_type_and_body(Term) of
     {<<"input">>, Body} ->
       Point = ws_receive:get_input(Body),
-      avatar_server:handle_input(Id, Point);
+      avatar_sapi:handle_input(Id, Point);
     {<<"enter">>, _} ->
       avatar_root_sup:start_child(Id);
     {<<"leave">>, _} ->
