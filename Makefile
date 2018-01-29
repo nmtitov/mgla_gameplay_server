@@ -39,15 +39,7 @@ deps: cowboy cowlib goldrush gproc jsx lager ranch
 
 build:
 	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ \
-	src/*.erl		\
-	src/avatar/*.erl	\
-	src/bot/*.erl		\
-	src/map/*.erl		\
-	src/math/*.erl		\
-	src/misc/*.erl		\
-	src/pathfinder/*.erl	\
-	src/ws/*.erl		\
-	tests/avatar/*.erl	
+	`find src -type f -iname "*.erl" -print0 | xargs -0`
 	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
 compile: build dialyzer
