@@ -61,7 +61,7 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_data:avatar_state(), Message :: jsx:json_text().
+-spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state(), Message :: jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
     type => teleport,

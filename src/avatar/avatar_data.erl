@@ -10,9 +10,9 @@
 -author("nt").
 
 -type data() :: map().
--type avatar_state() :: idle | walk.
+-type state() :: idle | walk.
 -type avatar_type() :: player | bot.
--export_type([data/0, avatar_state/0, avatar_type/0]).
+-export_type([data/0, state/0, avatar_type/0]).
 
 %% API
 -export([
@@ -205,10 +205,10 @@ get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 
 update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
 
--spec get_state_value(Data) -> X when Data :: data(), X :: avatar_state().
+-spec get_state_value(Data) -> X when Data :: data(), X :: state().
 get_state_value(#{state := #{value := X}}) -> X.
 
--spec set_state_value(X, Data) -> NewData when X :: avatar_state(), Data :: data(), NewData :: data().
+-spec set_state_value(X, Data) -> NewData when X :: state(), Data :: data(), NewData :: data().
 set_state_value(Value, #{state := Nested} = Data) ->
   Data#{
     state := Nested#{
