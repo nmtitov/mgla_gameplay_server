@@ -39,8 +39,8 @@ init([]) ->
     period => 1
   },
   ChildSpecs = [#{
-    id => components_sup,
-    start => {components_sup, start_link, []},
+    id => avatar_components_sup,
+    start => {avatar_components_sup, start_link, []},
     shutdown => brutal_kill
   }],
   {ok, {SupFlags, ChildSpecs}}.
