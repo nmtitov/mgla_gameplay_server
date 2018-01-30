@@ -9,6 +9,43 @@
 -module(av_d).
 -author("nt").
 
+-export([
+  zero/0,
+  new/4,
+
+  get_id/1,
+  get_name/1,
+  get_type/1,
+
+  get_position_value/1,
+  set_position_value/2,
+  get_position_update/1,
+  get_path/1,
+  set_path/2,
+  should_move/1,
+
+  get_health/1,
+  set_health/2,
+  get_health_percent/1,
+  get_health_update/1,
+  update_health_by/2,
+  set_health_max/2,
+
+  get_mana/1,
+  set_mana/2,
+  get_mana_percent/1,
+  get_mana_update/1,
+  update_mana_by/2,
+  set_mana_max/2,
+
+  get_state_value/1,
+  set_state_value/2,
+  get_state_update/1,
+
+  is_dirty/1,
+  clear_update_flags/1
+]).
+
 -type data() :: #{
   id := id_server:id(),
   type := type(),
@@ -52,40 +89,6 @@
 -type state() :: idle | walk.
 -type type() :: player | bot.
 -export_type([data/0, state/0, type/0]).
-
-%% API
--export([
-  zero/0,
-  new/4,
-
-  get_id/1,
-  get_name/1,
-  get_type/1,
-
-  get_position_value/1,
-  set_position_value/2,
-  get_position_update/1,
-  get_path/1,
-  set_path/2,
-  should_move/1,
-
-  get_health/1,
-  set_health/2,
-  get_health_percent/1,
-  update_health_by/2,
-  set_health_max/2,
-
-  get_mana/1,
-  set_mana/2,
-  get_mana_percent/1,
-  update_mana_by/2,
-  set_mana_max/2,
-
-  get_state_value/1,
-  set_state_value/2,
-  get_state_update/1,
-  clear_update_flags/1
-]).
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
@@ -171,6 +174,8 @@ should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
 
 get_health(#{health := #{value := X}}) -> X.
+
+-spec set_health(RawX :: number(), Data :: data()) -> data().
 set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
   X = float(RawX),
   MaxValue = get_health_max(Data),
@@ -204,6 +209,9 @@ set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) when is_numbe
   }.
 
 get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
+
+-spec get_health_update(D :: data()) -> boolean().
+get_health_update(#{health := #{update := U}}) -> U.
 
 update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
@@ -242,6 +250,9 @@ set_mana_max(RawXMax, #{mana := N, mana_max := NMax} = Data) when is_number(RawX
 
 get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 
+-spec get_mana_update(D :: data()) -> boolean().
+get_mana_update(#{mana := #{update := U}}) -> U.
+
 update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
 
 -spec get_state_value(Data) -> X when Data :: data(), X :: state().
@@ -259,10 +270,23 @@ set_state_value(Value, #{state := Nested} = Data) ->
 -spec get_state_update(Data) -> X when Data :: data(), X :: boolean().
 get_state_update(#{state := #{update := X}}) -> X.
 
+-spec is_dirty(D :: data()) -> boolean().
+is_dirty(D) ->
+  get_position_update(D)
+  orelse get_health_update(D)
+  orelse get_mana_update(D)
+  orelse get_state_update(D).
+
 -spec clear_update_flags(Data) -> NewData when Data :: data(), NewData :: data().
-clear_update_flags(#{position := Position, state := State} = Data) ->
+clear_update_flags(#{position := Position, mana := M, health := H, state := State} = Data) ->
   Data#{
     position := Position#{
+      update := false
+    },
+    health := H#{
+      update := false
+    },
+    mana := M#{
       update := false
     },
     state := State#{
