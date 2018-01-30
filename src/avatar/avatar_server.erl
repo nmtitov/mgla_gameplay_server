@@ -33,7 +33,7 @@ init([Type, Id] = M) ->
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   Name = <<"Player">>,
-  State = avatar_data:new(Id, Type, Name, Position),
+  State = av_d:new(Id, Type, Name, Position),
   {ok, State, 0}.
 
 
@@ -41,11 +41,11 @@ handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position= avatar_data:get_position_value(State),
+  Position= av_d:get_position_value(State),
   {reply, Position, State};
 
 handle_call(get_state, _From, State) ->
-  X = avatar_data:get_state_value(State),
+  X = av_d:get_state_value(State),
   {reply, X, State};
 
 handle_call(_Request, _From, State) ->
@@ -55,10 +55,10 @@ handle_call(_Request, _From, State) ->
 handle_cast({handle_click, Point} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
-  Id = avatar_data:get_id(State),
-  Position = avatar_data:get_position_value(State),
+  Id = av_d:get_id(State),
+  Position = av_d:get_position_value(State),
   Path = pathfinder_server:path(Id, Position, Point, Blocks),
-  NewState = avatar_data:set_path(Path, State),
+  NewState = av_d:set_path(Path, State),
   {noreply, NewState};
 
 handle_cast({set_data, NewState}, _) ->
@@ -66,32 +66,32 @@ handle_cast({set_data, NewState}, _) ->
 
 handle_cast({set_position, P} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = avatar_data:set_position_value(P, State),
+  State2 = av_d:set_position_value(P, State),
   {noreply, State2};
 
 handle_cast({add_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = avatar_data:update_health_by(X, State),
+  State2 = av_d:update_health_by(X, State),
   {noreply, State2};
 
 handle_cast({subtract_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = avatar_data:update_health_by(-X, State),
+  State2 = av_d:update_health_by(-X, State),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
-  State2 = avatar_data:update_mana_by(X, State),
+  State2 = av_d:update_mana_by(X, State),
   {noreply, State2};
 
 handle_cast({subtract_mana, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = avatar_data:update_mana_by(-X, State),
+  State2 = av_d:update_mana_by(-X, State),
   {noreply, State2};
 
 handle_cast({set_state, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = avatar_data:set_state_value(X, State),
+  State2 = av_d:set_state_value(X, State),
   {noreply, State2};
 
 handle_cast(Request, State) ->
@@ -101,8 +101,8 @@ handle_cast(Request, State) ->
 
 handle_info(timeout = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  Id = avatar_data:get_id(State),
-  Type = avatar_data:get_type(State),
+  Id = av_d:get_id(State),
+  Type = av_d:get_type(State),
   map_server:add_avatar(Type, Id),
   {noreply, State};
 
@@ -113,7 +113,7 @@ handle_info(_Info = M, State) ->
 
 terminate(_Reason = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  Id = avatar_data:get_id(State),
+  Id = av_d:get_id(State),
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.

@@ -33,11 +33,11 @@
 handle_click(Id, Point) ->
   gproc_tools:cast(avatar_server:name(Id), {handle_click, Point}).
 
--spec get_data(Id :: id_server:id()) -> {ok, avatar_data:data()} | gproc_tools:not_found().
+-spec get_data(Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
 get_data(Id) ->
   gproc_tools:call(avatar_server:name(Id), get_data).
 
--spec set_data(Data :: avatar_data:data(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec set_data(Data :: av_d:data(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 set_data(Data, Id) ->
   gproc_tools:cast(avatar_server:name(Id), {set_data, Data}).
 
@@ -65,10 +65,10 @@ add_mana(X, Id) ->
 subtract_mana(X, Id) ->
   gproc_tools:cast(avatar_server:name(Id), {subtract_mana, X}).
 
--spec get_state(Id :: id_server:id()) -> {ok, avatar_data:state()} | gproc_tools:not_found().
+-spec get_state(Id :: id_server:id()) -> {ok, av_d:state()} | gproc_tools:not_found().
 get_state(Id) ->
   gproc_tools:call(avatar_server:name(Id), get_state).
 
--spec set_state(X :: avatar_data:state(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec set_state(X :: av_d:state(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 set_state(X, Id) ->
   gproc_tools:cast(avatar_server:name(Id), {set_state, X}).
