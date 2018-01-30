@@ -11,6 +11,7 @@
 
 %% API
 -export([sort/1]).
+%%-include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 -spec sort([T]) -> [T].
@@ -26,3 +27,7 @@ test_two() ->
   [?_assertEqual([17,42], sort([X,Y])) || {X,Y} <- [{17,42}, {42,17}]].
 test_four() ->
   [?_assertEqual([1,2,3,4], sort([3,1,4,2]))].
+
+
+prop_ordered() ->
+  ok.
