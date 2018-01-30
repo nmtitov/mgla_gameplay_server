@@ -141,6 +141,19 @@ set_health_max_test_() ->
     ?_assertEqual(100.0, av_d:get_health(Data4))
   ].
 
+set_health_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_health(50.0, D),
+  D3 = av_d:clear_update_flags(D2),
+  D4 = av_d:set_health(25.0, D3),
+  [
+    ?_assertEqual(50.0, av_d:get_health(D2)),
+    ?_assertEqual(true, av_d:get_health_update(D2)),
+    ?_assertEqual(false, av_d:get_health_update(D3)),
+    ?_assertEqual(25.0, av_d:get_health(D4)),
+    ?_assertEqual(true, av_d:get_health_update(D4))
+  ].
+
 get_mana_test_() ->
   Data = av_d:zero(),
   [

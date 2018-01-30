@@ -72,12 +72,14 @@
   get_health/1,
   set_health/2,
   get_health_percent/1,
+  get_health_update/1,
   update_health_by/2,
   set_health_max/2,
 
   get_mana/1,
   set_mana/2,
   get_mana_percent/1,
+  get_mana_update/1,
   update_mana_by/2,
   set_mana_max/2,
 
@@ -171,6 +173,8 @@ should_move(#{path := []}) -> false;
 should_move(#{path := _}) -> true.
 
 get_health(#{health := #{value := X}}) -> X.
+
+-spec set_health(RawX :: number(), Data :: data()) -> data().
 set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
   X = float(RawX),
   MaxValue = get_health_max(Data),
@@ -204,6 +208,9 @@ set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) when is_numbe
   }.
 
 get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
+
+-spec get_health_update(D :: data()) -> boolean().
+get_health_update(#{health := #{update := U}}) -> U.
 
 update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
@@ -242,6 +249,9 @@ set_mana_max(RawXMax, #{mana := N, mana_max := NMax} = Data) when is_number(RawX
 
 get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 
+-spec get_mana_update(D :: data()) -> boolean().
+get_mana_update(#{mana := #{update := U}}) -> U.
+
 update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
 
 -spec get_state_value(Data) -> X when Data :: data(), X :: state().
@@ -260,9 +270,15 @@ set_state_value(Value, #{state := Nested} = Data) ->
 get_state_update(#{state := #{update := X}}) -> X.
 
 -spec clear_update_flags(Data) -> NewData when Data :: data(), NewData :: data().
-clear_update_flags(#{position := Position, state := State} = Data) ->
+clear_update_flags(#{position := Position, mana := M, health := H, state := State} = Data) ->
   Data#{
     position := Position#{
+      update := false
+    },
+    health := H#{
+      update := false
+    },
+    mana := M#{
       update := false
     },
     state := State#{
