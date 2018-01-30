@@ -37,10 +37,10 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
   lager:info("<<id=~p", [Id]),
   Term = jsx:decode(Message),
   lager:info("[decoded] id=~p: ~p", [Id, Term]),
-  case ws_receive:get_type_and_body(Term) of
-    {<<"input">>, Body} ->
-      Point = ws_receive:get_input(Body),
-      avatar_sapi:handle_input(Id, Point);
+  case ws_receive:decompose_message(Term) of
+    {<<"click">>, Body} ->
+      Point = ws_receive:extract_point(Body),
+      avatar_sapi:handle_click(Id, Point);
     {<<"enter">>, _} ->
       avatar_factory_sup:start_child(Id);
     {<<"leave">>, _} ->

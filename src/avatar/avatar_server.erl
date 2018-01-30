@@ -51,8 +51,8 @@ handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
 
-handle_cast({handle_input, Point}, State) ->
-  lager:info("avatar_server:handle_cast({handle_input, ~p}", Point),
+handle_cast({handle_click, Point} = M, State) ->
+  lager:info("avatar_server:handle_cast(~p)", [M]),
   Blocks = map_tools:blocks(),
   Id = avatar_data:get_id(State),
   Position = avatar_data:get_position_value(State),

@@ -11,7 +11,7 @@
 
 %% API
 -export([
-  handle_input/2,
+  handle_click/2,
 
   get_data/1,
   set_data/2,
@@ -29,9 +29,9 @@
   set_state/2
 ]).
 
--spec handle_input(Id :: id_server:id(), Point :: point:point()) -> ok.
-handle_input(Id, Point) ->
-  ok = gproc_tools:cast(avatar_server:name(Id), {handle_input, Point}).
+-spec handle_click(Id :: id_server:id(), Point :: point:point()) -> ok.
+handle_click(Id, Point) ->
+  ok = gproc_tools:cast(avatar_server:name(Id), {handle_click, Point}).
 
 -spec get_data(Id :: id_server:id()) -> Data :: avatar_data:data().
 get_data(Id) ->
