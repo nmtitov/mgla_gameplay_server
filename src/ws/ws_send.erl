@@ -2,7 +2,7 @@
 -author("nt").
 -export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/1]).
 
--spec id(Id::id_server:id()) -> jsx:json_text().
+-spec id(Id :: id_server:id()) -> jsx:json_text().
 id(Id) ->
   jsx:encode(#{
     type => id,
