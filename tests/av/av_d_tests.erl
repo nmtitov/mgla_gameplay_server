@@ -187,6 +187,19 @@ set_mana_max_test_() ->
     ?_assertEqual(100.0, av_d:get_mana(Data4))
   ].
 
+set_mana_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_mana(50.0, D),
+  D3 = av_d:clear_update_flags(D2),
+  D4 = av_d:set_mana(25.0, D3),
+  [
+    ?_assertEqual(50.0, av_d:get_mana(D2)),
+    ?_assertEqual(true, av_d:get_mana_update(D2)),
+    ?_assertEqual(false, av_d:get_mana_update(D3)),
+    ?_assertEqual(25.0, av_d:get_mana(D4)),
+    ?_assertEqual(true, av_d:get_mana_update(D4))
+  ].
+
 get_state_value_test_() ->
   Data = av_d:zero(),
   State = av_d:get_state_value(Data),
