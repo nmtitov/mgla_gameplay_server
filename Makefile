@@ -1,11 +1,11 @@
 all: clean compile run
 
 cowlib:
-	rm -rf lib/cowlib/ebin/*.erl
+	rm -rf lib/cowlib/ebin/*.beam
 	erlc +debug_info -I lib/cowlib/include -o lib/cowlib/ebin lib/cowlib/src/*.erl
 
 cowboy:
-	rm -rf lib/cowboy/ebin/*.erl
+	rm -rf lib/cowboy/ebin/*.beam
 	erlc +debug_info -I lib -o lib/cowboy/ebin lib/cowboy/src/*.erl
 
 goldrush:
@@ -32,7 +32,7 @@ lager:
 	cp lib/lager/src/lager.app.src lib/lager/ebin/lager.app
 
 ranch:
-	rm -rf lib/ranch/ebin/*.erl
+	rm -rf lib/ranch/ebin/*.beam
 	erlc +debug_info -o lib/ranch/ebin lib/ranch/src/*.erl	
 
 deps: cowboy cowlib goldrush gproc jsx lager ranch
