@@ -67,13 +67,13 @@ update_message(Id, {X, Y}, State) ->
     type => teleport,
     body => #{
       id => Id,
-      point => #{
+      position => #{
         x => X,
         y => Y
       },
-      new_state => if
-                     State == undefined -> null;
-                     true -> State
-                   end
+      state => case State of
+                 undefined -> null;
+                 _ -> State
+               end
     }
   }).
