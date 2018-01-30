@@ -79,7 +79,8 @@ set_position_value_test_() ->
   NewPositionUpdate = av_d:get_position_update(NewData),
   [
     ?_assertEqual(NewPosition2, NewPosition),
-    ?_assertEqual(NewPositionUpdate, true)
+    ?_assertEqual(NewPositionUpdate, true),
+    ?_assertEqual(true, av_d:is_dirty(NewData))
   ].
 
 get_path_test_() ->
@@ -151,7 +152,8 @@ set_health_test_() ->
     ?_assertEqual(true, av_d:get_health_update(D2)),
     ?_assertEqual(false, av_d:get_health_update(D3)),
     ?_assertEqual(25.0, av_d:get_health(D4)),
-    ?_assertEqual(true, av_d:get_health_update(D4))
+    ?_assertEqual(true, av_d:get_health_update(D4)),
+    ?_assertEqual(true, av_d:is_dirty(D4))
   ].
 
 get_mana_test_() ->
@@ -197,7 +199,8 @@ set_mana_test_() ->
     ?_assertEqual(true, av_d:get_mana_update(D2)),
     ?_assertEqual(false, av_d:get_mana_update(D3)),
     ?_assertEqual(25.0, av_d:get_mana(D4)),
-    ?_assertEqual(true, av_d:get_mana_update(D4))
+    ?_assertEqual(true, av_d:get_mana_update(D4)),
+    ?_assertEqual(true, av_d:is_dirty(D4))
   ].
 
 get_state_value_test_() ->
@@ -215,7 +218,8 @@ set_state_value_test_() ->
   NewStateUpdate = av_d:get_state_update(NewData),
   [
     ?_assertEqual(NewState, State),
-    ?_assertEqual(NewStateUpdate, true)
+    ?_assertEqual(NewStateUpdate, true),
+    ?_assertEqual(true, av_d:is_dirty(NewData))
   ].
 
 clear_update_flags_test() ->
@@ -227,5 +231,6 @@ clear_update_flags_test() ->
   StateUpdate = av_d:get_state_update(NewData2),
   [
     ?_assertEqual(PositionUpdate, false),
-    ?_assertEqual(StateUpdate, false)
+    ?_assertEqual(StateUpdate, false),
+    ?_assertEqual(false, av_d:is_dirty(NewData2))
   ].

@@ -139,12 +139,10 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
 update(Avatars, Dt, MapRect, Blocks) ->
   MovedAvatars = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Avatars),
 
-  Updated = lists:filter(fun(#{position := #{update := UpdatePosition}, state := #{update := UpdateState}}) ->
-    (UpdatePosition == true) or (UpdateState == true)
-  end, MovedAvatars),
+  Dirty = lists:filter(fun(D) -> av_d:is_dirty(D) end, MovedAvatars),
   lists:foreach(fun(Avatar) ->
     ws_handler:broadcast(ws_send:update_message(Avatar))
-  end, Updated),
+  end, Dirty),
 
   lists:map(fun(P) -> av_d:clear_update_flags(P) end, MovedAvatars).
 
