@@ -46,10 +46,12 @@ intersects_line({{OriginX, OriginY}, {W, H}} = R, {X1, Y1} = A, {X2, Y2} = B) ->
 
 %% P0 = {0, 0). S = {10, 10). R = rect:rect(P0, S). PX1 = {0, -5). PX2 = {0, 0). P1 = {5, -5). P2 = {5, 0). A = {-20, -20). B = {20, 20). In = {5,5). Blocks = [R].
 
--spec calculate_y_for_x(X, A, B) -> Y when X :: float(), A :: point:point(), B :: point:point(), Y :: float().
+-spec calculate_y_for_x(X :: number(), A :: point:point(), B :: point:point()) -> float().
 calculate_y_for_x(_, {X1, _}, {X1, _}) ->
   error(badarg);
-calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
+calculate_y_for_x(X, {X1, Y1} = A, {X2, Y2} = B) when is_number(X) ->
+  case point:is_point(A) of false -> error(badarg); _ -> ok end,
+  case point:is_point(B) of false -> error(badarg); _ -> ok end,
   ((X - X1) / (X2 - X1)) * (Y2 - Y1) + Y1.
 
 -spec vertices(R) -> [V] when R :: rect(), V :: point:point().
