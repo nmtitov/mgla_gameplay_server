@@ -1,11 +1,11 @@
 all: clean compile run
 
 cowlib:
-	rm -rf lib/cowlib/ebin/*.erl
+	rm -rf lib/cowlib/ebin/*.beam
 	erlc +debug_info -I lib/cowlib/include -o lib/cowlib/ebin lib/cowlib/src/*.erl
 
 cowboy:
-	rm -rf lib/cowboy/ebin/*.erl
+	rm -rf lib/cowboy/ebin/*.beam
 	erlc +debug_info -I lib -o lib/cowboy/ebin lib/cowboy/src/*.erl
 
 goldrush:
@@ -32,19 +32,24 @@ lager:
 	cp lib/lager/src/lager.app.src lib/lager/ebin/lager.app
 
 ranch:
-	rm -rf lib/ranch/ebin/*.erl
-	erlc +debug_info -o lib/ranch/ebin lib/ranch/src/*.erl	
+	rm -rf lib/ranch/ebin/*.beam
+	erlc +debug_info -o lib/ranch/ebin lib/ranch/src/*.erl
 
-deps: cowboy cowlib goldrush gproc jsx lager ranch
+proper:
+	rm -rf lib/proper/ebin/*.beam
+	./lib/proper/write_compile_flags lib/proper/include/compile_flags.hrl
+	erlc +debug_info -I lib/proper/include -o lib/proper/ebin lib/proper/src/vararg.erl
+	erlc +debug_info "+{parse_transform, vararg}" -I lib/proper/include -pa lib/proper/ebin -o lib/proper/ebin lib/proper/src/*.erl
+
+deps: cowboy cowlib goldrush gproc jsx lager ranch proper
 
 build:
-	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ `find src tests -type f -iname "*.erl" -print0 | xargs -0`
-	cp src/gameplay_server.app.src ebin/gameplay_server.app
+	erlc +debug_info -I lib/proper/include "+{parse_transform, lager_transform}" "+{parse_transform, proper_unused_imports_remover}" -pa lib/lager/ebin/ -pa lib/proper/ebin -pa lib -o ebin/ `find src tests -type f -iname "*.erl" -print0 | xargs -0`
 
 compile: build dialyzer
 
 clean:
-	rm -rf ebin/*
+	rm -rf ebin/*.beam
 
 run: compile shell
 
@@ -63,6 +68,7 @@ shell:
 	lib/jsx/ebin/ 		\
 	lib/lager/ebin/ 	\
 	lib/ranch/ebin/ 	\
+	lib/proper/ebin 	\
 	-s gameplay_server
 
 noshell:

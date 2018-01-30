@@ -353,5 +353,6 @@ _build
 
 .idea/
 ebin/*
+!ebin/*.app
 lib/**/ebin/*
 log
