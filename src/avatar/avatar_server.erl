@@ -11,12 +11,17 @@
 
 -behaviour(gen_server).
 
--export([name/1]).
+-export([name/1, start_link/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %% gproc
 
 name(Id) -> {n, l, {avatar, Id}}.
+
+%% API
+
+start_link(Type, Id) ->
+  gen_server:start_link(avatar_server, [Type, Id], []).
 
 %% Callbacks
 

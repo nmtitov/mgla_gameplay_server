@@ -11,8 +11,6 @@
 
 %% API
 -export([
-  start_link/2,
-
   handle_input/2,
 
   get_data/1,
@@ -30,9 +28,6 @@
   get_state/1,
   set_state/2
 ]).
-
-start_link(Type, Id) ->
-  gen_server:start_link(avatar_server, [Type, Id], []).
 
 -spec handle_input(Id :: id_server:id(), Point :: point:point()) -> ok.
 handle_input(Id, Point) ->
