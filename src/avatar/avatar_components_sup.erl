@@ -35,8 +35,8 @@ init([Id]) ->
     start => {pathfinder_server, start_link, [Id]},
     shutdown => 5000
   }, #{
-    id => avatar_server,
-    start => {avatar_server, start_link, [player, Id]},
+    id => av_s,
+    start => {av_s, start_link, [player, Id]},
     shutdown => 5000
   }],
   {ok, {RestartStrategy, Children}}.

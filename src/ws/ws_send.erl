@@ -11,14 +11,14 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar :: avatar_data:data()) -> jsx:json_text().
+-spec init(Avatar :: av_d:data()) -> jsx:json_text().
 init(A) ->
-  Id = avatar_data:get_id(A),
-  Name = avatar_data:get_name(A),
-  {X, Y} = avatar_data:get_position_value(A),
-  HealthPercent = avatar_data:get_health_percent(A),
-  ManaPercent = avatar_data:get_mana_percent(A),
-  State = avatar_data:get_state_value(A),
+  Id = av_d:get_id(A),
+  Name = av_d:get_name(A),
+  {X, Y} = av_d:get_position_value(A),
+  HealthPercent = av_d:get_health_percent(A),
+  ManaPercent = av_d:get_mana_percent(A),
+  State = av_d:get_state_value(A),
   jsx:encode(#{
     type => init,
     body => #{
@@ -61,15 +61,15 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(D :: avatar_data:data()) -> jsx:json_text().
+-spec update_message(D :: av_d:data()) -> jsx:json_text().
 update_message(D) ->
-  Id = avatar_data:get_id(D),
+  Id = av_d:get_id(D),
   jsx:encode(#{
     type => update,
     body => #{
       id => Id,
-      position => valueOrNull(point:pointToMap(avatar_data:get_position_value(D)), avatar_data:get_position_update(D)),
-      state => valueOrNull(avatar_data:get_state_value(D), avatar_data:get_state_update(D))
+      position => valueOrNull(point:pointToMap(av_d:get_position_value(D)), av_d:get_position_update(D)),
+      state => valueOrNull(av_d:get_state_value(D), av_d:get_state_update(D))
     }
   }).
 
