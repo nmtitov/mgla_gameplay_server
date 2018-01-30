@@ -1,11 +1,11 @@
 all: clean compile run
 
 cowlib:
-	rm -rf lib/cowlib/ebin/*.erl
+	rm -rf lib/cowlib/ebin/*.beam
 	erlc +debug_info -I lib/cowlib/include -o lib/cowlib/ebin lib/cowlib/src/*.erl
 
 cowboy:
-	rm -rf lib/cowboy/ebin/*.erl
+	rm -rf lib/cowboy/ebin/*.beam
 	erlc +debug_info -I lib -o lib/cowboy/ebin lib/cowboy/src/*.erl
 
 goldrush:
@@ -32,19 +32,18 @@ lager:
 	cp lib/lager/src/lager.app.src lib/lager/ebin/lager.app
 
 ranch:
-	rm -rf lib/ranch/ebin/*.erl
+	rm -rf lib/ranch/ebin/*.beam
 	erlc +debug_info -o lib/ranch/ebin lib/ranch/src/*.erl	
 
 deps: cowboy cowlib goldrush gproc jsx lager ranch
 
 build:
 	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ `find src tests -type f -iname "*.erl" -print0 | xargs -0`
-	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
 compile: build dialyzer
 
 clean:
-	rm -rf ebin/*
+	rm -rf ebin/*.beam
 
 run: compile shell
 
