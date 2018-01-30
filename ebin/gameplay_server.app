@@ -15,6 +15,5 @@
     {modules, []},
 
     {maintainers, []},
-    {licenses, ["Apache 2.0"]},
     {links, []}
   ]}.
