@@ -54,7 +54,7 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
 
   ws_handler:broadcast(ws_send:enter_message(Id)),
 
-  case avatar_sapi:get_data(Id) of
+  case av_sapi:get_data(Id) of
     {ok, Data} ->
       case Type of
         player ->
@@ -62,7 +62,7 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
           ws_handler:send(Id, ws_send:id(Id)),
           ws_handler:send(Id, ws_send:init(Data)),
           lists:foreach(fun({_, Id_}) ->
-            case avatar_sapi:get_data(Id_) of
+            case av_sapi:get_data(Id_) of
               {ok, Data_} -> ws_handler:send(Id, ws_send:init(Data_));
               _ -> ok
             end
@@ -121,13 +121,13 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
 
   Avatars = lists:map(fun({_, Id}) ->
-    {ok, Data} = avatar_sapi:get_data(Id), Data
+    {ok, Data} = av_sapi:get_data(Id), Data
   end, AvatarsMeta),
   Dt = ?UPDATE_RATE / 1000.0,
   NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
   lists:foreach(fun(#{id := Id} = Avatar) ->
-    avatar_sapi:set_data(Avatar, Id)
+    av_sapi:set_data(Avatar, Id)
   end, NewAvatars),
 
   TimeB = erlang:system_time(),
