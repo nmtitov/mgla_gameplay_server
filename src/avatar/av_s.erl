@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 20. Jan 2018 17:58
 %%%-------------------------------------------------------------------
--module(avatar_server).
+-module(av_s).
 -author("nt").
 
 -behaviour(gen_server).
@@ -21,7 +21,7 @@ name(Id) -> {n, l, {avatar, Id}}.
 %% API
 
 start_link(Type, Id) ->
-  gen_server:start_link(avatar_server, [Type, Id], []).
+  gen_server:start_link(av_s, [Type, Id], []).
 
 %% Callbacks
 
