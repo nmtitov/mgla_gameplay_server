@@ -11,14 +11,14 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar :: av_d:data()) -> jsx:json_text().
-init(A) ->
-  Id = av_d:get_id(A),
-  Name = av_d:get_name(A),
-  {X, Y} = av_d:get_position_value(A),
-  HealthPercent = av_d:get_health_percent(A),
-  ManaPercent = av_d:get_mana_percent(A),
-  State = av_d:get_state_value(A),
+-spec init(D :: av_d:data()) -> jsx:json_text().
+init(D) ->
+  Id = av_d:get_id(D),
+  Name = av_d:get_name(D),
+  {X, Y} = av_d:get_position_value(D),
+  HealthPercent = av_d:get_health_percent(D),
+  ManaPercent = av_d:get_mana_percent(D),
+  State = av_d:get_state_value(D),
   jsx:encode(#{
     type => init,
     body => #{
