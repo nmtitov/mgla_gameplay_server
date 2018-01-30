@@ -78,7 +78,6 @@ handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewAvatarsMeta = lists:filter(fun({_, Id2}) -> Id =/= Id2 end, AvatarsMeta),
   NewState = State#{avatars := NewAvatarsMeta},
-  avatar_factory_sup:stop_child(Id),
   ws_handler:broadcast(ws_send:leave_message(Id)),
   {noreply, NewState};
 
@@ -100,7 +99,8 @@ handle_info(Info, State) ->
   {noreply, State}.
 
 
-terminate(_Reason, _State) ->
+terminate(_Reason = M, _State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   ok.
 
 

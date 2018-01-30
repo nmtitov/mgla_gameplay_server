@@ -25,8 +25,9 @@ start_link(Type, Id) ->
 
 %% Callbacks
 
-init([Type, Id]) ->
-  lager:info("avatar_server:init(~p)", [Id]),
+init([Type, Id] = M) ->
+  process_flag(trap_exit, true),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   gproc:reg(name(Id)),
   R = {{0, 0}, {600, 1000}},
   Blocks = map_tools:blocks(),
@@ -52,7 +53,7 @@ handle_call(_Request, _From, State) ->
 
 
 handle_cast({handle_click, Point} = M, State) ->
-  lager:info("avatar_server:handle_cast(~p)", [M]),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
   Id = avatar_data:get_id(State),
   Position = avatar_data:get_position_value(State),
@@ -63,18 +64,18 @@ handle_cast({handle_click, Point} = M, State) ->
 handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};
 
-handle_cast({set_position, P}, State) ->
-  lager:info("avatar_server:handle_cast({set_position, ~p}", P),
+handle_cast({set_position, P} = M, State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = avatar_data:set_position_value(P, State),
   {noreply, State2};
 
 handle_cast({add_health, X} = M, State) ->
-  lager:info("avatar_server:handle_cast(~p)", [M]),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = avatar_data:update_health_by(X, State),
   {noreply, State2};
 
 handle_cast({subtract_health, X} = M, State) ->
-  lager:info("avatar_server:handle_cast(~p)", [M]),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = avatar_data:update_health_by(-X, State),
   {noreply, State2};
 
@@ -84,12 +85,12 @@ handle_cast({add_mana, X} = M, State) ->
   {noreply, State2};
 
 handle_cast({subtract_mana, X} = M, State) ->
-  lager:info("avatar_server:handle_cast(~p)", [M]),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = avatar_data:update_mana_by(-X, State),
   {noreply, State2};
 
 handle_cast({set_state, X} = M, State) ->
-  lager:info("avatar_server:handle_cast(~p)", [M]),
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = avatar_data:set_state_value(X, State),
   {noreply, State2};
 
@@ -98,21 +99,21 @@ handle_cast(Request, State) ->
   {noreply, State}.
 
 
-handle_info(timeout, State) ->
-  lager:info("avatar_server:handle_info(timeout)"),
+handle_info(timeout = M, State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = avatar_data:get_id(State),
   Type = avatar_data:get_type(State),
   map_server:add_avatar(Type, Id),
   {noreply, State};
 
-handle_info(Info, State) ->
-  lager:info("avatar_server:handle_info(~p = Info, State)", [Info]),
+handle_info(_Info = M, State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   {noreply, State}.
 
 
-terminate(Reason, State) ->
+terminate(_Reason = M, State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = avatar_data:get_id(State),
-  lager:info("avatar_server:terminate(~p = Reason, ~p = State)", [Reason, State]),
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.

@@ -44,12 +44,13 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
     {<<"enter">>, _} ->
       avatar_factory_sup:start_child(Id);
     {<<"leave">>, _} ->
-      map_server:remove_avatar(Id)
+      avatar_factory_sup:stop_child(Id)
+%%    map_server:remove_avatar(Id)
   end,
   {ok, State};
 
 websocket_handle(_Data, State) ->
-  lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
+  lager:info("~p:~p()", [?MODULE, ?FUNCTION_NAME]),
   {ok, State}.
 
 
@@ -63,14 +64,13 @@ websocket_info(_Info, State) ->
   {ok, State}.
 
 
-terminate({error, closed} = Info, _Req, #{id := Id} = State) ->
-  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
-  lager:info("exit id=~p", [Id]),
+terminate({error, closed} = M, _Req, #{id := Id} = State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   avatar_factory_sup:stop_child(Id),
   gproc:unreg(name(Id)),
   gproc:unreg(broadcast_property()),
   ok;
 
-terminate(Reason, _Req, State) ->
-  lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Reason, State]),
+terminate(_Reason = M, _Req, _State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   ok.

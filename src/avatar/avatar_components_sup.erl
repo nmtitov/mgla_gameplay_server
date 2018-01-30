@@ -33,12 +33,10 @@ init([Id]) ->
   Children = [#{
     id => pathfinder_server,
     start => {pathfinder_server, start_link, [Id]},
-    shutdown => brutal_kill,
-    modules => [pathfinder_server]
+    shutdown => 5000
   }, #{
     id => avatar_server,
     start => {avatar_server, start_link, [player, Id]},
-    shutdown => brutal_kill,
-    modules => [avatar_server]
+    shutdown => 5000
   }],
   {ok, {RestartStrategy, Children}}.

@@ -21,10 +21,12 @@
 start_link() ->
   supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-start_child(Id) ->
+start_child(Id = M) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   supervisor:start_child(?SERVER, [Id]).
 
-stop_child(Id) ->
+stop_child(Id = M) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   case gproc:where(avatar_components_sup:name(Id)) of
     Pid when is_pid(Pid) -> {ok, supervisor:terminate_child(?SERVER, Pid)};
     _                    -> {error, undefined}
@@ -41,6 +43,7 @@ init([]) ->
   ChildSpecs = [#{
     id => avatar_components_sup,
     start => {avatar_components_sup, start_link, []},
-    shutdown => brutal_kill
+    shutdown => infinity,
+    type => supervisor
   }],
   {ok, {SupFlags, ChildSpecs}}.
