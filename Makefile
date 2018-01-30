@@ -39,12 +39,11 @@ deps: cowboy cowlib goldrush gproc jsx lager ranch
 
 build:
 	erlc +debug_info "+{parse_transform, lager_transform}" -pa lib/lager/ebin/ -o ebin/ `find src tests -type f -iname "*.erl" -print0 | xargs -0`
-	cp src/gameplay_server.app.src ebin/gameplay_server.app
 
 compile: build dialyzer
 
 clean:
-	rm -rf ebin/*
+	rm -rf ebin/*.beam
 
 run: compile shell
 
