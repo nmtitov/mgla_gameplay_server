@@ -32,7 +32,7 @@ init([Type, Id] = M) ->
   R = {{0, 0}, {600, 1000}},
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
-  Name = <<"Name">>,
+  Name = <<"Player">>,
   State = avatar_data:new(Id, Type, Name, Position),
   {ok, State, 0}.
 
