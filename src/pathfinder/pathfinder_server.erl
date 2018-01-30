@@ -36,6 +36,7 @@ next_point(Id, A, B, Dt, Speed, MapRect, Blocks) ->
 %% Callbacks
 
 init([Id]) ->
+  process_flag(trap_exit, true),
   lager:info("pathfinder_server:init(~p)", [Id]),
   gproc:reg(name(Id)),
   {ok, Id}.
@@ -65,8 +66,8 @@ handle_info(_Info, State) ->
   {noreply, State}.
 
 
-terminate(Reason, Id) ->
-  lager:info("pathfinder_server:terminate(~p = Reason, ~p = Id)", [Reason, Id]),
+terminate(_Reason = M, Id) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   gproc:unreg(name(Id)),
   ok.
 

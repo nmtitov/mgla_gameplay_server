@@ -9,19 +9,23 @@
 -module(gproc_tools).
 -author("nt").
 
+-type result() :: {ok, term()}.
+-type not_found() :: {not_found, gproc:key()}.
+-export_type([result/0, not_found/0]).
+
 %% API
 -export([call/2, cast/2]).
 
--spec call(Name :: term(), Message :: term()) -> {ok, term()} | {error, undefined}.
-call(Name, Message) ->
-  case gproc:where(Name) of
+-spec call(Key :: term(), Message :: term()) -> result() | not_found().
+call(Key, Message) ->
+  case gproc:where(Key) of
     Pid when is_pid(Pid) -> {ok, gen_server:call(Pid, Message)};
-    _                    -> {error, not_found}
+    _                    -> {not_found, Key}
   end.
 
--spec cast(Name :: term(), Message :: term()) -> ok | {error, undefined}.
-cast(Name, Message) ->
-  case gproc:where(Name) of
+-spec cast(Key :: term(), Message :: term()) -> ok | not_found().
+cast(Key, Message) ->
+  case gproc:where(Key) of
     Pid when is_pid(Pid) -> gen_server:cast(Pid, Message);
-    _                    -> {error, not_found}
+    _                    -> {not_found, Key}
   end.

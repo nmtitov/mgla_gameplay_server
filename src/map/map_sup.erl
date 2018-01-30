@@ -24,8 +24,7 @@ init([]) ->
     #{
       id => map_server,
       start => {map_server, start_link, []},
-      shutdown => brutal_kill,
-      modules => [map_server]
+      shutdown => 5000
     }
   ],
   {ok, {RestartStrategy, Children}}.
