@@ -54,8 +54,9 @@ calculate_y_for_x(X, {X1, Y1} = A, {X2, Y2} = B) when is_number(X) ->
   case point:is_point(B) of false -> error(badarg); _ -> ok end,
   ((X - X1) / (X2 - X1)) * (Y2 - Y1) + Y1.
 
--spec vertices(R) -> [V] when R :: rect(), V :: point:point().
-vertices({{OriginX, OriginY}, {W, H}}) ->
+-spec vertices(R :: rect()) -> [point:point()].
+vertices({{OriginX, OriginY}, {W, H}} = R) ->
+  case is_rect(R) of false -> error(badarg); _ -> ok end,
   [
     {OriginX, OriginY},
     {OriginX + W, OriginY},
