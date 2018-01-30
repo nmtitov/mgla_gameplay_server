@@ -26,3 +26,6 @@
 	path = lib/lager
 	url = https://github.com/erlang-lager/lager
 	ignore = dirty
+[submodule "lib/proper"]
+	path = lib/proper
+	url = https://github.com/manopapad/proper.git
