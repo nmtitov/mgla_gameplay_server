@@ -64,7 +64,7 @@ leave_message(Id) ->
 -spec update_message(Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state()) -> jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
-    type => teleport,
+    type => update,
     body => #{
       id => Id,
       position => #{
