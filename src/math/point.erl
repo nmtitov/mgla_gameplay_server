@@ -8,7 +8,7 @@
 
 -spec is_point(P :: point()) -> boolean().
 is_point({X, Y}) when is_number(X), is_number(Y) -> true;
-is_point(_)                                      -> false.
+is_point(_) -> false.
 
 -spec distance(A :: point(), B :: point()) -> float().
 distance({X1, Y1} = A, {X2, Y2} = B) ->
