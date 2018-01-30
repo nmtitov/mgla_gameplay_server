@@ -162,11 +162,9 @@ move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := 
       case State of
         idle ->
           NewPlayer = avatar_data:set_position_value(New, Avatar),
-          NewPlayer2 = avatar_data:set_state_value(walk, NewPlayer),
-          NewPlayer2;
+          avatar_data:set_state_value(walk, NewPlayer);
         _ ->
-          NewPlayer = avatar_data:set_position_value(New, Avatar),
-          NewPlayer
+          avatar_data:set_position_value(New, Avatar)
       end
   end.
 
