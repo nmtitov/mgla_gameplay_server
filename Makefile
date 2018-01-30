@@ -38,7 +38,8 @@ ranch:
 proper:
 	rm -rf lib/proper/ebin/*.beam
 	./lib/proper/write_compile_flags lib/proper/include/compile_flags.hrl
-	erlc +debug_info -I lib/proper/include -o lib/proper/ebin lib/proper/src/*.erl
+	erlc +debug_info -I lib/proper/include -o lib/proper/ebin lib/proper/src/vararg.erl
+	erlc +debug_info "+{parse_transform, vararg}" -I lib/proper/include -pa lib/proper/ebin -o lib/proper/ebin lib/proper/src/*.erl
 
 deps: cowboy cowlib goldrush gproc jsx lager ranch proper
 
