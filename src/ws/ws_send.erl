@@ -69,7 +69,9 @@ update_message(D) ->
     body => #{
       id => Id,
       position => valueOrNull(point:pointToMap(av_d:get_position_value(D)), av_d:get_position_update(D)),
-      state => valueOrNull(av_d:get_state_value(D), av_d:get_state_update(D))
+      state => valueOrNull(av_d:get_state_value(D), av_d:get_state_update(D)),
+      health_percent => valueOrNull(av_d:get_health_percent(D), av_d:get_health_update(D)),
+      mana_percent => valueOrNull(av_d:get_mana_percent(D), av_d:get_mana_update(D))
     }
   }).
 
