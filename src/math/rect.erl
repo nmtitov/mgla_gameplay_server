@@ -23,8 +23,8 @@ contains({{OriginX, OriginY}, {W, H}}, {X, Y}) ->
 intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
   RectMaxX = OriginX + W,
   RectMaxY = OriginY + H,
-  {LineXMin, LineXMax} = asc(X1, X2),
-  {LineYMin, LineYMax} = asc(Y1, Y2),
+  [LineXMin, LineXMax] = lists:sort([X1, X2]),
+  [LineYMin, LineYMax] = lists:sort([Y1, Y2]),
   if
     (OriginX > LineXMax) or (RectMaxX < LineXMin) or (OriginY > LineYMax) or (RectMaxY < LineYMin) -> false;
     true ->
@@ -43,9 +43,6 @@ calculate_y_for_x(_, {X1, _}, {X1, _}) ->
   error(badarg);
 calculate_y_for_x(X, {X1, Y1}, {X2, Y2}) ->
   ((X - X1) / (X2 - X1)) * (Y2 - Y1) + Y1.
-
-asc(X, Y) when X < Y -> {X, Y};
-asc(X, Y) -> {Y, X}.
 
 -spec vertices(R) -> [V] when R :: rect(), V :: point:point().
 vertices({{OriginX, OriginY}, {W, H}}) ->
