@@ -140,8 +140,8 @@ update(Avatars, Dt, MapRect, Blocks) ->
   MovedAvatars = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Avatars),
 
   Dirty = lists:filter(fun(D) -> av_d:is_dirty(D) end, MovedAvatars),
-  lists:foreach(fun(Avatar) ->
-    ws_handler:broadcast(ws_send:update_message(Avatar))
+  lists:foreach(fun(D) ->
+    ws_handler:broadcast(ws_send:update_message(D))
   end, Dirty),
 
   lists:map(fun(P) -> av_d:clear_update_flags(P) end, MovedAvatars).
