@@ -11,7 +11,7 @@ id(Id) ->
     }
   }).
 
--spec init(Avatar) -> Message when Avatar :: avatar_data:data(), Message :: jsx:json_text().
+-spec init(Avatar :: avatar_data:data()) -> jsx:json_text().
 init(A) ->
   Id = avatar_data:get_id(A),
   Name = avatar_data:get_name(A),
@@ -34,7 +34,7 @@ init(A) ->
     }
   }).
 
--spec deinit(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+-spec deinit(id_server:id()) -> jsx:json_text().
 deinit(Id) ->
   jsx:encode(#{
     type => deinit,
@@ -43,7 +43,7 @@ deinit(Id) ->
     }
   }).
 
--spec enter_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+-spec enter_message(Id :: id_server:id()) -> jsx:json_text().
 enter_message(Id) ->
   jsx:encode(#{
     type => enter,
@@ -52,7 +52,7 @@ enter_message(Id) ->
     }
   }).
 
--spec leave_message(Id) -> Message when Id :: id_server:id(), Message :: jsx:json_text().
+-spec leave_message(Id :: id_server:id()) -> jsx:json_text().
 leave_message(Id) ->
   jsx:encode(#{
     type => leave,
@@ -61,7 +61,7 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(Id, Point, State) -> Message when Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state(), Message :: jsx:json_text().
+-spec update_message(Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state()) -> jsx:json_text().
 update_message(Id, {X, Y}, State) ->
   jsx:encode(#{
     type => teleport,
