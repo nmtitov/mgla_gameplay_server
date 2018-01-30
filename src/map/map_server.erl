@@ -143,15 +143,7 @@ update(Avatars, Dt, MapRect, Blocks) ->
     (UpdatePosition == true) or (UpdateState == true)
   end, MovedAvatars),
   lists:foreach(fun(Avatar) ->
-    Id = avatar_data:get_id(Avatar),
-    P = avatar_data:get_position_value(Avatar),
-    State = avatar_data:get_state_value(Avatar),
-    UpdateState = avatar_data:get_state_update(Avatar),
-    PlayerState2 = if
-      UpdateState == true -> State;
-      true -> undefined
-    end,
-    ws_handler:broadcast(ws_send:update_message(Id, P, PlayerState2))
+    ws_handler:broadcast(ws_send:update_message(Avatar))
   end, Updated),
 
   lists:map(fun(P) -> avatar_data:clear_update_flags(P) end, MovedAvatars).

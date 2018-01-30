@@ -1,6 +1,6 @@
 -module(ws_send).
 -author("nt").
--export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/3]).
+-export([id/1, init/1, deinit/1, enter_message/1, leave_message/1, update_message/1]).
 
 -spec id(Id::id_server:id()) -> jsx:json_text().
 id(Id) ->
@@ -61,19 +61,18 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(Id :: id_server:id(), Point :: point:point(), State :: avatar_data:state()) -> jsx:json_text().
-update_message(Id, {X, Y}, State) ->
+-spec update_message(D :: avatar_data:data()) -> jsx:json_text().
+update_message(D) ->
+  Id = avatar_data:get_id(D),
   jsx:encode(#{
     type => update,
     body => #{
       id => Id,
-      position => #{
-        x => X,
-        y => Y
-      },
-      state => case State of
-                 undefined -> null;
-                 _ -> State
-               end
+      position => valueOrNull(point:pointToMap(avatar_data:get_position_value(D)), avatar_data:get_position_update(D)),
+      state => valueOrNull(avatar_data:get_state_value(D), avatar_data:get_state_update(D))
     }
   }).
+
+-spec valueOrNull(X, Update :: boolean()) -> X | null when X :: any().
+valueOrNull(Value, true) -> Value;
+valueOrNull(_, _) -> null.

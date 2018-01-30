@@ -1,7 +1,7 @@
 -module(point).
 -author("nt").
 
--export([is_point/1, distance/2, translate/2]).
+-export([is_point/1, distance/2, translate/2, pointToMap/1]).
 
 -type point() :: {number(), number()}.
 -export_type([point/0]).
@@ -21,3 +21,11 @@ translate({X1, Y1} = A, {X2, Y2} = B) ->
   case is_point(A) of false -> error(badarg); _ -> ok end,
   case is_point(B) of false -> error(badarg); _ -> ok end,
   {X1 + X2, Y1 + Y2}.
+
+-spec pointToMap(A :: point()) -> #{x:= number(), y := number()}.
+pointToMap({X, Y} = A) ->
+  case is_point(A) of false -> error(badarg); _ -> ok end,
+  #{
+    x => X,
+    y => Y
+  }.
