@@ -11,12 +11,13 @@
 
 %% API
 -export([sort/1]).
-%%-include_lib("proper/include/proper.hrl").
+
+-include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 -spec sort([T]) -> [T].
 sort([])    -> [];
-sort([H|T]) -> sort([X || X <- T, X < H]) ++ [H] ++ sort([X || X <- T, H < X]).
+sort([H|T]) -> sort([X || X <- T, X =< H]) ++ [H] ++ sort([X || X <- T, H < X]).
 
 sort_test_() ->
   [test_zero(), test_two(), test_four()].
@@ -30,4 +31,11 @@ test_four() ->
 
 
 prop_ordered() ->
-  ok.
+  ?FORALL(L, list(integer()), ordered(sort(L))).
+
+prop_same_length() ->
+  ?FORALL(L, list(integer()), length(L) =:= length(sort(L))).
+
+ordered([]) -> true;
+ordered([_]) -> true;
+ordered([A,B|T]) -> A =< B andalso ordered([B|T]).
