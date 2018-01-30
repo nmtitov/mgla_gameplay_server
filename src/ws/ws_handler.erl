@@ -64,8 +64,9 @@ websocket_info(_Info, State) ->
   {ok, State}.
 
 
-terminate({error, closed} = M, _Req, #{id := Id} = State) ->
+terminate({error, closed} = M, _Req, #{id := Id} = _State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
+  lager:info("close id=~p", [Id]),
   avatar_factory_sup:stop_child(Id),
   gproc:unreg(name(Id)),
   gproc:unreg(broadcast_property()),
