@@ -25,7 +25,10 @@ contains({{OriginX, OriginY}, {W, H}} = R, {X, Y} = P) ->
   case point:is_point(P) of false -> error(badarg); _ -> ok end,
   ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).
 
-intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
+intersects_line({{OriginX, OriginY}, {W, H}} = R, {X1, Y1} = A, {X2, Y2} = B) ->
+  case is_rect(R) of false -> error(badarg); _ -> ok end,
+  case point:is_point(A) of false -> error(badarg); _ -> ok end,
+  case point:is_point(B) of false -> error(badarg); _ -> ok end,
   RectMaxX = OriginX + W,
   RectMaxY = OriginY + H,
   [LineXMin, LineXMax] = lists:sort([X1, X2]),
