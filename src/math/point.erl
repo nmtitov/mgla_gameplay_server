@@ -12,10 +12,12 @@ is_point(_)                                      -> false.
 
 -spec distance(A :: point(), B :: point()) -> float().
 distance({X1, Y1} = A, {X2, Y2} = B) ->
-  case is_point(A) andalso is_point(B) of false -> error(badarg); _ -> ok end,
+  case is_point(A) of false -> error(badarg); _ -> ok end,
+  case is_point(B) of false -> error(badarg); _ -> ok end,
   math:sqrt(math:pow((X2 - X1), 2) + math:pow(Y2 - Y1, 2)).
 
 -spec translate(A :: point(), B :: point()) -> point().
 translate({X1, Y1} = A, {X2, Y2} = B) ->
-  case is_point(A) andalso is_point(B) of false -> error(badarg); _ -> ok end,
+  case is_point(A) of false -> error(badarg); _ -> ok end,
+  case is_point(B) of false -> error(badarg); _ -> ok end,
   {X1 + X2, Y1 + Y2}.
