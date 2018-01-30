@@ -78,7 +78,7 @@ handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   lager:info("~p:~p/~p", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY]),
   NewAvatarsMeta = lists:filter(fun({_, Id2}) -> Id =/= Id2 end, AvatarsMeta),
   NewState = State#{avatars := NewAvatarsMeta},
-  avatar_root_sup:stop_child(Id),
+  avatar_factory_sup:stop_child(Id),
   ws_handler:broadcast(ws_send:leave_message(Id)),
   {noreply, NewState};
 
@@ -171,20 +171,20 @@ move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := 
   end.
 
 start_bots() ->
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()),
-  bot_root_sup:start_child(id_server:get_id()).
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()),
+  bot_factory_sup:start_child(id_server:get_id()).

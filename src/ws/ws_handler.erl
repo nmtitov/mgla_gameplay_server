@@ -42,7 +42,7 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
       Point = ws_receive:get_input(Body),
       avatar_sapi:handle_input(Id, Point);
     {<<"enter">>, _} ->
-      avatar_root_sup:start_child(Id);
+      avatar_factory_sup:start_child(Id);
     {<<"leave">>, _} ->
       map_server:remove_avatar(Id)
   end,
@@ -66,7 +66,7 @@ websocket_info(_Info, State) ->
 terminate({error, closed} = Info, _Req, #{id := Id} = State) ->
   lager:info("~p:~p ~p:~p/~p(~p, ~p)", [?FILE, ?LINE, ?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
   lager:info("exit id=~p", [Id]),
-  avatar_root_sup:stop_child(Id),
+  avatar_factory_sup:stop_child(Id),
   gproc:unreg(name(Id)),
   gproc:unreg(broadcast_property()),
   ok;
