@@ -11,13 +11,18 @@
 -include("../../include/block.hrl").
 
 %% API
--export([contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
+-export([is_rect/1, contains/2, intersects_line/3, vertices/1, visible_vertices/2]).
 
 -type rect() :: {point:point(), point:point()}.
 -export_type([rect/0]).
 
+is_rect({{OriginX, OriginY}, {W, H}}) when is_number(OriginX), is_number(OriginY), is_number(W), is_number(H) -> true;
+is_rect(_) -> false.
+
 -spec contains(Rect, Point) -> boolean() when Rect :: rect(), Point :: point:point().
-contains({{OriginX, OriginY}, {W, H}}, {X, Y}) ->
+contains({{OriginX, OriginY}, {W, H}} = R, {X, Y} = P) ->
+  case is_rect(R) of false -> error(badarg); _ -> ok end,
+  case point:is_point(P) of false -> error(badarg); _ -> ok end,
   ((OriginX < X) and (X < (OriginX + W))) and ((OriginY < Y) and (Y < (OriginY + H))).
 
 intersects_line({{OriginX, OriginY}, {W, H}}, {X1, Y1} = A, {X2, Y2} = B) ->
