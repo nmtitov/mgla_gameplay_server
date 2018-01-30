@@ -267,7 +267,7 @@ set_state_value(Value, #{state := Nested} = Data) ->
     }
   }.
 
--spec get_state_update(Data) -> X when Data :: data(), X :: boolean().
+-spec get_state_update(Data :: data()) -> boolean().
 get_state_update(#{state := #{update := X}}) -> X.
 
 -spec is_dirty(D :: data()) -> boolean().
@@ -277,7 +277,7 @@ is_dirty(D) ->
   orelse get_mana_update(D)
   orelse get_state_update(D).
 
--spec clear_update_flags(Data) -> NewData when Data :: data(), NewData :: data().
+-spec clear_update_flags(Data :: data()) -> data().
 clear_update_flags(#{position := Position, mana := M, health := H, state := State} = Data) ->
   Data#{
     position := Position#{
