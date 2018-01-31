@@ -52,13 +52,18 @@ handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
 
-handle_cast({handle_click, Point} = M, State) ->
+handle_cast({handle_click, Point, AvatarId} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
   Id = av_d:get_id(State),
-  Position = av_d:get_position_value(State),
-  Path = pathfinder_server:path(Id, Position, Point, Blocks),
-  NewState = av_d:set_path(Path, State),
+  NewState = case Id == AvatarId orelse undefined == AvatarId of
+    true ->
+      Position = av_d:get_position_value(State),
+      Path = pathfinder_server:path(Id, Position, Point, Blocks),
+      av_d:set_path(Path, State);
+    _ ->
+      State
+  end,
   {noreply, NewState};
 
 handle_cast({set_data, NewState}, _) ->

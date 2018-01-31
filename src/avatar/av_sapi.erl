@@ -11,7 +11,7 @@
 
 %% API
 -export([
-  handle_click/2,
+  handle_click/3,
 
   get_data/1,
   set_data/2,
@@ -29,9 +29,9 @@
   set_state/2
 ]).
 
--spec handle_click(Id :: id_server:id(), Point :: point:point()) -> ok | gproc_tools:not_found().
-handle_click(Id, Point) ->
-  gproc_tools:cast(av_s:name(Id), {handle_click, Point}).
+-spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
+handle_click(Id, Point, AvatarId) ->
+  gproc_tools:cast(av_s:name(Id), {handle_click, Point, AvatarId}).
 
 -spec get_data(Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
 get_data(Id) ->
