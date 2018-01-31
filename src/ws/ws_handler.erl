@@ -35,11 +35,11 @@ websocket_init(Params) ->
 websocket_handle({text, Message} = Info, #{id := Id} = State) ->
   lager:info("~p:~p/~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, Info, State]),
   lager:info("<<id=~p", [Id]),
-  Term = jsx:decode(Message),
+  Term = jsx:decode(Message, [return_maps]),
   lager:info("[decoded] id=~p: ~p", [Id, Term]),
   case ws_receive:decompose_message(Term) of
     {<<"click">>, Body} ->
-      Point = ws_receive:extract_point(Body),
+      {Point, _AvatarId} = ws_receive:parse_click_body(Body),
       av_sapi:handle_click(Id, Point);
     {<<"enter">>, _} ->
       avatar_factory_sup:start_child(Id);
