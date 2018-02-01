@@ -41,7 +41,7 @@ handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position= av_d:get_position_value(State),
+  Position = av_d:get_position_value(State),
   {reply, Position, State};
 
 handle_call(get_state, _From, State) ->
