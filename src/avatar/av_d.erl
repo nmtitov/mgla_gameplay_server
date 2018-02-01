@@ -40,6 +40,13 @@
   subtract_mana/2,
   set_mana_max/2,
 
+  get_attack_default_cooldown/1,
+  set_attack_default_cooldown/2,
+  get_attack_cooldown/1,
+  set_attack_cooldown/2,
+  get_attack_state_value/1,
+  set_attack_state_value/2,
+
   get_state_value/1,
   set_state_value/2,
   get_state_update/1,
@@ -79,6 +86,12 @@
   attack_speed := number(),
   attack_range := number(),
   attack_damage := number(),
+  attack_default_cooldown := number(), % second
+  attack_cooldown := number(), % seconds
+  attack_state := #{
+    value := attack_state(),
+    update := boolean()
+  },
   state := #{
     value := state(),
     update := boolean()
@@ -89,6 +102,7 @@
   }
 }.
 -type state() :: idle | walk.
+-type attack_state() :: idle | attack | wait.
 -type type() :: player | bot.
 -export_type([data/0, state/0, type/0]).
 
@@ -127,6 +141,12 @@ new(Id, Type, Name, Position) ->
     attack_speed => 0,
     attack_range => 0,
     attack_damage => 0,
+    attack_default_cooldown => 5,
+    attack_cooldown => 0,
+    attack_state => #{
+      value => idle,
+      update => false
+    },
     state => #{
       value => idle,
       update => true
@@ -274,6 +294,44 @@ subtract_mana(X, D) ->
   update_mana_by(-X, D).
 
 
+-spec get_attack_default_cooldown(D :: data()) -> X :: number().
+get_attack_default_cooldown(#{attack_default_cooldown := X}) -> X.
+
+-spec set_attack_default_cooldown(X :: number(), D :: data()) -> data().
+set_attack_default_cooldown(X, D) ->
+  case X < 0 of true -> error(badarg); _ -> ok end,
+  D#{
+    attack_default_cooldown := X
+  }.
+
+-spec get_attack_cooldown(D :: data()) -> X :: number().
+get_attack_cooldown(#{attack_cooldown := X}) -> X.
+
+-spec set_attack_cooldown(X :: number(), D :: data()) -> data().
+set_attack_cooldown(X, #{attack_default_cooldown := DefaultCooldown, attack_cooldown := X} = D) when is_number(X) ->
+  D#{
+    attack_cooldown := if
+                         X > DefaultCooldown -> DefaultCooldown;
+                         X < 0 -> 0;
+                         true -> X
+                       end
+  }.
+
+-spec get_attack_state_value(D) -> X when D :: data(), X :: state().
+get_attack_state_value(#{attack_state := #{value := X}}) -> X.
+
+-spec set_attack_state_value(X :: state(), D :: data()) -> data().
+set_attack_state_value(X, #{attack_state := N} = D) when is_atom(X) ->
+  D#{
+    attack_state := N#{
+      value := X,
+      update := true
+    }
+  }.
+
+-spec get_attack_state_update(D :: data()) -> boolean().
+get_attack_state_update(#{attack_state := #{update := X}}) -> X.
+
 -spec get_state_value(Data) -> X when Data :: data(), X :: state().
 get_state_value(#{state := #{value := X}}) -> X.
 
@@ -294,10 +352,11 @@ is_dirty(D) ->
   get_position_update(D)
   orelse get_health_update(D)
   orelse get_mana_update(D)
+  orelse get_attack_state_update(D)
   orelse get_state_update(D).
 
 -spec clear_update_flags(Data :: data()) -> data().
-clear_update_flags(#{position := Position, mana := M, health := H, state := State} = Data) ->
+clear_update_flags(#{position := Position, mana := M, health := H, attack_state := AttackState, state := State} = Data) ->
   Data#{
     position := Position#{
       update := false
@@ -306,6 +365,9 @@ clear_update_flags(#{position := Position, mana := M, health := H, state := Stat
       update := false
     },
     mana := M#{
+      update := false
+    },
+    attack_state := AttackState#{
       update := false
     },
     state := State#{
