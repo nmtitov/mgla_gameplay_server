@@ -104,7 +104,7 @@ handle_info({timeout, _Ref, update}, State) ->
 
 handle_info(timeout, State) ->
   lager:info("~p:~p/~p(~p, State)", [?MODULE, ?FUNCTION_NAME, ?FUNCTION_ARITY, timeout]),
-  start_bots(),
+  bot_factory_sup:start_bots(),
   NewState = update(State),
   {noreply, NewState};
 
@@ -160,7 +160,7 @@ update(AvatarsMeta, Dt, MapRect, Blocks) ->
       _ -> false
     end
   end, AvatarsMeta),
-  lists:foreach(fun({Type, Id}) ->
+  lists:foreach(fun({_, Id}) ->
     case av_sapi:get_data(Id) of
       {ok, D} -> ws_handler:broadcast(ws_send:update_message(D));
       _ -> ok
@@ -170,22 +170,3 @@ update(AvatarsMeta, Dt, MapRect, Blocks) ->
   lists:foreach(fun({_, Id}) ->
     {ok, _} = av_sapi:clear_update_flags(Id)
   end, AvatarsMeta).
-
-start_bots() ->
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()),
-  bot_factory_sup:start_child(id_server:get_id()).
