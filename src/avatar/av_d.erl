@@ -52,6 +52,7 @@
   attack_speed := number(),
   attack_range := number(),
   attack_damage := number(),
+  attack_target := av_d_attack:target(),
   attack_default_cooldown := number(), % second
   attack_cooldown := number(), % seconds
   attack_state := #{
@@ -106,6 +107,7 @@ new(Id, Type, Name, Position) ->
     attack_speed => 0,
     attack_range => 0,
     attack_damage => 0,
+    attack_target => undefined,
     attack_default_cooldown => 5,
     attack_cooldown => 0,
     attack_state => #{

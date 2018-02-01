@@ -21,7 +21,8 @@
 ]).
 
 -type state() :: idle | attack.
--export_type([state/0]).
+-type target() :: id_server:id() | undefined.
+-export_type([state/0, target/0]).
 
 -spec get_attack_default_cooldown(D :: av_d:data()) -> X :: number().
 get_attack_default_cooldown(#{attack_default_cooldown := X}) -> X.
