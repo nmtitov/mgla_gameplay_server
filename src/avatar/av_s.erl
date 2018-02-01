@@ -58,6 +58,7 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Id = av_d:get_id(State),
   NewState = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
+      map_server:attack(Id, AvatarId),
       State;
     _ ->
       Position = av_d_position:get_position_value(State),

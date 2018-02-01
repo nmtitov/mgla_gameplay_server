@@ -5,7 +5,7 @@
 
 -define(UPDATE_RATE, 33).
 
--export([start_link/0, add_avatar/2, remove_avatar/1, get_avatars_meta/0]).
+-export([start_link/0, add_avatar/2, remove_avatar/1, get_avatars_meta/0, attack/2]).
 
 -export([init/1,
   handle_call/3,
@@ -27,6 +27,10 @@ remove_avatar(Id) ->
 -spec get_avatars_meta() -> [av_d:data()].
 get_avatars_meta() ->
   gen_server:call(?SERVER, get_avatars_meta).
+
+-spec attack(AttackerId :: id_server:id(), TargetId :: id_server:id()) -> ok.
+attack(AttackerId, TargetId) ->
+  gen_server:cast(?SERVER, {attack, AttackerId, TargetId}).
 
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -87,6 +91,9 @@ handle_cast({remove_avatar, Id}, #{avatars := AvatarsMeta} = State) ->
   NewState = State#{avatars := NewAvatarsMeta},
   ws_handler:broadcast(ws_send:leave_message(Id)),
   {noreply, NewState};
+
+handle_cast({attack, _AttackerId, _TargetId}, State) ->
+  {noreply, State};
 
 handle_cast(_Request, State) ->
   {noreply, State}.

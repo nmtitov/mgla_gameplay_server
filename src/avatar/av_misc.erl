@@ -12,7 +12,7 @@
 %% API
 -export([is_valid_target/2]).
 
--spec is_valid_target(Id :: id_server:id(), TargetId :: id_server:id() | undefined) -> boolean().
+-spec is_valid_target(AttackerId :: id_server:id(), TargetId :: id_server:id() | undefined) -> boolean().
 is_valid_target(Id, Id)       -> false;
 is_valid_target(_, undefined) -> false;
 is_valid_target(_, _)         -> true.
