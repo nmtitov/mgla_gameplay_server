@@ -9,6 +9,8 @@
 -module(av_sapi).
 -author("nt").
 
+-include("../../include/block.hrl").
+
 %% API
 -export([
   handle_click/3,
@@ -26,7 +28,12 @@
   subtract_mana/2,
 
   get_state/1,
-  set_state/2
+  set_state/2,
+
+  move/4,
+
+  is_dirty/1,
+  clear_update_flags/1
 ]).
 
 -spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
@@ -72,3 +79,15 @@ get_state(Id) ->
 -spec set_state(X :: av_d:state(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 set_state(X, Id) ->
   gproc_tools:cast(av_s:name(Id), {set_state, X}).
+
+-spec move(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
+move(Dt, MapRect, Blocks, Id) ->
+  gproc_tools:call(av_s:name(Id), {move, Dt, MapRect, Blocks}).
+
+-spec is_dirty(Id :: id_server:id()) -> {ok, boolean()} | gproc_tools:not_found().
+is_dirty(Id) ->
+  gproc_tools:call(av_s:name(Id), is_dirty).
+
+-spec clear_update_flags(Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
+clear_update_flags(Id) ->
+  gproc_tools:call(av_s:name(Id), clean).

@@ -126,16 +126,9 @@ code_change(_OldVsn, State, _Extra) ->
 
 update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
-
-  Avatars = lists:map(fun({_, Id}) ->
-    {ok, Data} = av_sapi:get_data(Id), Data
-  end, AvatarsMeta),
   Dt = ?UPDATE_RATE / 1000.0,
-  NewAvatars = update(Avatars, Dt, MapRect, Blocks),
 
-  lists:foreach(fun(#{id := Id} = Avatar) ->
-    av_sapi:set_data(Avatar, Id)
-  end, NewAvatars),
+  update(AvatarsMeta, Dt, MapRect, Blocks),
 
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
@@ -143,43 +136,40 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   erlang:start_timer(?UPDATE_RATE, self(), update),
   State.
 
-update(Avatars, Dt, MapRect, Blocks) ->
-  MovedAvatars = lists:map(fun(Player) -> move(Player, Dt, MapRect, Blocks) end, Avatars),
+update(AvatarsMeta, Dt, MapRect, Blocks) ->
+  % Move
+  lists:foreach(fun({_, Id}) -> av_sapi:move(Dt, MapRect, Blocks, Id) end, AvatarsMeta),
 
   % Attack
-  Attackers = lists:filter(fun(D) -> av_d_attack:get_attack_target(D) =/= undefined end, MovedAvatars),
+  Avatars = lists:map(fun({_, Id}) ->
+    {ok, Data} = av_sapi:get_data(Id), Data
+  end, AvatarsMeta),
+
+  Attackers = lists:filter(fun(D) -> av_d_attack:get_attack_target(D) =/= undefined end, Avatars),
   lists:foreach(fun(D) ->
     Damage = 1,
     TargetId = av_d_attack:get_attack_target(D),
     av_sapi:subtract_health(Damage, TargetId)
   end, Attackers),
 
-  Dirty = lists:filter(fun(D) -> av_d:is_dirty(D) end, MovedAvatars),
-  lists:foreach(fun(D) ->
-    ws_handler:broadcast(ws_send:update_message(D))
+  Dirty = lists:filter(fun({_, Id}) ->
+    case av_sapi:is_dirty(Id) of
+      {ok, X} -> X;
+      _ -> false
+    end
+  end, AvatarsMeta),
+  lists:foreach(fun({Type, Id}) ->
+    case Type of
+      player ->
+        case av_sapi:get_data(Id) of
+          {ok, D} -> ws_handler:broadcast(ws_send:update_message(D));
+          _ -> ok
+        end;
+      _ -> ok
+    end
   end, Dirty),
 
-  lists:map(fun(P) -> av_d:clear_update_flags(P) end, MovedAvatars).
-
--spec move(Data :: av_d:data(), Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()]) -> av_d:data().
-move(#{path := [], state := #{value := State}} = Data, _, _, _) ->
-  case State of
-    walk -> av_d_position:set_state_value(idle, Data);
-    _    -> Data
-  end;
-move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Data, Dt, MapRect, Blocks) ->
-  case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
-    undefined ->
-      av_d_position:set_path(Rest, Data);
-    New ->
-      case State of
-        idle ->
-          NewPlayer = av_d_position:set_position_value(New, Data),
-          av_d_position:set_state_value(walk, NewPlayer);
-        _ ->
-          av_d_position:set_position_value(New, Data)
-      end
-  end.
+  lists:foreach(fun({_, Id}) -> av_sapi:clear_update_flags(Id) end, AvatarsMeta).
 
 start_bots() ->
   bot_factory_sup:start_child(id_server:get_id()),

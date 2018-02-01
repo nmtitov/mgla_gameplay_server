@@ -9,6 +9,8 @@
 -module(av_s).
 -author("nt").
 
+-include("../../include/block.hrl").
+
 -behaviour(gen_server).
 
 -export([name/1, start_link/2]).
@@ -47,6 +49,18 @@ handle_call(get_position, _From, State) ->
 handle_call(get_state, _From, State) ->
   X = av_d_position:get_state_value(State),
   {reply, X, State};
+
+handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
+  D2 = move(Dt, MapRect, Blocks, D),
+  {reply, D2, D2};
+
+handle_call(is_dirty, _From, D) ->
+  X = av_d:is_dirty(D),
+  {reply, X, D};
+
+handle_call(clear_update_flags, _From, D) ->
+  D2 = av_d:clear_update_flags(D),
+  {reply, D2, D2};
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
@@ -136,3 +150,26 @@ terminate(_Reason = M, State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+
+%% Private
+
+-spec move(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], D :: av_d:data()) -> av_d:data().
+move(_, _, _, #{path := [], state := #{value := State}} = D) ->
+  case State of
+    walk -> av_d_position:set_state_value(idle, D);
+    _    -> D
+  end;
+move(Dt, MapRect, Blocks, #{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Data) ->
+  case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
+    undefined ->
+      av_d_position:set_path(Rest, Data);
+    New ->
+      case State of
+        idle ->
+          NewPlayer = av_d_position:set_position_value(New, Data),
+          av_d_position:set_state_value(walk, NewPlayer);
+        _ ->
+          av_d_position:set_position_value(New, Data)
+      end
+  end.
