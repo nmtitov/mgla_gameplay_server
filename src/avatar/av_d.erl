@@ -102,7 +102,7 @@
   }
 }.
 -type state() :: idle | walk.
--type attack_state() :: idle | attack | wait.
+-type attack_state() :: idle | attack.
 -type type() :: player | bot.
 -export_type([data/0, state/0, type/0]).
 
