@@ -90,6 +90,8 @@ handle_cast({add_health, X} = M, State) ->
 handle_cast({subtract_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = av_d_health:subtract_health(X, State),
+  lager:info("New health ~p", [av_d_health:get_health(State2)]),
+  lager:info("New health% ~p", [av_d_health:get_health_percent(State2)]),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->
