@@ -59,11 +59,18 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   NewState = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
       map_server:attack(Id, AvatarId),
-      State;
+      State2 = av_d_attack:set_attack_target(AvatarId, State),
+      TargetId = av_d_attack:get_attack_target(State2),
+      lager:info("New target: ~p", [TargetId]),
+      State2;
     _ ->
       Position = av_d_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
-      av_d_position:set_path(Path, State)
+      State2 = av_d_position:set_path(Path, State),
+      State3 = av_d_attack:clear_attack_target(State2),
+      TargetId = av_d_attack:get_attack_target(State2),
+      lager:info("New target: ~p", [TargetId]),
+      State3
   end,
   {noreply, NewState};
 
