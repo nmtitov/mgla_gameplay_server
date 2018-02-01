@@ -90,4 +90,4 @@ is_dirty(Id) ->
 
 -spec clear_update_flags(Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
 clear_update_flags(Id) ->
-  gproc_tools:call(av_s:name(Id), clean).
+  gproc_tools:call(av_s:name(Id), clear_update_flags).
