@@ -28,14 +28,16 @@
   set_health/2,
   get_health_percent/1,
   get_health_update/1,
-  update_health_by/2,
+  add_health/2,
+  subtract_health/2,
   set_health_max/2,
 
   get_mana/1,
   set_mana/2,
   get_mana_percent/1,
   get_mana_update/1,
-  update_mana_by/2,
+  add_mana/2,
+  subtract_mana/2,
   set_mana_max/2,
 
   get_state_value/1,
@@ -215,6 +217,16 @@ get_health_update(#{health := #{update := U}}) -> U.
 
 update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
 
+-spec add_health(X :: number(), D :: data()) -> data().
+add_health(X, Data) ->
+  case X < 0 of true -> error(badarg); _ -> ok end,
+  update_health_by(X, Data).
+
+-spec subtract_health(X :: number(), D :: data()) -> data().
+subtract_health(X, D) ->
+  case X < 0 of true -> error(badarg); _ -> ok end,
+  update_health_by(-X, D).
+
 get_mana(#{mana := #{value := X}}) -> X.
 set_mana(RawX, #{mana := N} = Data) when is_number(RawX) ->
   X = float(RawX),
@@ -254,6 +266,17 @@ get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 get_mana_update(#{mana := #{update := U}}) -> U.
 
 update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
+
+-spec add_mana(X :: number(), Data :: data()) -> data().
+add_mana(X, D) ->
+  case X < 0 of true -> error(badarg); _ -> ok end,
+  update_mana_by(X, D).
+
+-spec subtract_mana(X :: number(), D :: data()) -> data().
+subtract_mana(X, D) ->
+  case X < 0 of true -> error(badarg); _ -> ok end,
+  update_mana_by(-X, D).
+
 
 -spec get_state_value(Data) -> X when Data :: data(), X :: state().
 get_state_value(#{state := #{value := X}}) -> X.

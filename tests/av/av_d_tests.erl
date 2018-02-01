@@ -121,14 +121,26 @@ get_health_percent_test_() ->
     ?_assertEqual(1.0, av_d:get_health_percent(Data))
   ].
 
-update_health_by_test_() ->
-  Data = av_d:zero(),
+add_health_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_health(50, D),
   [
-    ?_assertEqual(1.0, av_d:get_health_percent(av_d:update_health_by(50, Data))),
-    ?_assertEqual(1.0, av_d:get_health_percent(av_d:update_health_by(0, Data))),
-    ?_assertEqual(0.5, av_d:get_health_percent(av_d:update_health_by(-50, Data))),
-    ?_assertEqual(0.0, av_d:get_health_percent(av_d:update_health_by(-100, Data))),
-    ?_assertEqual(0.0, av_d:get_health_percent(av_d:update_health_by(-150, Data)))
+    ?_assertEqual(50.0, av_d:get_health(av_d:add_health(0, D2))),
+    ?_assertEqual(60.0, av_d:get_health(av_d:add_health(10, D2))),
+    ?_assertEqual(100.0, av_d:get_health(av_d:add_health(50, D2))),
+    ?_assertEqual(100.0, av_d:get_health(av_d:add_health(100, D2))),
+    ?_assertError(badarg, av_d:add_health(-50, D2))
+  ].
+
+subtract_health_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_health(50, D),
+  [
+    ?_assertEqual(50.0, av_d:get_health(av_d:subtract_health(0, D2))),
+    ?_assertEqual(40.0, av_d:get_health(av_d:subtract_health(10, D2))),
+    ?_assertEqual(0.0, av_d:get_health(av_d:subtract_health(50, D2))),
+    ?_assertEqual(0, av_d:get_health(av_d:subtract_health(100, D2))),
+    ?_assertError(badarg, av_d:subtract_health(-50, D2))
   ].
 
 set_health_max_test_() ->
@@ -168,14 +180,26 @@ get_mana_percent_test_() ->
     ?_assertEqual(1.0, av_d:get_mana_percent(Data))
   ].
 
-update_mana_by_test_() ->
-  Data = av_d:zero(),
+add_mana_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_mana(50, D),
   [
-    ?_assertEqual(1.0, av_d:get_mana_percent(av_d:update_mana_by(50, Data))),
-    ?_assertEqual(1.0, av_d:get_mana_percent(av_d:update_mana_by(0, Data))),
-    ?_assertEqual(0.5, av_d:get_mana_percent(av_d:update_mana_by(-50, Data))),
-    ?_assertEqual(0.0, av_d:get_mana_percent(av_d:update_mana_by(-100, Data))),
-    ?_assertEqual(0.0, av_d:get_mana_percent(av_d:update_mana_by(-150, Data)))
+    ?_assertEqual(50.0, av_d:get_mana(av_d:add_mana(0, D2))),
+    ?_assertEqual(60.0, av_d:get_mana(av_d:add_mana(10, D2))),
+    ?_assertEqual(100.0, av_d:get_mana(av_d:add_mana(50, D2))),
+    ?_assertEqual(100.0, av_d:get_mana(av_d:add_mana(100, D2))),
+    ?_assertError(badarg, av_d:add_mana(-50, D2))
+  ].
+
+subtract_mana_test_() ->
+  D = av_d:zero(),
+  D2 = av_d:set_mana(50, D),
+  [
+    ?_assertEqual(50.0, av_d:get_mana(av_d:subtract_mana(0, D2))),
+    ?_assertEqual(40.0, av_d:get_mana(av_d:subtract_mana(10, D2))),
+    ?_assertEqual(0.0, av_d:get_mana(av_d:subtract_mana(50, D2))),
+    ?_assertEqual(0, av_d:get_mana(av_d:subtract_mana(100, D2))),
+    ?_assertError(badarg, av_d:subtract_mana(-50, D2))
   ].
 
 set_mana_max_test_() ->

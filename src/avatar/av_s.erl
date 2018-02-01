@@ -76,22 +76,22 @@ handle_cast({set_position, P} = M, State) ->
 
 handle_cast({add_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:update_health_by(X, State),
+  State2 = av_d:add_health(X, State),
   {noreply, State2};
 
 handle_cast({subtract_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:update_health_by(-X, State),
+  State2 = av_d:subtract_health(X, State),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
-  State2 = av_d:update_mana_by(X, State),
+  State2 = av_d:add_mana(X, State),
   {noreply, State2};
 
 handle_cast({subtract_mana, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:update_mana_by(-X, State),
+  State2 = av_d:subtract_mana(X, State),
   {noreply, State2};
 
 handle_cast({set_state, X} = M, State) ->
