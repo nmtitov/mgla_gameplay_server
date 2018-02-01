@@ -56,7 +56,7 @@
   attack_default_cooldown := number(), % second
   attack_cooldown := number(), % seconds
   attack_state := #{
-    value := av_d_attack:attack_state(),
+    value := av_d_attack:state(),
     update := boolean()
   },
   state := #{
