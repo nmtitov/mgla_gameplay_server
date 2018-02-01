@@ -11,7 +11,7 @@
 
 -behaviour(supervisor).
 
--export([start_link/0, start_child/1, stop_child/1]).
+-export([start_link/0, start_child/1, stop_child/1, start_bots/0]).
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
@@ -31,6 +31,25 @@ stop_child(Id = M) ->
     Pid when is_pid(Pid) -> {ok, supervisor:terminate_child(?SERVER, Pid)};
     _                    -> {error, undefined}
   end.
+
+start_bots() ->
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()).
 
 %% Callback
 
