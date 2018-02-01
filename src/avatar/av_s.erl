@@ -41,11 +41,11 @@ handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position = av_d:get_position_value(State),
+  Position = av_d_position:get_position_value(State),
   {reply, Position, State};
 
 handle_call(get_state, _From, State) ->
-  X = av_d:get_state_value(State),
+  X = av_d_position:get_state_value(State),
   {reply, X, State};
 
 handle_call(_Request, _From, State) ->
@@ -58,9 +58,9 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Id = av_d:get_id(State),
   NewState = case Id == AvatarId orelse undefined == AvatarId of
     true ->
-      Position = av_d:get_position_value(State),
+      Position = av_d_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
-      av_d:set_path(Path, State);
+      av_d_position:set_path(Path, State);
     _ ->
       State
   end,
@@ -71,32 +71,32 @@ handle_cast({set_data, NewState}, _) ->
 
 handle_cast({set_position, P} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:set_position_value(P, State),
+  State2 = av_d_position:set_position_value(P, State),
   {noreply, State2};
 
 handle_cast({add_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:add_health(X, State),
+  State2 = av_d_health:add_health(X, State),
   {noreply, State2};
 
 handle_cast({subtract_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:subtract_health(X, State),
+  State2 = av_d_health:subtract_health(X, State),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
-  State2 = av_d:add_mana(X, State),
+  State2 = av_d_mana:add_mana(X, State),
   {noreply, State2};
 
 handle_cast({subtract_mana, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:subtract_mana(X, State),
+  State2 = av_d_mana:subtract_mana(X, State),
   {noreply, State2};
 
 handle_cast({set_state, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d:set_state_value(X, State),
+  State2 = av_d_position:set_state_value(X, State),
   {noreply, State2};
 
 handle_cast(Request, State) ->

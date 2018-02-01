@@ -149,20 +149,20 @@ update(Avatars, Dt, MapRect, Blocks) ->
 -spec move(Data :: av_d:data(), Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()]) -> av_d:data().
 move(#{path := [], state := #{value := State}} = Data, _, _, _) ->
   case State of
-    walk -> av_d:set_state_value(idle, Data);
+    walk -> av_d_position:set_state_value(idle, Data);
     _    -> Data
   end;
 move(#{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Data, Dt, MapRect, Blocks) ->
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-      av_d:set_path(Rest, Data);
+      av_d_position:set_path(Rest, Data);
     New ->
       case State of
         idle ->
-          NewPlayer = av_d:set_position_value(New, Data),
-          av_d:set_state_value(walk, NewPlayer);
+          NewPlayer = av_d_position:set_position_value(New, Data),
+          av_d_position:set_state_value(walk, NewPlayer);
         _ ->
-          av_d:set_position_value(New, Data)
+          av_d_position:set_position_value(New, Data)
       end
   end.
 
