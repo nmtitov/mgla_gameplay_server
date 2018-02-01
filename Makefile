@@ -46,10 +46,10 @@ deps: cowboy cowlib goldrush gproc jsx lager ranch proper
 build:
 	erlc +debug_info -I lib/proper/include "+{parse_transform, lager_transform}" "+{parse_transform, proper_unused_imports_remover}" -pa lib/lager/ebin/ -pa lib/proper/ebin -pa lib -o ebin/ `find src tests -type f -iname "*.erl" -print0 | xargs -0`
 
-compile: build dialyzer
-
 clean:
 	rm -rf ebin/*.beam
+
+compile: clean build dialyzer
 
 run: compile shell
 
