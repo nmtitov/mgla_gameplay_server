@@ -112,7 +112,7 @@ should_move_test_() ->
 get_health_test_() ->
   Data = av_d:zero(),
   [
-    ?_assertEqual(100.0, av_d:get_health(Data))
+    ?_assertEqual(100, av_d:get_health(Data))
   ].
 
 get_health_percent_test_() ->
@@ -125,10 +125,10 @@ add_health_test_() ->
   D = av_d:zero(),
   D2 = av_d:set_health(50, D),
   [
-    ?_assertEqual(50.0, av_d:get_health(av_d:add_health(0, D2))),
-    ?_assertEqual(60.0, av_d:get_health(av_d:add_health(10, D2))),
-    ?_assertEqual(100.0, av_d:get_health(av_d:add_health(50, D2))),
-    ?_assertEqual(100.0, av_d:get_health(av_d:add_health(100, D2))),
+    ?_assertEqual(50, av_d:get_health(av_d:add_health(0, D2))),
+    ?_assertEqual(60, av_d:get_health(av_d:add_health(10, D2))),
+    ?_assertEqual(100, av_d:get_health(av_d:add_health(50, D2))),
+    ?_assertEqual(100, av_d:get_health(av_d:add_health(100, D2))),
     ?_assertError(badarg, av_d:add_health(-50, D2))
   ].
 
@@ -136,9 +136,9 @@ subtract_health_test_() ->
   D = av_d:zero(),
   D2 = av_d:set_health(50, D),
   [
-    ?_assertEqual(50.0, av_d:get_health(av_d:subtract_health(0, D2))),
-    ?_assertEqual(40.0, av_d:get_health(av_d:subtract_health(10, D2))),
-    ?_assertEqual(0.0, av_d:get_health(av_d:subtract_health(50, D2))),
+    ?_assertEqual(50, av_d:get_health(av_d:subtract_health(0, D2))),
+    ?_assertEqual(40, av_d:get_health(av_d:subtract_health(10, D2))),
+    ?_assertEqual(0, av_d:get_health(av_d:subtract_health(50, D2))),
     ?_assertEqual(0, av_d:get_health(av_d:subtract_health(100, D2))),
     ?_assertError(badarg, av_d:subtract_health(-50, D2))
   ].
@@ -149,9 +149,9 @@ set_health_max_test_() ->
   Data3 = av_d:set_health_max(100, Data2),
   Data4 = av_d:set_health(100, Data3),
   [
-    ?_assertEqual(50.0, av_d:get_health(Data2)),
-    ?_assertEqual(50.0, av_d:get_health(Data3)),
-    ?_assertEqual(100.0, av_d:get_health(Data4))
+    ?_assertEqual(50, av_d:get_health(Data2)),
+    ?_assertEqual(50, av_d:get_health(Data3)),
+    ?_assertEqual(100, av_d:get_health(Data4))
   ].
 
 set_health_test_() ->
@@ -171,7 +171,7 @@ set_health_test_() ->
 get_mana_test_() ->
   Data = av_d:zero(),
   [
-    ?_assertEqual(100.0, av_d:get_mana(Data))
+    ?_assertEqual(100, av_d:get_mana(Data))
   ].
 
 get_mana_percent_test_() ->
@@ -184,10 +184,10 @@ add_mana_test_() ->
   D = av_d:zero(),
   D2 = av_d:set_mana(50, D),
   [
-    ?_assertEqual(50.0, av_d:get_mana(av_d:add_mana(0, D2))),
-    ?_assertEqual(60.0, av_d:get_mana(av_d:add_mana(10, D2))),
-    ?_assertEqual(100.0, av_d:get_mana(av_d:add_mana(50, D2))),
-    ?_assertEqual(100.0, av_d:get_mana(av_d:add_mana(100, D2))),
+    ?_assertEqual(50, av_d:get_mana(av_d:add_mana(0, D2))),
+    ?_assertEqual(60, av_d:get_mana(av_d:add_mana(10, D2))),
+    ?_assertEqual(100, av_d:get_mana(av_d:add_mana(50, D2))),
+    ?_assertEqual(100, av_d:get_mana(av_d:add_mana(100, D2))),
     ?_assertError(badarg, av_d:add_mana(-50, D2))
   ].
 
@@ -195,9 +195,9 @@ subtract_mana_test_() ->
   D = av_d:zero(),
   D2 = av_d:set_mana(50, D),
   [
-    ?_assertEqual(50.0, av_d:get_mana(av_d:subtract_mana(0, D2))),
-    ?_assertEqual(40.0, av_d:get_mana(av_d:subtract_mana(10, D2))),
-    ?_assertEqual(0.0, av_d:get_mana(av_d:subtract_mana(50, D2))),
+    ?_assertEqual(50, av_d:get_mana(av_d:subtract_mana(0, D2))),
+    ?_assertEqual(40, av_d:get_mana(av_d:subtract_mana(10, D2))),
+    ?_assertEqual(0, av_d:get_mana(av_d:subtract_mana(50, D2))),
     ?_assertEqual(0, av_d:get_mana(av_d:subtract_mana(100, D2))),
     ?_assertError(badarg, av_d:subtract_mana(-50, D2))
   ].
@@ -208,9 +208,9 @@ set_mana_max_test_() ->
   Data3 = av_d:set_mana_max(100, Data2),
   Data4 = av_d:set_mana(100, Data3),
   [
-    ?_assertEqual(50.0, av_d:get_mana(Data2)),
-    ?_assertEqual(50.0, av_d:get_mana(Data3)),
-    ?_assertEqual(100.0, av_d:get_mana(Data4))
+    ?_assertEqual(50, av_d:get_mana(Data2)),
+    ?_assertEqual(50, av_d:get_mana(Data3)),
+    ?_assertEqual(100, av_d:get_mana(Data4))
   ].
 
 set_mana_test_() ->

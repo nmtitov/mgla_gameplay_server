@@ -56,35 +56,35 @@
     value := point:point(),
     update := boolean()
   },
-  movement_speed := float(),
+  movement_speed := number(),
   path := [point:point()],
   health := #{
-    value := float(),
+    value := number(),
     update := boolean()
   },
   health_max := #{
-    value := float(),
+    value := number(),
     update := boolean()
   },
-  health_regen := float(),
+  health_regen := number(),
   mana := #{
-    value := float(),
+    value := number(),
     update := boolean()
   },
   mana_max := #{
-    value := float(),
+    value := number(),
     update := boolean()
   },
-  mana_regen := float(),
-  attack_speed := float(),
-  attack_range := float(),
-  attack_damage := float(),
+  mana_regen := number(),
+  attack_speed := number(),
+  attack_range := number(),
+  attack_damage := number(),
   state := #{
     value := state(),
     update := boolean()
   },
   xp := #{
-    value := float(),
+    value := number(),
     update := boolean()
   }
 }.
@@ -104,35 +104,35 @@ new(Id, Type, Name, Position) ->
       value => Position,
       update => true
     },
-    movement_speed => 100.0,
+    movement_speed => 100,
     path => [],
     health => #{
-      value => 100.0,
+      value => 100,
       update => true
     },
     health_max => #{
-      value => 100.0,
+      value => 100,
       update => true
     },
-    health_regen => 0.0,
+    health_regen => 0,
     mana => #{
-      value => 100.0,
+      value => 100,
       update => true
     },
     mana_max => #{
-      value => 100.0,
+      value => 100,
       update => true
     },
-    mana_regen => 0.0,
-    attack_speed => 0.0,
-    attack_range => 0.0,
-    attack_damage => 0.0,
+    mana_regen => 0,
+    attack_speed => 0,
+    attack_range => 0,
+    attack_damage => 0,
     state => #{
       value => idle,
       update => true
     },
     xp => #{
-      value => 0.0,
+      value => 0,
       update => true
     }
   }.
@@ -178,8 +178,7 @@ should_move(#{path := _}) -> true.
 get_health(#{health := #{value := X}}) -> X.
 
 -spec set_health(RawX :: number(), Data :: data()) -> data().
-set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
-  X = float(RawX),
+set_health(X, #{health := N} = Data) when is_number(X) ->
   MaxValue = get_health_max(Data),
   Data#{
     health := N#{
@@ -193,8 +192,7 @@ set_health(RawX, #{health := N} = Data) when is_number(RawX) ->
   }.
 
 get_health_max(#{health_max := #{value := X}}) -> X.
-set_health_max(RawXMax, #{health := N, health_max := NMax} = Data) when is_number(RawXMax) ->
-  XMax = float(RawXMax),
+set_health_max(XMax, #{health := N, health_max := NMax} = Data) when is_number(XMax) ->
   X = get_health(Data),
   Data#{
     health := N#{
@@ -228,8 +226,7 @@ subtract_health(X, D) ->
   update_health_by(-X, D).
 
 get_mana(#{mana := #{value := X}}) -> X.
-set_mana(RawX, #{mana := N} = Data) when is_number(RawX) ->
-  X = float(RawX),
+set_mana(X, #{mana := N} = Data) when is_number(X) ->
   MaxValue = get_mana_max(Data),
   Data#{
     mana := N#{
@@ -243,8 +240,7 @@ set_mana(RawX, #{mana := N} = Data) when is_number(RawX) ->
   }.
 
 get_mana_max(#{mana_max := #{value := X}}) -> X.
-set_mana_max(RawXMax, #{mana := N, mana_max := NMax} = Data) when is_number(RawXMax) ->
-  XMax = float(RawXMax),
+set_mana_max(XMax, #{mana := N, mana_max := NMax} = Data) when is_number(XMax) ->
   X = get_mana(Data),
   Data#{
     mana := N#{
