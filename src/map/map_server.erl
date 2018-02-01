@@ -138,7 +138,9 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
 
 update(AvatarsMeta, Dt, MapRect, Blocks) ->
   % Move
-  lists:foreach(fun({_, Id}) -> av_sapi:move(Dt, MapRect, Blocks, Id) end, AvatarsMeta),
+  lists:foreach(fun({_, Id}) ->
+    av_sapi:move(Dt, MapRect, Blocks, Id) end,
+  AvatarsMeta),
 
   % Attack
   Avatars = lists:map(fun({_, Id}) ->
@@ -149,27 +151,25 @@ update(AvatarsMeta, Dt, MapRect, Blocks) ->
   lists:foreach(fun(D) ->
     Damage = 1,
     TargetId = av_d_attack:get_attack_target(D),
-    av_sapi:subtract_health(Damage, TargetId)
+    {ok, _} = av_sapi:subtract_health(Damage, TargetId)
   end, Attackers),
 
   Dirty = lists:filter(fun({_, Id}) ->
     case av_sapi:is_dirty(Id) of
-      {ok, X} -> X;
+      {ok, true} -> true;
       _ -> false
     end
   end, AvatarsMeta),
   lists:foreach(fun({Type, Id}) ->
-    case Type of
-      player ->
-        case av_sapi:get_data(Id) of
-          {ok, D} -> ws_handler:broadcast(ws_send:update_message(D));
-          _ -> ok
-        end;
+    case av_sapi:get_data(Id) of
+      {ok, D} -> ws_handler:broadcast(ws_send:update_message(D));
       _ -> ok
     end
   end, Dirty),
 
-  lists:foreach(fun({_, Id}) -> av_sapi:clear_update_flags(Id) end, AvatarsMeta).
+  lists:foreach(fun({_, Id}) ->
+    {ok, _} = av_sapi:clear_update_flags(Id)
+  end, AvatarsMeta).
 
 start_bots() ->
   bot_factory_sup:start_child(id_server:get_id()),

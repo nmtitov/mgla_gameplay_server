@@ -50,6 +50,13 @@ handle_call(get_state, _From, State) ->
   X = av_d_position:get_state_value(State),
   {reply, X, State};
 
+handle_call({subtract_health, X} = M, _From, State) ->
+  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
+  State2 = av_d_health:subtract_health(X, State),
+  lager:info("New health ~p", [av_d_health:get_health(State2)]),
+  lager:info("New health% ~p", [av_d_health:get_health_percent(State2)]),
+  {reply, State2, State2};
+
 handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
   D2 = move(Dt, MapRect, Blocks, D),
   {reply, D2, D2};
@@ -99,13 +106,6 @@ handle_cast({set_position, P} = M, State) ->
 handle_cast({add_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = av_d_health:add_health(X, State),
-  {noreply, State2};
-
-handle_cast({subtract_health, X} = M, State) ->
-  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_health:subtract_health(X, State),
-  lager:info("New health ~p", [av_d_health:get_health(State2)]),
-  lager:info("New health% ~p", [av_d_health:get_health_percent(State2)]),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->

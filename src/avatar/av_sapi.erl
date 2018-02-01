@@ -60,9 +60,9 @@ set_position(P, Id) ->
 add_health(X, Id) ->
   gproc_tools:cast(av_s:name(Id), {add_health, X}).
 
--spec subtract_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av_d:data()} | gproc_tools:not_found().
 subtract_health(X, Id) ->
-  gproc_tools:cast(av_s:name(Id), {subtract_health, X}).
+  gproc_tools:call(av_s:name(Id), {subtract_health, X}).
 
 -spec add_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 add_mana(X, Id) ->
