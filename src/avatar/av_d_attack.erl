@@ -18,8 +18,10 @@
   get_attack_state_value/1,
   set_attack_state_value/2,
   get_attack_state_update/1,
+
   get_attack_target/1,
-  set_attack_target/2
+  set_attack_target/2,
+  clear_attack_target/1
 ]).
 
 -type state() :: idle | attack.
@@ -64,11 +66,17 @@ set_attack_state_value(X, #{attack_state := N} = D) when is_atom(X) ->
 -spec get_attack_state_update(D :: av_d:data()) -> boolean().
 get_attack_state_update(#{attack_state := #{update := X}}) -> X.
 
--spec get_attack_target(D :: av_d:data()) -> id_server:id().
+-spec get_attack_target(D :: av_d:data()) -> target().
 get_attack_target(#{attack_target := X}) -> X.
 
--spec set_attack_target(X :: id_server:id(), D :: av_d:data()) -> av_d:data().
+-spec set_attack_target(X :: target(), D :: av_d:data()) -> av_d:data().
 set_attack_target(X, D) when is_number(X) ->
   D#{
     attack_target := X
+  }.
+
+-spec clear_attack_target(D :: av_d:data()) -> av_d:data().
+clear_attack_target(D) ->
+  D#{
+    attack_target := undefined
   }.
