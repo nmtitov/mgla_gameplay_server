@@ -10,9 +10,9 @@
 -author("nt").
 -behaviour(gen_statem).
 
--export([start/0,push/0,get_count/0,stop/0]).
+-export([start/0,update/1,set_target/1,stop/0]).
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
--export([on/3,off/3]).
+-export([cd/3,ready/3]).
 
 name() -> autoattack_statem. % The registered server name
 
@@ -20,18 +20,21 @@ name() -> autoattack_statem. % The registered server name
 %% and does not link to the caller.
 start() ->
   gen_statem:start({local,name()}, ?MODULE, [], []).
-push() ->
-  gen_statem:call(name(), push).
-get_count() ->
-  gen_statem:call(name(), get_count).
+set_target(TargetId) ->
+  gen_statem:call(name(), {set_target,TargetId}).
+update(Dt) ->
+  gen_statem:call(name(), {update,Dt}).
 stop() ->
   gen_statem:stop(name()).
 
 %% Mandatory callback functions
 init([]) ->
-  %% Set the initial state + data.  Data is used only as a counter.
-  State = off, Data = 0,
-  {ok,State,Data}.
+  Data = #{
+    init_cd => 5000,
+    cd => 0,
+    target => undefined
+  },
+  {ok,ready,Data}.
 callback_mode() ->
   state_functions.
 terminate(_Reason, _State, _Data) ->
@@ -41,25 +44,33 @@ code_change(_Vsn, State, Data, _Extra) ->
 
 %%% state callback(s)
 
-off({call,From}, push, Data) ->
-  %% Go to 'on', increment count and reply
-  %% that the resulting status is 'on'
-  {next_state,on,Data+1,[{reply,From,on}]};
-off(EventType, EventContent, Data) ->
-  handle_event(EventType, EventContent, Data).
+cd({call,_}, {update,Dt}, #{cd := Cd} = D) ->
+  Cd2 = Cd - Dt,
+  D2 = D#{cd := Cd2},
+  case Cd2 < 0 of
+    true  -> {next_state,ready,D2};
+    false -> {keep_state,D2}
+  end;
+cd({call,_}, {set_target, T}, D) ->
+  D2 = D#{target := T},
+  {keep_state,D2}.
 
-on({call,From}, push, Data) ->
-  %% Go to 'off' and reply that the resulting status is 'off'
-  {next_state,off,Data,[{reply,From,off}]};
-on(EventType, EventContent, Data) ->
-  handle_event(EventType, EventContent, Data).
 
-%% Handle events common to all states
-handle_event({call,From}, get_count, Data) ->
-  %% Reply with the current count
-  {keep_state,Data,[{reply,From,Data}]};
-handle_event(_, _, Data) ->
-  %% Ignore all other events
-  {keep_state,Data}.
+ready({call,_}, {update,_}, #{init_cd := InitCd, target := T} = D) when T =/= undefined ->
+  D2 = D#{cd := InitCd},
+  do_attack(T),
+  {next_state,cd,D2};
+
+ready(_, {set_target,undefined = T}, D) ->
+  D2 = D#{target := T},
+  {keep_state,D2};
+
+ready(_, {set_target,T}, #{init_cd := InitCd} = D) ->
+  D2 = D#{cd := InitCd, target := T},
+  do_attack(T),
+  {next_state,cd,D2}.
 
 %% actions
+do_attack(TargetId) when TargetId =/= undefined ->
+  Damage = 1,
+  {ok,_} = av_sapi:subtract_health(Damage, TargetId).
