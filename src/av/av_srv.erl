@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 20. Jan 2018 17:58
 %%%-------------------------------------------------------------------
--module(av_s).
+-module(av_srv).
 -author("nt").
 
 -include("../../include/block.hrl").
@@ -23,7 +23,7 @@ name(Id) -> {n, l, {avatar, Id}}.
 %% API
 
 start_link(Type, Id) ->
-  gen_server:start_link(av_s, [Type, Id], []).
+  gen_server:start_link(av_srv, [Type, Id], []).
 
 %% Callbacks
 
