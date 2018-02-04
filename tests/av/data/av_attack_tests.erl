@@ -12,10 +12,12 @@
 
 set_target_test_() ->
   D = av:zero(),
-  D2 = av_attack:set_target(0, D),
-  D3 = av_attack:clear_target(D),
+  D2 = av_position:set_path([{1, 1}, {2, 2}], D),
+  D3 = av_attack:set_target(0, D2),
+  D4 = av_attack:clear_target(D2),
   [
     ?_assertEqual(undefined, av_attack:get_target(D)),
-    ?_assertEqual(0, av_attack:get_target(D2)),
-    ?_assertEqual(undefined, av_attack:get_target(D3))
+    ?_assertEqual(0, av_attack:get_target(D3)),
+    ?_assertEqual([], av_position:get_path(D3)),
+    ?_assertEqual(undefined, av_attack:get_target(D4))
   ].
