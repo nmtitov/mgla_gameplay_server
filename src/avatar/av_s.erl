@@ -35,7 +35,7 @@ init([Type, Id] = M) ->
   Blocks = map_tools:blocks(),
   Position = pathfinder_server:initial_point(Id, R, Blocks),
   Name = <<"Player">>,
-  State = av_d:new(Id, Type, Name, Position),
+  State = av:new(Id, Type, Name, Position),
   {ok, State, 0}.
 
 
@@ -43,18 +43,18 @@ handle_call(get_data, _From, State) ->
   {reply, State, State};
 
 handle_call(get_position, _From, State) ->
-  Position = av_d_position:get_position_value(State),
+  Position = av_position:get_position_value(State),
   {reply, Position, State};
 
 handle_call(get_state, _From, State) ->
-  X = av_d_position:get_state_value(State),
+  X = av_position:get_state_value(State),
   {reply, X, State};
 
 handle_call({subtract_health, X} = M, _From, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_health:subtract_health(X, State),
-  lager:info("New health ~p", [av_d_health:get_health(State2)]),
-  lager:info("New health% ~p", [av_d_health:get_health_percent(State2)]),
+  State2 = av_health:subtract_health(X, State),
+  lager:info("New health ~p", [av_health:get_health(State2)]),
+  lager:info("New health% ~p", [av_health:get_health_percent(State2)]),
   {reply, State2, State2};
 
 handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
@@ -62,11 +62,11 @@ handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
   {reply, D2, D2};
 
 handle_call(is_dirty, _From, D) ->
-  X = av_d:is_dirty(D),
+  X = av:is_dirty(D),
   {reply, X, D};
 
 handle_call(clear_update_flags, _From, D) ->
-  D2 = av_d:clear_update_flags(D),
+  D2 = av:clear_update_flags(D),
   {reply, D2, D2};
 
 handle_call(_Request, _From, State) ->
@@ -76,20 +76,20 @@ handle_call(_Request, _From, State) ->
 handle_cast({handle_click, Point, AvatarId} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
-  Id = av_d:get_id(State),
+  Id = av:get_id(State),
   NewState = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
       map_server:attack(Id, AvatarId),
-      State2 = av_d_attack:set_attack_target(AvatarId, State),
-      TargetId = av_d_attack:get_attack_target(State2),
+      State2 = av_attack:set_attack_target(AvatarId, State),
+      TargetId = av_attack:get_attack_target(State2),
       lager:info("New target: ~p", [TargetId]),
       State2;
     _ ->
-      Position = av_d_position:get_position_value(State),
+      Position = av_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
-      State2 = av_d_position:set_path(Path, State),
-      State3 = av_d_attack:clear_attack_target(State2),
-      TargetId = av_d_attack:get_attack_target(State2),
+      State2 = av_position:set_path(Path, State),
+      State3 = av_attack:clear_attack_target(State2),
+      TargetId = av_attack:get_attack_target(State2),
       lager:info("New target: ~p", [TargetId]),
       State3
   end,
@@ -100,27 +100,27 @@ handle_cast({set_data, NewState}, _) ->
 
 handle_cast({set_position, P} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_position:set_position_value(P, State),
+  State2 = av_position:set_position_value(P, State),
   {noreply, State2};
 
 handle_cast({add_health, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_health:add_health(X, State),
+  State2 = av_health:add_health(X, State),
   {noreply, State2};
 
 handle_cast({add_mana, X} = M, State) ->
   lager:info("avatar_server:handle_cast(~p)", [M]),
-  State2 = av_d_mana:add_mana(X, State),
+  State2 = av_mana:add_mana(X, State),
   {noreply, State2};
 
 handle_cast({subtract_mana, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_mana:subtract_mana(X, State),
+  State2 = av_mana:subtract_mana(X, State),
   {noreply, State2};
 
 handle_cast({set_state, X} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  State2 = av_d_position:set_state_value(X, State),
+  State2 = av_position:set_state_value(X, State),
   {noreply, State2};
 
 handle_cast(Request, State) ->
@@ -130,8 +130,8 @@ handle_cast(Request, State) ->
 
 handle_info(timeout = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  Id = av_d:get_id(State),
-  Type = av_d:get_type(State),
+  Id = av:get_id(State),
+  Type = av:get_type(State),
   map_server:add_avatar(Type, Id),
   {noreply, State};
 
@@ -142,7 +142,7 @@ handle_info(_Info = M, State) ->
 
 terminate(_Reason = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
-  Id = av_d:get_id(State),
+  Id = av:get_id(State),
   map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
@@ -154,22 +154,22 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Private
 
--spec move(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], D :: av_d:data()) -> av_d:data().
+-spec move(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], D :: av:data()) -> av:data().
 move(_, _, _, #{path := [], state := #{value := State}} = D) ->
   case State of
-    walk -> av_d_position:set_state_value(idle, D);
+    walk -> av_position:set_state_value(idle, D);
     _    -> D
   end;
 move(Dt, MapRect, Blocks, #{id := Id, position := #{value := A}, path := [B|Rest], movement_speed := S, state := #{value := State}} = Data) ->
   case pathfinder_server:next_point(Id, A, B, S, Dt, MapRect, Blocks) of
     undefined ->
-      av_d_position:set_path(Rest, Data);
+      av_position:set_path(Rest, Data);
     New ->
       case State of
         idle ->
-          NewPlayer = av_d_position:set_position_value(New, Data),
-          av_d_position:set_state_value(walk, NewPlayer);
+          NewPlayer = av_position:set_position_value(New, Data),
+          av_position:set_state_value(walk, NewPlayer);
         _ ->
-          av_d_position:set_position_value(New, Data)
+          av_position:set_position_value(New, Data)
       end
   end.

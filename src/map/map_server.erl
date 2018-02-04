@@ -24,7 +24,7 @@ add_avatar(Type, Id) ->
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
 
--spec get_avatars_meta() -> [av_d:data()].
+-spec get_avatars_meta() -> [av:data()].
 get_avatars_meta() ->
   gen_server:call(?SERVER, get_avatars_meta).
 
@@ -147,10 +147,10 @@ update(AvatarsMeta, Dt, MapRect, Blocks) ->
     {ok, Data} = av_sapi:get_data(Id), Data
   end, AvatarsMeta),
 
-  Attackers = lists:filter(fun(D) -> av_d_attack:get_attack_target(D) =/= undefined end, Avatars),
+  Attackers = lists:filter(fun(D) -> av_attack:get_attack_target(D) =/= undefined end, Avatars),
   lists:foreach(fun(D) ->
     Damage = 1,
-    TargetId = av_d_attack:get_attack_target(D),
+    TargetId = av_attack:get_attack_target(D),
     {ok, _} = av_sapi:subtract_health(Damage, TargetId)
   end, Attackers),
 

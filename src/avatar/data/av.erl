@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 22. Jan 2018 11:51
 %%%-------------------------------------------------------------------
--module(av_d).
+-module(av).
 -author("nt").
 
 -export([
@@ -52,11 +52,11 @@
   attack_speed := number(),
   attack_range := number(),
   attack_damage := number(),
-  attack_target := av_d_attack:target(),
+  attack_target := av_attack:target(),
   attack_default_cooldown := number(), % second
   attack_cooldown := number(), % seconds
   attack_state := #{
-    value := av_d_attack:state(),
+    value := av_attack:state(),
     update := boolean()
   },
   state := #{
@@ -135,11 +135,11 @@ get_name(#{name := X}) -> X.
 
 -spec is_dirty(D :: data()) -> boolean().
 is_dirty(D) ->
-  av_d_position:get_position_update(D)
-  orelse av_d_position:get_state_update(D)
-  orelse av_d_health:get_health_update(D)
-  orelse av_d_mana:get_mana_update(D)
-  orelse av_d_attack:get_attack_state_update(D).
+  av_position:get_position_update(D)
+  orelse av_position:get_state_update(D)
+  orelse av_health:get_health_update(D)
+  orelse av_mana:get_mana_update(D)
+  orelse av_attack:get_attack_state_update(D).
 
 -spec clear_update_flags(Data :: data()) -> data().
 clear_update_flags(#{position := Position, mana := M, health := H, attack_state := AttackState, state := State} = Data) ->
