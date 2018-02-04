@@ -10,39 +10,52 @@
 -author("nt").
 -behaviour(gen_statem).
 
--export([start/0,update/1,set_target/1,stop/0]).
+-export([start_link/1,set_target/2, update/2]).
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
 -export([cd/3,ready/3]).
 
-name() -> autoattack_statem. % The registered server name
+%% gproc
 
-%% API.  This example uses a registered name name()
-%% and does not link to the caller.
-start() ->
-  gen_statem:start({local,name()}, ?MODULE, [], []).
-set_target(TargetId) ->
-  gen_statem:call(name(), {set_target,TargetId}).
-update(Dt) ->
-  gen_statem:call(name(), {update,Dt}).
-stop() ->
-  gen_statem:stop(name()).
+name(Id) -> {n, l, {autoattack, Id}}.
 
-%% Mandatory callback functions
-init([]) ->
+%% API
+
+start_link(Id) ->
+  gen_statem:start_link(autoattack_statem, [Id], []).
+
+set_target(TargetId, Id) ->
+  {ok, _} = gproc_tools:statem_call(name(Id), {set_target,TargetId}).
+
+update(Dt, Id) ->
+  {ok, _} = gproc_tools:statem_call(name(Id), {update,Dt}).
+
+
+%% Callback
+
+init([Id]) ->
+  process_flag(trap_exit, true),
+  gproc:reg(name(Id)),
   Data = #{
+    id => Id,
     init_cd => 5000,
     cd => 0,
     target => undefined
   },
   {ok,ready,Data}.
+
 callback_mode() ->
   state_functions.
-terminate(_Reason, _State, _Data) ->
+
+terminate(_Reason = M, State, #{id := Id} = Data) ->
+  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, Data]),
+  gproc:unreg(name(Id)),
   void.
+
 code_change(_Vsn, State, Data, _Extra) ->
   {ok,State,Data}.
 
-%%% state callback(s)
+
+%%% State
 
 cd({call,_}, {update,Dt}, #{cd := Cd} = D) ->
   Cd2 = Cd - Dt,
@@ -70,7 +83,10 @@ ready(_, {set_target,T}, #{init_cd := InitCd} = D) ->
   do_attack(T),
   {next_state,cd,D2}.
 
-%% actions
+
+%% Actions
+
 do_attack(TargetId) when TargetId =/= undefined ->
+  lager:info("Attacking #~p", [TargetId]),
   Damage = 1,
   {ok,_} = av_sapi:subtract_health(Damage, TargetId).
