@@ -36,6 +36,10 @@ init([Id]) ->
     start => {pathfinder_server, start_link, [Id]},
     shutdown => 5000
   }, #{
+    id => autoattack_statem,
+    start => {autoattack_statem, start_link, [Id]},
+    shutdown => 5000
+  }, #{
     id => av_srv,
     start => {av_srv, start_link, [bot, Id]},
     shutdown => 5000

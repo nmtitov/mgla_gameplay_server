@@ -70,13 +70,9 @@ handle_call(clear_update_flags, _From, D) ->
   {reply, D2, D2};
 
 handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
+  Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
-  case av_attack:get_target(D) of
-    undefined -> ok;
-    TargetId ->
-      Damage = 1,
-      {ok, _} = av_sapi:subtract_health(Damage, TargetId)
-  end,
+  autoattack_statem:update(Dt, Id),
   {reply, ok, D2};
 
 handle_call(broadcast_update, _From, D) ->
@@ -96,8 +92,12 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Id = av:get_id(State),
   State2 = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
+      lager:info("Set Target ~p of ~p", [AvatarId, Id]),
+      autoattack_statem:set_target(AvatarId, Id),
       av_attack:set_target(AvatarId, State);
     _ ->
+      lager:info("Set Target ~p of ~p", [undefined, Id]),
+      autoattack_statem:set_target(undefined, Id),
       Position = av_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
       av_position:set_path(Path, State)
