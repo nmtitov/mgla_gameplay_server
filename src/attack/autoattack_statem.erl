@@ -78,7 +78,7 @@ cooldown({call,From} = E, {set_target,T} = M, D) ->
 
 
 ready({call,From}, {update,_}, D) ->
-  {keep_state,D,[{reply,From,{ok,D}}]};
+  {keep_state_and_data,[{reply,From,{ok,D}}]};
 
 ready({call,From}, {set_target,undefined = T} = M, D) ->
   lager:info("~p", [M]),
