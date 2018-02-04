@@ -68,7 +68,7 @@ cd({call,From}, {update,Dt}, #{cd := Cd, init_cd := InitCd, target := T} = D) ->
     true  ->
       D2 = D#{cd := Cd2},
       {keep_state,D2,[{reply,From,{ok,D2}}]};
-    false ->
+    _     ->
       case T of
         undefined ->
           D2 = D#{cd := 0},
