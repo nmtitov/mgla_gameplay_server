@@ -28,6 +28,7 @@
   clear_update_flags/1
 ]).
 
+
 handle_click(Id, Point, AvatarId) ->
   gproc_tools:cast(av_srv:name(Id), {handle_click, Point, AvatarId}).
 
