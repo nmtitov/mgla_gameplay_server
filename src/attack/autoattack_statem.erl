@@ -12,7 +12,7 @@
 
 -export([start_link/1,set_target/2, update/2]).
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
--export([cd/3,ready/3]).
+-export([cooldown/3,ready/3]).
 
 %% gproc
 
@@ -54,7 +54,7 @@ code_change(_Vsn, State, Data, _Extra) ->
 
 %%% State
 
-cd({call,From}, {update,Dt}, D) ->
+cooldown({call,From}, {update,Dt}, D) ->
   Id = autoattack:get_id(D),
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
@@ -71,14 +71,14 @@ cd({call,From}, {update,Dt}, D) ->
     false ->
       {keep_state,D2,[{reply,From,{ok,D2}}]}
   end;
-cd({call,From} = E, {set_target,T} = M, D) ->
+cooldown({call,From} = E, {set_target,T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
   D2 = autoattack:set_target(T, D),
   {keep_state,D2,[{reply,From,{ok,D2}}]}.
 
 
 ready({call,From}, {update,_}, D) ->
-  {keep_state,D,[{reply,From,{ok,D}}]};
+  {keep_state_and_data,[{reply,From,{ok,D}}]};
 
 ready({call,From}, {set_target,undefined = T} = M, D) ->
   lager:info("~p", [M]),
@@ -90,7 +90,7 @@ ready({call,From}, {set_target,T} = M, D) ->
   D2 = autoattack:set_target(T, D),
   D3 = autoattack:activate_cooldown(D2),
   do_attack(T),
-  {next_state,cd,D3,[{reply,From,{ok,D3}}]}.
+  {next_state, cooldown,D3,[{reply,From,{ok,D3}}]}.
 
 
 %% Actions
