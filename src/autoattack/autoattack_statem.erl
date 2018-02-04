@@ -12,7 +12,7 @@
 
 -export([start_link/1,set_target/2, update/2]).
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
--export([cooldown/3,ready/3]).
+-export([cooldown/3,ready/3,exec/3]).
 
 %% gproc
 
@@ -59,38 +59,40 @@ cooldown({call,From}, {update,Dt}, D) ->
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
     true  ->
-      Target = autoattack:get_target(D),
-      case av_misc:is_valid_target(Id, Target) of
+      case av_misc:is_valid_target(Id, autoattack:get_target(D)) of
         true ->
-          D3 = autoattack:activate_cooldown(D2),
-          do_attack(Target),
-          {keep_state,D3,[{reply,From,{ok,D3}}]};
-        false ->
-          {next_state,ready,D2,[{reply,From,{ok,D2}}]}
+          {next_state,exec,D2,[{reply,From,ok},{state_timeout,0,cooldown}]};
+        _ ->
+          {next_state,ready,D2,[{reply,From,ok}]}
       end;
-    false ->
-      {keep_state,D2,[{reply,From,{ok,D2}}]}
+    _ ->
+      {keep_state,D2,[{reply,From,ok}]}
   end;
 cooldown({call,From} = E, {set_target,T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
   D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,{ok,D2}}]}.
+  {keep_state,D2,[{reply,From,ok}]}.
 
 
-ready({call,From}, {update,_}, D) ->
-  {keep_state_and_data,[{reply,From,{ok,D}}]};
+ready({call,From}, {update,_}, _) ->
+  {keep_state_and_data,[{reply,From,ok}]};
 
 ready({call,From}, {set_target,undefined = T} = M, D) ->
   lager:info("~p", [M]),
   D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,{ok,D2}}]};
+  {keep_state,D2,[{reply,From,ok}]};
 
 ready({call,From}, {set_target,T} = M, D) ->
   lager:info("~p", [M]),
   D2 = autoattack:set_target(T, D),
-  D3 = autoattack:activate_cooldown(D2),
+  {next_state,exec,D2,[{reply,From,ok},{state_timeout,0,cooldown}]}.
+
+
+exec(state_timeout, cooldown, D) ->
+  T = autoattack:get_target(D),
   do_attack(T),
-  {next_state, cooldown,D3,[{reply,From,{ok,D3}}]}.
+  D2 = autoattack:activate_cooldown(D),
+  {next_state,cooldown,D2,[]}.
 
 
 %% Actions
