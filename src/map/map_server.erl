@@ -137,35 +137,13 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   State.
 
 update(AvatarsMeta, Dt, MapRect, Blocks) ->
-  % Move
   lists:foreach(fun({_, Id}) ->
-    av_sapi:move(Dt, MapRect, Blocks, Id) end,
-  AvatarsMeta),
-
-  % Attack
-  Avatars = lists:map(fun({_, Id}) ->
-    {ok, Data} = av_sapi:get_data(Id), Data
+    av_sapi:update(Dt, MapRect, Blocks, Id)
   end, AvatarsMeta),
 
-  Attackers = lists:filter(fun(D) -> av_attack:get_attack_target(D) =/= undefined end, Avatars),
-  lists:foreach(fun(D) ->
-    Damage = 1,
-    TargetId = av_attack:get_attack_target(D),
-    {ok, _} = av_sapi:subtract_health(Damage, TargetId)
-  end, Attackers),
-
-  Dirty = lists:filter(fun({_, Id}) ->
-    case av_sapi:is_dirty(Id) of
-      {ok, true} -> true;
-      _ -> false
-    end
-  end, AvatarsMeta),
   lists:foreach(fun({_, Id}) ->
-    case av_sapi:get_data(Id) of
-      {ok, D} -> ws_handler:broadcast(ws_send:update_message(D));
-      _ -> ok
-    end
-  end, Dirty),
+    av_sapi:broadcast_update(Id)
+  end, AvatarsMeta),
 
   lists:foreach(fun({_, Id}) ->
     {ok, _} = av_sapi:clear_update_flags(Id)
