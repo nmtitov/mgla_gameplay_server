@@ -74,7 +74,7 @@ cooldown({call,From} = E, {set_target,T} = M, D) ->
   {keep_state,D2,[{reply,From,ok}]}.
 
 
-ready({call,From}, {update,_}, D) ->
+ready({call,From}, {update,_}, _) ->
   {keep_state_and_data,[{reply,From,ok}]};
 
 ready({call,From}, {set_target,undefined = T} = M, D) ->
