@@ -28,42 +28,48 @@
   clear_update_flags/1
 ]).
 
--spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
 handle_click(Id, Point, AvatarId) ->
   gproc_tools:cast(av_srv:name(Id), {handle_click, Point, AvatarId}).
 
 
--spec get_data(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 get_data(Id) ->
   gproc_tools:call(av_srv:name(Id), get_data).
 
 
--spec add_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 add_health(X, Id) ->
   gproc_tools:cast(av_srv:name(Id), {add_health, X}).
 
--spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 subtract_health(X, Id) ->
   gproc_tools:call(av_srv:name(Id), {subtract_health, X}).
 
 
--spec add_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 add_mana(X, Id) ->
   gproc_tools:cast(av_srv:name(Id), {add_mana, X}).
 
--spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 subtract_mana(X, Id) ->
   gproc_tools:cast(av_srv:name(Id), {subtract_mana, X}).
 
 
--spec update(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 update(Dt, MapRect, Blocks, Id) ->
   gproc_tools:call(av_srv:name(Id), {update, Dt, MapRect, Blocks}).
 
--spec broadcast_update(Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 broadcast_update(Id) ->
   gproc_tools:call(av_srv:name(Id), broadcast_update).
 
--spec clear_update_flags(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 clear_update_flags(Id) ->
   gproc_tools:call(av_srv:name(Id), clear_update_flags).
+
+
+-spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
+
+-spec get_data(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
+
+-spec add_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
+
+-spec add_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+
+-spec update(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
+-spec broadcast_update(Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
+-spec clear_update_flags(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
