@@ -40,10 +40,11 @@ get_path_test_() ->
 set_path_test_() ->
   D = av:zero(),
   Path = [{0, 0}, {1, 1}, {2, 2}],
-  D2 = av_position:set_path(Path, D),
-  NewPath = av_position:get_path(D2),
+  D2 = av_attack:set_target(0, D),
+  D3 = av_position:set_path(Path, D2),
   [
-    ?_assertEqual(NewPath, Path)
+    ?_assertEqual(Path, av_position:get_path(D3)),
+    ?_assertEqual(undefined, av_attack:get_target(D3))
   ].
 
 should_move_test_() ->
