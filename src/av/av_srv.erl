@@ -69,6 +69,23 @@ handle_call(clear_update_flags, _From, D) ->
   D2 = av:clear_update_flags(D),
   {reply, D2, D2};
 
+handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
+  D2 = move(Dt, MapRect, Blocks, D),
+  case av_attack:get_attack_target(D) of
+    undefined -> ok;
+    TargetId ->
+      Damage = 1,
+      {ok, _} = av_sapi:subtract_health(Damage, TargetId)
+  end,
+  {reply, ok, D2};
+
+handle_call(broadcast_update, _From, D) ->
+  case av:is_dirty(D) of
+    true -> ws_handler:broadcast(ws_send:update_message(D));
+    _ -> ok
+  end,
+  {reply, ok, D};
+
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 

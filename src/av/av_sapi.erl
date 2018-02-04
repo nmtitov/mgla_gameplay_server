@@ -32,6 +32,8 @@
   move/4,
 
   is_dirty/1,
+  update/4,
+  broadcast_update/1,
   clear_update_flags/1
 ]).
 
@@ -86,3 +88,11 @@ is_dirty(Id) ->
 -spec clear_update_flags(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 clear_update_flags(Id) ->
   gproc_tools:call(av_srv:name(Id), clear_update_flags).
+
+-spec update(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
+update(Dt, MapRect, Blocks, Id) ->
+  gproc_tools:call(av_srv:name(Id), {update, Dt, MapRect, Blocks}).
+
+-spec broadcast_update(Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
+broadcast_update(Id) ->
+  gproc_tools:call(av_srv:name(Id), broadcast_update).
