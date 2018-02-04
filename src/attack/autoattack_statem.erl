@@ -36,19 +36,15 @@ update(Dt, Id) ->
 init([Id]) ->
   process_flag(trap_exit, true),
   gproc:reg(name(Id)),
-  Data = #{
-    id => Id,
-    init_cd => 1,
-    cd => 0,
-    target => undefined
-  },
-  {ok,ready,Data}.
+  D = autoattack:new(Id, 2),
+  {ok,ready,D}.
 
 callback_mode() ->
-  [state_functions, state_enter].
+  state_functions.
 
-terminate(_Reason = M, State, #{id := Id} = Data) ->
-  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, Data]),
+terminate(_Reason = M, State, D) ->
+  Id = autoattack:get_id(D),
+  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, Id]),
   gproc:unreg(name(Id)),
   void.
 
@@ -58,55 +54,48 @@ code_change(_Vsn, State, Data, _Extra) ->
 
 %%% State
 
-cd(enter, OldState, D) ->
-  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, enter, OldState, D]),
-  {keep_state,D};
-
-cd({call,From}, {update,Dt}, #{cd := Cd, init_cd := InitCd, target := T} = D) ->
-  Cd2 = Cd - Dt,
-  case Cd2 > 0 of
+cd({call,From}, {update,Dt}, D) ->
+  Id = autoattack:get_id(D),
+  D2 = autoattack:update(Dt, D),
+  case autoattack:is_ready(D2) of
     true  ->
-      D2 = D#{cd := Cd2},
-      {keep_state,D2,[{reply,From,{ok,D2}}]};
-    _     ->
-      case T of
-        undefined ->
-          D2 = D#{cd := 0},
-          {next_state,ready,D2,[{reply,From,{ok,D2}}]};
-        _ ->
-          D2 = D#{cd := InitCd},
-          do_attack(T),
-          {keep_state,D2,[{reply,From,{ok,D2}}]}
-      end
+      Target = autoattack:get_target(D),
+      case av_misc:is_valid_target(Id, Target) of
+        true ->
+          D3 = autoattack:activate_cooldown(D2),
+          do_attack(Target),
+          {keep_state,D3,[{reply,From,{ok,D3}}]};
+        false ->
+          {next_state,ready,D2,[{reply,From,{ok,D2}}]}
+      end;
+    false ->
+      {keep_state,D2,[{reply,From,{ok,D2}}]}
   end;
-cd({call,From} = E, {set_target, T} = M, D) ->
+cd({call,From} = E, {set_target,T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
-  D2 = D#{target := T},
+  D2 = autoattack:set_target(T, D),
   {keep_state,D2,[{reply,From,{ok,D2}}]}.
 
-
-ready(enter, OldState, D) ->
-  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, enter, OldState, D]),
-  {keep_state,D};
 
 ready({call,From}, {update,_}, D) ->
   {keep_state,D,[{reply,From,{ok,D}}]};
 
-ready({call,From}, {set_target,undefined} = M, D) ->
+ready({call,From}, {set_target,undefined = T} = M, D) ->
   lager:info("~p", [M]),
-  D2 = D#{target := undefined},
+  D2 = autoattack:set_target(T, D),
   {keep_state,D2,[{reply,From,{ok,D2}}]};
 
-ready({call,From}, {set_target,T} = M, #{init_cd := InitCd} = D) ->
+ready({call,From}, {set_target,T} = M, D) ->
   lager:info("~p", [M]),
-  D2 = D#{cd := InitCd, target := T},
+  D2 = autoattack:set_target(T, D),
+  D3 = autoattack:activate_cooldown(D2),
   do_attack(T),
-  {next_state,cd,D2,[{reply,From,{ok,D2}}]}.
+  {next_state,cd,D3,[{reply,From,{ok,D3}}]}.
 
 
 %% Actions
 
-do_attack(TargetId) when TargetId =/= undefined ->
+do_attack(TargetId) ->
   lager:info("Attacking #~p", [TargetId]),
   Damage = 10,
   {ok,_} = av_sapi:subtract_health(Damage, TargetId).

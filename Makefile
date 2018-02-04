@@ -55,7 +55,7 @@ run: compile shell
 
 eunit:
 	erl -noshell -pa ebin/		\
-	-eval "eunit:test([av, av_attack, av_health, av_mana, av_position, av_misc], [verbose])" -s init stop
+	-eval "eunit:test([av, av_attack, av_health, av_mana, av_position, av_misc, autoattack], [verbose])" -s init stop
 
 test: compile eunit
 

@@ -17,7 +17,8 @@
 -define(SERVER, ?MODULE).
 
 -type id() :: non_neg_integer().
--export_type([id/0]).
+-type id_opt() :: id() | undefined.
+-export_type([id/0, id_opt/0]).
 
 -spec get_id() -> Id when Id :: id().
 get_id() ->
