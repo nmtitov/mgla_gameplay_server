@@ -19,6 +19,14 @@ new_test_() ->
     ?_assertEqual(undefined, autoattack:get_target(D))
   ].
 
+is_ready_test_() ->
+  D = autoattack:new(0, 5),
+  D2 = autoattack:activate_cooldown(D),
+  [
+    ?_assertEqual(true, autoattack:is_ready(D)),
+    ?_assertEqual(false, autoattack:is_ready(D2))
+  ].
+
 active_cooldown_test_() ->
   D = autoattack:new(0, 5),
   D2 = autoattack:activate_cooldown(D),
