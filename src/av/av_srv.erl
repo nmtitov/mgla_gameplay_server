@@ -94,7 +94,7 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
   Id = av:get_id(State),
-  NewState = case av_misc:is_valid_target(Id, AvatarId) of
+  State2 = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
       av_attack:set_target(AvatarId, State);
     _ ->
@@ -102,7 +102,7 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
       av_position:set_path(Path, State)
   end,
-  {noreply, NewState};
+  {noreply, State2};
 
 handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};
