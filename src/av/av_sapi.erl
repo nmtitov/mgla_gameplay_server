@@ -16,7 +16,6 @@
   handle_click/3,
 
   get_data/1,
-  set_data/2,
 
   get_position/1,
   set_position/2,
@@ -43,10 +42,6 @@ handle_click(Id, Point, AvatarId) ->
 -spec get_data(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 get_data(Id) ->
   gproc_tools:call(av_srv:name(Id), get_data).
-
--spec set_data(Data :: av:data(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
-set_data(Data, Id) ->
-  gproc_tools:cast(av_srv:name(Id), {set_data, Data}).
 
 -spec get_position(Id :: id_server:id()) -> {ok, point:point()} | gproc_tools:not_found().
 get_position(Id) ->
