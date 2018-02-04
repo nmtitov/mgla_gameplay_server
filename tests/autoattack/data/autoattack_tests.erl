@@ -18,3 +18,11 @@ new_test_() ->
     ?_assertEqual(0, autoattack:get_time_to_go(D)),
     ?_assertEqual(undefined, autoattack:get_target(D))
   ].
+
+active_cooldown_test_() ->
+  D = autoattack:new(0, 5),
+  D2 = autoattack:activate_cooldown(D),
+  [
+    ?_assertEqual(0, autoattack:get_time_to_go(D)),
+    ?_assertEqual(5, autoattack:get_time_to_go(D2))
+  ].
