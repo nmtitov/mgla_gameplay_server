@@ -15,5 +15,6 @@ new_test_() ->
   [
     ?_assertEqual(0, autoattack:get_id(D)),
     ?_assertEqual(5, autoattack:get_cooldown(D)),
-    ?_assertEqual(0, autoattack:get_time_to_go(D))
+    ?_assertEqual(0, autoattack:get_time_to_go(D)),
+    ?_assertEqual(undefined, autoattack:get_target(D))
   ].
