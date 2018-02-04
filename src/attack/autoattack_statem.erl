@@ -79,7 +79,7 @@ cd({call,From}, {update,Dt}, #{cd := Cd, init_cd := InitCd, target := T} = D) ->
           {keep_state,D2,[{reply,From,{ok,D2}}]}
       end
   end;
-cd({call,From} = E, {set_target, T} = M, D) ->
+cd({call,From} = E, {set_target,T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
   D2 = D#{target := T},
   {keep_state,D2,[{reply,From,{ok,D2}}]}.
