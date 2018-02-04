@@ -62,12 +62,22 @@ cd(enter, OldState, D) ->
   lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, enter, OldState, D]),
   {keep_state,D};
 
-cd({call,From}, {update,Dt}, #{cd := Cd} = D) ->
+cd({call,From}, {update,Dt}, #{cd := Cd, init_cd := InitCd, target := T} = D) ->
   Cd2 = Cd - Dt,
-  D2 = D#{cd := Cd2},
   case Cd2 > 0 of
-    true  -> {keep_state,D2,[{reply,From,{ok,D2}}]};
-    false -> {next_state,ready,D2,[{reply,From,{ok,D2}}]}
+    true  ->
+      D2 = D#{cd := Cd2},
+      {keep_state,D2,[{reply,From,{ok,D2}}]};
+    _     ->
+      case T of
+        undefined ->
+          D2 = D#{cd := 0},
+          {next_state,ready,D2,[{reply,From,{ok,D2}}]};
+        _ ->
+          D2 = D#{cd := InitCd},
+          do_attack(T),
+          {keep_state,D2,[{reply,From,{ok,D2}}]}
+      end
   end;
 cd({call,From} = E, {set_target, T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
@@ -78,12 +88,6 @@ cd({call,From} = E, {set_target, T} = M, D) ->
 ready(enter, OldState, D) ->
   lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, enter, OldState, D]),
   {keep_state,D};
-
-ready({call,From} = E, {update,_} = M, #{init_cd := InitCd, target := T} = D) when T =/= undefined ->
-  lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
-  D2 = D#{cd := InitCd},
-  do_attack(T),
-  {next_state,cd,D2,[{reply,From,{ok,D2}}]};
 
 ready({call,From}, {update,_}, D) ->
   {keep_state,D,[{reply,From,{ok,D}}]};
