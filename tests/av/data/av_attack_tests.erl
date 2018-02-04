@@ -10,12 +10,12 @@
 -author("nt").
 -include_lib("eunit/include/eunit.hrl").
 
-set_attack_target_test_() ->
+set_target_test_() ->
   D = av:zero(),
-  D2 = av_attack:set_attack_target(0, D),
-  D3 = av_attack:clear_attack_target(D),
+  D2 = av_attack:set_target(0, D),
+  D3 = av_attack:clear_target(D),
   [
-    ?_assertEqual(undefined, av_attack:get_attack_target(D)),
-    ?_assertEqual(0, av_attack:get_attack_target(D2)),
-    ?_assertEqual(undefined, av_attack:get_attack_target(D3))
+    ?_assertEqual(undefined, av_attack:get_target(D)),
+    ?_assertEqual(0, av_attack:get_target(D2)),
+    ?_assertEqual(undefined, av_attack:get_target(D3))
   ].

@@ -49,8 +49,10 @@ get_position_update(#{position := #{update := X}}) -> X.
 -spec get_path(Data) -> X when Data :: av:data(), X :: [point:point()].
 get_path(#{path := X}) -> X.
 
--spec set_path(X, Data) -> NewData when X :: [point:point()], Data :: av:data(), NewData :: av:data().
-set_path(X, Data) -> Data#{path := X}.
+-spec set_path(X, D) -> NewData when X :: [point:point()], D :: av:data(), NewData :: av:data().
+set_path(X, D) ->
+  D2 = D#{path := X},
+  av_attack:clear_target(D2).
 
 -spec should_move(Data) -> X when Data :: av:data(), X :: boolean().
 should_move(#{path := []}) -> false;

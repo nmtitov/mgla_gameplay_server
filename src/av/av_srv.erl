@@ -70,13 +70,9 @@ handle_call(clear_update_flags, _From, D) ->
   {reply, D2, D2};
 
 handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
+  Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
-  case av_attack:get_attack_target(D) of
-    undefined -> ok;
-    TargetId ->
-      Damage = 1,
-      {ok, _} = av_sapi:subtract_health(Damage, TargetId)
-  end,
+  autoattack_statem:update(Dt, Id),
   {reply, ok, D2};
 
 handle_call(broadcast_update, _From, D) ->
@@ -94,23 +90,19 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
   Id = av:get_id(State),
-  NewState = case av_misc:is_valid_target(Id, AvatarId) of
+  State2 = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
-      map_server:attack(Id, AvatarId),
-      State2 = av_attack:set_attack_target(AvatarId, State),
-      TargetId = av_attack:get_attack_target(State2),
-      lager:info("New target: ~p", [TargetId]),
-      State2;
+      lager:info("Set Target ~p of ~p", [AvatarId, Id]),
+      autoattack_statem:set_target(AvatarId, Id),
+      av_attack:set_target(AvatarId, State);
     _ ->
+      lager:info("Set Target ~p of ~p", [undefined, Id]),
+      autoattack_statem:set_target(undefined, Id),
       Position = av_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
-      State2 = av_position:set_path(Path, State),
-      State3 = av_attack:clear_attack_target(State2),
-      TargetId = av_attack:get_attack_target(State2),
-      lager:info("New target: ~p", [TargetId]),
-      State3
+      av_position:set_path(Path, State)
   end,
-  {noreply, NewState};
+  {noreply, State2};
 
 handle_cast({set_data, NewState}, _) ->
   {noreply, NewState};

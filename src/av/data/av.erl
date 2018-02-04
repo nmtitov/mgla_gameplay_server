@@ -49,15 +49,17 @@
     update := boolean()
   },
   mana_regen := number(),
-  attack_speed := number(),
-  attack_range := number(),
-  attack_damage := number(),
-  attack_target := av_attack:target(),
-  attack_default_cooldown := number(), % second
-  attack_cooldown := number(), % seconds
-  attack_state := #{
-    value := av_attack:state(),
-    update := boolean()
+  attack := #{
+    speed := number(),
+    range := number(),
+    damage := number(),
+    target := av_attack:target(),
+    default_cooldown := number(), % second
+    cooldown := number(), % seconds
+    state := #{
+      value := av_attack:state(),
+      update := boolean()
+    }
   },
   state := #{
     value := state(),
@@ -104,15 +106,17 @@ new(Id, Type, Name, Position) ->
       update => true
     },
     mana_regen => 0,
-    attack_speed => 0,
-    attack_range => 0,
-    attack_damage => 0,
-    attack_target => undefined,
-    attack_default_cooldown => 5,
-    attack_cooldown => 0,
-    attack_state => #{
-      value => idle,
-      update => false
+    attack => #{
+      speed => 0,
+      range => 0,
+      damage => 0,
+      target => undefined,
+      default_cooldown => 5,
+      cooldown => 0,
+      state => #{
+        value => idle,
+        update => false
+      }
     },
     state => #{
       value => idle,
@@ -139,10 +143,10 @@ is_dirty(D) ->
   orelse av_position:get_state_update(D)
   orelse av_health:get_health_update(D)
   orelse av_mana:get_mana_update(D)
-  orelse av_attack:get_attack_state_update(D).
+  orelse av_attack:get_state_update(D).
 
 -spec clear_update_flags(Data :: data()) -> data().
-clear_update_flags(#{position := Position, mana := M, health := H, attack_state := AttackState, state := State} = Data) ->
+clear_update_flags(#{position := Position, mana := M, health := H, attack := #{state := AS} = A, state := State} = Data) ->
   Data#{
     position := Position#{
       update := false
@@ -153,8 +157,10 @@ clear_update_flags(#{position := Position, mana := M, health := H, attack_state 
     mana := M#{
       update := false
     },
-    attack_state := AttackState#{
-      update := false
+    attack := A#{
+      state := AS#{
+        update := false
+      }
     },
     state := State#{
       update := false
