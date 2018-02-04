@@ -77,7 +77,8 @@ get_target(#{attack := #{target := X}}) -> X.
 
 -spec set_target(X :: target(), D :: av:data()) -> av:data().
 set_target(X, #{attack := N} = D) when is_number(X) ->
-  D#{
+  D2 = av_position:set_path([], D),
+  D2#{
     attack := N#{
       target := X
     }
