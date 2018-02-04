@@ -143,7 +143,7 @@ is_dirty(D) ->
   orelse av_position:get_state_update(D)
   orelse av_health:get_health_update(D)
   orelse av_mana:get_mana_update(D)
-  orelse av_attack:get_attack_state_update(D).
+  orelse av_attack:get_state_update(D).
 
 -spec clear_update_flags(Data :: data()) -> data().
 clear_update_flags(#{position := Position, mana := M, health := H, attack := #{state := AS} = A, state := State} = Data) ->

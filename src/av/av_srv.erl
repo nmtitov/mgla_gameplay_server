@@ -71,7 +71,7 @@ handle_call(clear_update_flags, _From, D) ->
 
 handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   D2 = move(Dt, MapRect, Blocks, D),
-  case av_attack:get_attack_target(D) of
+  case av_attack:get_target(D) of
     undefined -> ok;
     TargetId ->
       Damage = 1,
@@ -97,16 +97,16 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   NewState = case av_misc:is_valid_target(Id, AvatarId) of
     true ->
       map_server:attack(Id, AvatarId),
-      State2 = av_attack:set_attack_target(AvatarId, State),
-      TargetId = av_attack:get_attack_target(State2),
+      State2 = av_attack:set_target(AvatarId, State),
+      TargetId = av_attack:get_target(State2),
       lager:info("New target: ~p", [TargetId]),
       State2;
     _ ->
       Position = av_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
       State2 = av_position:set_path(Path, State),
-      State3 = av_attack:clear_attack_target(State2),
-      TargetId = av_attack:get_attack_target(State2),
+      State3 = av_attack:clear_target(State2),
+      TargetId = av_attack:get_target(State2),
       lager:info("New target: ~p", [TargetId]),
       State3
   end,
