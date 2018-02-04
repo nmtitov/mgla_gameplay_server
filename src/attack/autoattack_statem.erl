@@ -69,9 +69,15 @@ cd({call,From}, {update,Dt}, #{cd := Cd, init_cd := InitCd, target := T} = D) ->
       D2 = D#{cd := Cd2},
       {keep_state,D2,[{reply,From,{ok,D2}}]};
     false ->
-      D2 = D#{cd := InitCd},
-      do_attack(T),
-      {keep_state,D2,[{reply,From,{ok,D2}}]}
+      case T of
+        undefined ->
+          D2 = D#{cd := 0},
+          {next_state,ready,D2,[{reply,From,{ok,D2}}]};
+        _ ->
+          D2 = D#{cd := InitCd},
+          do_attack(T),
+          {keep_state,D2,[{reply,From,{ok,D2}}]}
+      end
   end;
 cd({call,From} = E, {set_target, T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
