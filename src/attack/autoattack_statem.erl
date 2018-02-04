@@ -38,7 +38,7 @@ init([Id]) ->
   gproc:reg(name(Id)),
   Data = #{
     id => Id,
-    init_cd => 5,
+    init_cd => 1,
     cd => 0,
     target => undefined
   },
