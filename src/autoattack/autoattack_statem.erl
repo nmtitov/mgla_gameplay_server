@@ -40,7 +40,7 @@ init([Id]) ->
   {ok,ready,D}.
 
 callback_mode() ->
-  state_functions.
+  [state_functions,state_enter].
 
 terminate(_Reason = M, State, D) ->
   Id = autoattack:get_id(D),
@@ -53,6 +53,9 @@ code_change(_Vsn, State, Data, _Extra) ->
 
 
 %%% State
+
+cooldown(enter, _OldState, _) ->
+  {keep_state_and_data,[]};
 
 cooldown({call,From}, {update,Dt}, D) ->
   Id = autoattack:get_id(D),
@@ -71,11 +74,15 @@ cooldown({call,From}, {update,Dt}, D) ->
     false ->
       {keep_state,D2,[{reply,From,{ok,D2}}]}
   end;
+
 cooldown({call,From} = E, {set_target,T} = M, D) ->
   lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
   D2 = autoattack:set_target(T, D),
   {keep_state,D2,[{reply,From,{ok,D2}}]}.
 
+
+ready(enter, _OldState, _) ->
+  {keep_state_and_data,[]};
 
 ready({call,From}, {update,_}, D) ->
   {keep_state_and_data,[{reply,From,{ok,D}}]};
@@ -91,7 +98,6 @@ ready({call,From}, {set_target,T} = M, D) ->
   D3 = autoattack:activate_cooldown(D2),
   do_attack(T),
   {next_state, cooldown,D3,[{reply,From,{ok,D3}}]}.
-
 
 %% Actions
 
