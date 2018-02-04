@@ -63,15 +63,12 @@ get_health_percent(Data) -> get_health(Data) / get_health_max(Data).
 -spec get_health_update(D :: av:data()) -> boolean().
 get_health_update(#{health := #{update := U}}) -> U.
 
--spec update_health_by(X :: number(), D :: av:data()) -> av:data().
-update_health_by(X, Data) -> set_health(get_health(Data) + X, Data).
-
 -spec add_health(X :: number(), D :: av:data()) -> av:data().
-add_health(X, Data) ->
+add_health(X, D) ->
   case X < 0 of true -> error(badarg); _ -> ok end,
-  update_health_by(X, Data).
+  set_health(get_health(D) + X, D).
 
 -spec subtract_health(X :: number(), D :: av:data()) -> av:data().
 subtract_health(X, D) ->
   case X < 0 of true -> error(badarg); _ -> ok end,
-  update_health_by(-X, D).
+  set_health(get_health(D) - X, D).

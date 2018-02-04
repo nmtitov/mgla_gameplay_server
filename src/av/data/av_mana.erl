@@ -63,15 +63,12 @@ get_mana_percent(Data) -> get_mana(Data) / get_mana_max(Data).
 -spec get_mana_update(D :: av:data()) -> boolean().
 get_mana_update(#{mana := #{update := U}}) -> U.
 
--spec update_mana_by(X :: number(), D :: av:data()) -> av:data().
-update_mana_by(X, Data) -> set_mana(get_mana(Data) + X, Data).
-
 -spec add_mana(X :: number(), Data :: av:data()) -> av:data().
 add_mana(X, D) ->
   case X < 0 of true -> error(badarg); _ -> ok end,
-  update_mana_by(X, D).
+  set_mana(get_mana(D) + X, D).
 
 -spec subtract_mana(X :: number(), D :: av:data()) -> av:data().
 subtract_mana(X, D) ->
   case X < 0 of true -> error(badarg); _ -> ok end,
-  update_mana_by(-X, D).
+  set_mana(get_mana(D) - X, D).
