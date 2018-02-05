@@ -12,7 +12,6 @@
 
 %% API
 -export([
-  get_position/1,
   set_position/2,
 
   get_state/1,
@@ -23,9 +22,6 @@
   is_dirty/1
 ]).
 
--spec get_position(Id :: id_server:id()) -> {ok, point:point()} | gproc_tools:not_found().
-get_position(Id) ->
-  gproc_tools:call(av_srv:name(Id), get_position).
 
 -spec set_position(P :: point:point(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 set_position(P, Id) ->

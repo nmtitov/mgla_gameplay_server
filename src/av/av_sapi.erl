@@ -16,6 +16,8 @@
 
   get_data/1,
 
+  get_position/1,
+
   add_health/2,
   subtract_health/2,
 
@@ -35,6 +37,10 @@ handle_click(Id, Point, AvatarId) ->
 
 get_data(Id) ->
   gproc_tools:call(av_srv:name(Id), get_data).
+
+
+get_position(Id) ->
+  gproc_tools:call(av_srv:name(Id), get_position).
 
 
 add_health(X, Id) ->
@@ -64,6 +70,8 @@ clear_update_flags(Id) ->
 -spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
 
 -spec get_data(Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
+
+-spec get_position(Id :: id_server:id()) -> {ok, point:point()} | gproc_tools:not_found().
 
 -spec add_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
 -spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
