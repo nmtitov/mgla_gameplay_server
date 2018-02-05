@@ -10,6 +10,18 @@
 -author("nt").
 -include_lib("eunit/include/eunit.hrl").
 
+get_speed_test_() ->
+  D = av:zero(),
+  [
+    ?_assertEqual(1.5, av_attack:get_speed(D))
+  ].
+
+get_range_test_() ->
+  D = av:zero(),
+  [
+    ?_assertEqual(200, av_attack:get_range(D))
+  ].
+
 set_target_test_() ->
   D = av:zero(),
   D2 = av_position:set_path([{1, 1}, {2, 2}], D),

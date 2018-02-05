@@ -11,6 +11,8 @@
 
 %% API
 -export([
+  get_speed/1,
+  get_range/1,
   get_init_cd/1,
   set_init_cd/2,
   get_cd/1,
@@ -27,6 +29,9 @@
 -type state() :: idle | attack.
 -type target() :: id_server:id() | undefined.
 -export_type([state/0, target/0]).
+
+get_speed(#{attack := #{speed := X}}) -> X.
+get_range(#{attack := #{range := X}}) -> X.
 
 -spec get_init_cd(D :: av:data()) -> X :: number().
 get_init_cd(#{attack := #{default_cooldown := X}}) -> X.
@@ -91,3 +96,7 @@ clear_target(#{attack := N} = D) ->
       target := undefined
     }
   }.
+
+
+-spec get_speed(D :: av:data()) -> X :: number().
+-spec get_range(D :: av:data()) -> X :: number().

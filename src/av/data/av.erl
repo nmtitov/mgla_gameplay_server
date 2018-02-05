@@ -107,8 +107,8 @@ new(Id, Type, Name, Position) ->
     },
     mana_regen => 0,
     attack => #{
-      speed => 0,
-      range => 0,
+      speed => 1.5,
+      range => 200,
       damage => 0,
       target => undefined,
       default_cooldown => 5,

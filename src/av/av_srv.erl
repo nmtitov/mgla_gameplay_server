@@ -90,7 +90,9 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Blocks = map_tools:blocks(),
   Id = av:get_id(State),
-  State2 = case av_misc:is_valid_target(Id, AvatarId) of
+  Position = av_position:get_position_value(State),
+  Range = av_attack:get_range(State),
+  State2 = case av_misc:is_valid_target(Id, AvatarId) andalso av_misc:is_in_range(Range, Position, AvatarId) of
     true ->
       lager:info("Set Target ~p of ~p", [AvatarId, Id]),
       autoattack_statem:set_target(AvatarId, Id),
