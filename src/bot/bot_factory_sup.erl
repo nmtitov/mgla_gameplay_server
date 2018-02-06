@@ -36,6 +36,19 @@ start_bots() ->
   start_child(id_server:get_id()),
   start_child(id_server:get_id()),
   start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
+  start_child(id_server:get_id()),
   start_child(id_server:get_id()).
 
 %% Callback
