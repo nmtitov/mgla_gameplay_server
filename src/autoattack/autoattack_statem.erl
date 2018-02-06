@@ -101,3 +101,6 @@ do_attack(TargetId) ->
   lager:info("Attacking #~p", [TargetId]),
   Damage = 10,
   {ok,_} = av_sapi:subtract_health(Damage, TargetId).
+
+
+-spec set_target(id_server:id_opt(), id_server:id()) -> any().
