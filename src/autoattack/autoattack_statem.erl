@@ -60,11 +60,12 @@ cooldown({call,From}, {update,Dt}, D) ->
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
     true  ->
-      case do_attack(D2) of
-        {ok,D3} ->
+      case av_misc:is_valid_target(Id, autoattack:get_target(D)) of
+        true ->
+          D3 = do_attack(D2),
           {keep_state,D3,[{reply,From,ok}]};
-        {error,D3} ->
-          {next_state,ready,D3,[{reply,From,ok}]}
+        _ ->
+          {next_state,ready,D2,[{reply,From,ok}]}
       end;
     _ ->
       {keep_state,D2,[{reply,From,ok}]}
@@ -86,29 +87,20 @@ ready({call,From}, {set_target,undefined = T} = M, D) ->
 ready({call,From}, {set_target,T} = M, D) ->
   lager:info("~p", [M]),
   D2 = autoattack:set_target(T, D),
-  {_, D3} = do_attack(D2),
+  D3 = do_attack(D2),
   {next_state,cooldown,D3,[{reply,From,ok}]}.
 
 
 %% Actions
 
 do_attack(D) ->
-  Id = autoattack:get_id(D),
   TargetId = autoattack:get_target(D),
   lager:info("Attacking #~p", [TargetId]),
-  case av_misc:is_valid_target(Id, TargetId) of
-    true ->
-      Damage = 10,
-      {ok,_} = av_sapi:subtract_health(Damage, TargetId),
-      D2 = autoattack:trigger_cooldown(D),
-      {ok,D2};
-    _ ->
-      {error,D}
-  end.
+  Damage = 10,
+  {ok,_} = av_sapi:subtract_health(Damage, TargetId),
+  autoattack:trigger_cooldown(D).
 
-
-%% Specs
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().
 
--spec do_attack(D :: autoattack:data()) -> {ok,autoattack:data()} | {error,autoattack:data()}.
+-spec do_attack(D :: autoattack:data()) -> D2 :: autoattack:data().
