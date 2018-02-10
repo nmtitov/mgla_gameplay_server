@@ -51,10 +51,7 @@ handle_call(get_state, _From, State) ->
   {reply, X, State};
 
 handle_call({subtract_health, X} = M, _From, State) ->
-  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = av_health:subtract_health(X, State),
-  lager:info("New health ~p", [av_health:get_health(State2)]),
-  lager:info("New health% ~p", [av_health:get_health_percent(State2)]),
   {reply, State2, State2};
 
 handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
@@ -94,11 +91,9 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Range = av_attack:get_range(State),
   State2 = case av_misc:is_valid_target(Id, AvatarId) andalso av_misc:is_in_range(Range, Position, AvatarId) of
     true ->
-      lager:info("Set Target ~p of ~p", [AvatarId, Id]),
       autoattack_statem:set_target(AvatarId, Id),
       av_attack:set_target(AvatarId, State);
     _ ->
-      lager:info("Set Target ~p of ~p", [undefined, Id]),
       autoattack_statem:set_target(undefined, Id),
       Position = av_position:get_position_value(State),
       Path = pathfinder_server:path(Id, Position, Point, Blocks),
@@ -143,7 +138,7 @@ handle_info(timeout = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = av:get_id(State),
   Type = av:get_type(State),
-  map_server:add_avatar(Type, Id),
+  map_srv:add_avatar(Type, Id),
   {noreply, State};
 
 handle_info(_Info = M, State) ->
@@ -154,7 +149,7 @@ handle_info(_Info = M, State) ->
 terminate(_Reason = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = av:get_id(State),
-  map_server:remove_avatar(Id),
+  map_srv:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
 

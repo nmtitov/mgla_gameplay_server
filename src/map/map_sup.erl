@@ -22,8 +22,8 @@ init([]) ->
   },
   Children = [
     #{
-      id => map_server,
-      start => {map_server, start_link, []},
+      id => map_srv,
+      start => {map_srv, start_link, []},
       shutdown => 5000
     }
   ],
