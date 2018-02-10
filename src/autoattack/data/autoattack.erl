@@ -65,7 +65,7 @@ is_ready(D) ->
   get_time_to_go(D) =< 0.
 
 trigger_cooldown(D) ->
-  case is_ready(D) of false -> error(on_cooldown); _ -> ok end,
+  case is_ready(D) of false -> error(internal); _ -> ok end,
   Cooldown = get_cooldown(D),
   set_time_to_go(Cooldown, D).
 
