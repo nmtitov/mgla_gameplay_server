@@ -12,7 +12,7 @@
 
 -export([start_link/1,set_target/2, update/2]).
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
--export([cooldown/3,ready/3,exec/3]).
+-export([cooldown/3,ready/3]).
 
 %% gproc
 
@@ -61,7 +61,8 @@ cooldown({call,From}, {update,Dt}, D) ->
     true  ->
       case av_misc:is_valid_target(Id, autoattack:get_target(D)) of
         true ->
-          {next_state,exec,D2,[{reply,From,ok},{state_timeout,0,cooldown}]};
+          D3 = do_attack(D2),
+          {keep_state,D3,[{reply,From,ok}]};
         _ ->
           {next_state,ready,D2,[{reply,From,ok}]}
       end;
@@ -85,22 +86,20 @@ ready({call,From}, {set_target,undefined = T} = M, D) ->
 ready({call,From}, {set_target,T} = M, D) ->
   lager:info("~p", [M]),
   D2 = autoattack:set_target(T, D),
-  {next_state,exec,D2,[{reply,From,ok},{state_timeout,0,cooldown}]}.
-
-
-exec(state_timeout, cooldown, D) ->
-  T = autoattack:get_target(D),
-  do_attack(T),
-  D2 = autoattack:trigger_cooldown(D),
-  {next_state,cooldown,D2,[]}.
+  D3 = do_attack(D2),
+  {next_state,cooldown,D3,[{reply,From,ok}]}.
 
 
 %% Actions
 
-do_attack(TargetId) ->
+do_attack(D) ->
+  TargetId = autoattack:get_target(D),
   lager:info("Attacking #~p", [TargetId]),
   Damage = 10,
-  {ok,_} = av_sapi:subtract_health(Damage, TargetId).
+  {ok,_} = av_sapi:subtract_health(Damage, TargetId),
+  autoattack:trigger_cooldown(D).
 
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().
+
+-spec do_attack(D :: autoattack:data()) -> D2 :: autoattack:data().
