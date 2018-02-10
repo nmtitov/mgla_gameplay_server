@@ -14,9 +14,11 @@
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
 -export([cooldown/3,ready/3]).
 
+
 %% gproc
 
 name(Id) -> {n, l, {autoattack, Id}}.
+
 
 %% API
 
