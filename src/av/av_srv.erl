@@ -51,10 +51,7 @@ handle_call(get_state, _From, State) ->
   {reply, X, State};
 
 handle_call({subtract_health, X} = M, _From, State) ->
-  lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   State2 = av_health:subtract_health(X, State),
-  lager:info("New health ~p", [av_health:get_health(State2)]),
-  lager:info("New health% ~p", [av_health:get_health_percent(State2)]),
   {reply, State2, State2};
 
 handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
