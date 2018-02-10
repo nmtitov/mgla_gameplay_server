@@ -21,7 +21,7 @@
 
   update/2,
   is_ready/1,
-  activate_cooldown/1
+  trigger_cooldown/1
 ]).
 
 
@@ -64,7 +64,8 @@ update(Dt, D) ->
 is_ready(D) ->
   get_time_to_go(D) =< 0.
 
-activate_cooldown(D) ->
+trigger_cooldown(D) ->
+  case is_ready(D) of false -> error(on_cooldown); _ -> ok end,
   Cooldown = get_cooldown(D),
   set_time_to_go(Cooldown, D).
 
@@ -81,4 +82,4 @@ activate_cooldown(D) ->
 
 -spec update(Dt :: number(), D :: data()) -> data().
 -spec is_ready(D :: data()) -> boolean().
--spec activate_cooldown(D :: data()) -> data().
+-spec trigger_cooldown(D :: data()) -> data().

@@ -91,7 +91,7 @@ ready({call,From}, {set_target,T} = M, D) ->
 exec(state_timeout, cooldown, D) ->
   T = autoattack:get_target(D),
   do_attack(T),
-  D2 = autoattack:activate_cooldown(D),
+  D2 = autoattack:trigger_cooldown(D),
   {next_state,cooldown,D2,[]}.
 
 
