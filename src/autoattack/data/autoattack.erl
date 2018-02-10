@@ -35,6 +35,7 @@
 
 -export_type([data/0]).
 
+
 %% API
 
 new(Id, Cooldown) -> #{
