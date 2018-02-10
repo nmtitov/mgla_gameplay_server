@@ -15,7 +15,7 @@ new_test_() ->
   [
     ?_assertEqual(0, autoattack:get_id(D)),
     ?_assertEqual(5, autoattack:get_cooldown(D)),
-    ?_assertEqual(0, autoattack:get_time_to_go(D)),
+    ?_assertEqual(0, autoattack:get_time_left(D)),
     ?_assertEqual(undefined, autoattack:get_target(D))
   ].
 
@@ -50,7 +50,7 @@ get_cooldown_test_() ->
 get_time_to_go_test_() ->
   D = autoattack:new(0, 5),
   [
-    ?_assertEqual(0, autoattack:get_time_to_go(D))
+    ?_assertEqual(0, autoattack:get_time_left(D))
   ].
 
 is_ready_test_() ->
@@ -65,6 +65,6 @@ active_cooldown_test_() ->
   D = autoattack:new(0, 5),
   D2 = autoattack:trigger_cooldown(D),
   [
-    ?_assertEqual(0, autoattack:get_time_to_go(D)),
-    ?_assertEqual(5, autoattack:get_time_to_go(D2))
+    ?_assertEqual(0, autoattack:get_time_left(D)),
+    ?_assertEqual(5, autoattack:get_time_left(D2))
   ].

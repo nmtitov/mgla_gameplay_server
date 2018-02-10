@@ -18,7 +18,7 @@
   set_target/2,
 
   get_cooldown/1,
-  get_time_to_go/1,
+  get_time_left/1,
 
   update/2,
   is_ready/1,
@@ -30,7 +30,7 @@
   id => id_server:id(),
   target => id_server:id_opt(),
   cooldown => number(),
-  time_to_go => number()
+  time_left => number()
 }.
 
 -export_type([data/0]).
@@ -42,7 +42,7 @@ new(Id, Cooldown) -> #{
   id => Id,
   target => undefined,
   cooldown => Cooldown,
-  time_to_go => 0
+  time_left => 0
 }.
 
 get_id(#{id := X}) -> X.
@@ -55,22 +55,22 @@ set_target(X, D) ->
 
 get_cooldown(#{cooldown := X}) -> X.
 
-get_time_to_go(#{time_to_go := X}) -> X.
-set_time_to_go(X, D) ->
+get_time_left(#{time_left := X}) -> X.
+set_time_left(X, D) ->
   D#{
-    time_to_go := X
+    time_left := X
   }.
 
 update(Dt, D) ->
-  set_time_to_go(get_time_to_go(D) - Dt, D).
+  set_time_left(get_time_left(D) - Dt, D).
 
 is_ready(D) ->
-  get_time_to_go(D) =< 0.
+  get_time_left(D) =< 0.
 
 trigger_cooldown(D) ->
   case is_ready(D) of false -> error(internal); _ -> ok end,
   Cooldown = get_cooldown(D),
-  set_time_to_go(Cooldown, D).
+  set_time_left(Cooldown, D).
 
 
 -spec new(Id :: id_server:id(), Cooldown :: number()) -> data().
@@ -82,8 +82,8 @@ trigger_cooldown(D) ->
 
 -spec get_cooldown(D :: data()) -> number().
 
--spec get_time_to_go(D :: data()) -> number().
--spec set_time_to_go(X :: number(), D :: data()) -> data().
+-spec get_time_left(D :: data()) -> number().
+-spec set_time_left(X :: number(), D :: data()) -> data().
 
 -spec update(Dt :: number(), D :: data()) -> data().
 -spec is_ready(D :: data()) -> boolean().
