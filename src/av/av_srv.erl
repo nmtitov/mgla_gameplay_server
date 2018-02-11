@@ -69,7 +69,7 @@ handle_call(clear_update_flags, _From, D) ->
 handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
-  autoattack_statem:update(Dt, Id),
+  _AutoattackEvents = autoattack_statem:update(Dt, Id),
   {reply, ok, D2};
 
 handle_call(broadcast_update, _From, D) ->
