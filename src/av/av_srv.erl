@@ -58,6 +58,10 @@ handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
   D2 = move(Dt, MapRect, Blocks, D),
   {reply, D2, D2};
 
+handle_call({append_game_event,GameEvent}, _From, D) ->
+  D2 = av:append_game_event(GameEvent, D),
+  {reply, D2, D2};
+
 handle_call(is_dirty, _From, D) ->
   X = av:is_dirty(D),
   {reply, X, D};

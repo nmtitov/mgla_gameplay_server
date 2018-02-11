@@ -18,11 +18,7 @@
 
   get_position/1,
 
-  add_health/2,
-  subtract_health/2,
-
-  add_mana/2,
-  subtract_mana/2,
+  append_game_event/2,
 
   update/4,
   broadcast_update/1,
@@ -43,18 +39,8 @@ get_position(Id) ->
   gproc_tools:call(av_srv:name(Id), get_position).
 
 
-add_health(X, Id) ->
-  gproc_tools:cast(av_srv:name(Id), {add_health, X}).
-
-subtract_health(X, Id) ->
-  gproc_tools:call(av_srv:name(Id), {subtract_health, X}).
-
-
-add_mana(X, Id) ->
-  gproc_tools:cast(av_srv:name(Id), {add_mana, X}).
-
-subtract_mana(X, Id) ->
-  gproc_tools:cast(av_srv:name(Id), {subtract_mana, X}).
+append_game_event(GameEvent, Id) ->
+  gproc_tools:call(av_srv:name(Id), {append_game_event,GameEvent}).
 
 
 update(Dt, MapRect, Blocks, Id) ->
@@ -73,11 +59,7 @@ clear_update_flags(Id) ->
 
 -spec get_position(Id :: id_server:id()) -> {ok, point:point()} | gproc_tools:not_found().
 
--spec add_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
--spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
-
--spec add_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
--spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec append_game_event(GameEvent :: any(), Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 
 -spec update(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 -spec broadcast_update(Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().

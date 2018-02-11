@@ -17,6 +17,9 @@
   get_name/1,
   get_type/1,
 
+  append_game_event/2,
+  withdraw_game_events/1,
+
   is_dirty/1,
   clear_update_flags/1
 ]).
@@ -68,10 +71,13 @@
   xp := #{
     value := number(),
     update := boolean()
-  }
+  },
+  game_events := game_events()
 }.
 -type state() :: idle | walk.
 -type type() :: player | bot.
+-type game_event() :: any().
+-type game_events() :: [] | [game_event()].
 -export_type([data/0, state/0, type/0]).
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
@@ -125,7 +131,8 @@ new(Id, Type, Name, Position) ->
     xp => #{
       value => 0,
       update => true
-    }
+    },
+    game_events => []
   }.
 
 -spec get_id(Data) -> X when Data :: data(), X :: non_neg_integer().
@@ -136,6 +143,19 @@ get_type(#{type := X}) -> X.
 
 -spec get_name(Data) -> X when Data :: data(), X :: binary().
 get_name(#{name := X}) -> X.
+
+
+append_game_event(GameEvent, #{game_events := GameEvents} = D) ->
+  D#{
+    game_events := [GameEvent|GameEvents]
+  }.
+
+withdraw_game_events(#{game_events := GameEvents} = D) ->
+  D2 = D#{
+    game_events := []
+  },
+  {GameEvents, D2}.
+
 
 -spec is_dirty(D :: data()) -> boolean().
 is_dirty(D) ->
@@ -166,3 +186,8 @@ clear_update_flags(#{position := Position, mana := M, health := H, attack := #{s
       update := false
     }
   }.
+
+
+%% Spec
+-spec append_game_event(GameEvent :: game_event(), Data :: data()) -> data().
+-spec withdraw_game_events(Data :: data()) -> {game_events(), data()}.

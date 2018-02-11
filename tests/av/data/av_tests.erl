@@ -63,6 +63,19 @@ get_name_test_() ->
   ].
 
 
+append_game_event_test_() ->
+  D = av:zero(),
+  {GE,_} = av:withdraw_game_events(D),
+  D2 = av:append_game_event(0, D),
+  {GE2,D3} = av:withdraw_game_events(D2),
+  {GE3,_} = av:withdraw_game_events(D3),
+  [
+    ?_assertEqual([], GE),
+    ?_assertEqual([0], GE2),
+    ?_assertEqual([], GE3)
+  ].
+
+
 clear_update_flags_test() ->
   Data = av:zero(),
   State = walk,
