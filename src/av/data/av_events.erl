@@ -10,44 +10,44 @@
 -author("nt").
 
 -export([
-  append_game_event/2,
-  withdraw_game_events/1,
-  handle_game_events/2
+  add_event/2,
+  withdraw_events/1,
+  handle_events/2
 ]).
 
--type game_event() :: any().
--type game_events() :: [] | [game_event()].
+-type event() :: any().
+-type events() :: [] | [event()].
 
--export_type([game_event/0, game_events/0]).
+-export_type([event/0, events/0]).
 
 %% API
 
-append_game_event(GameEvent, #{game_events := GameEvents} = D) ->
+add_event(E, #{events := Es} = D) ->
   D#{
-    game_events := [GameEvent|GameEvents]
+    events := [E | Es]
   }.
 
-withdraw_game_events(#{game_events := GameEvents} = D) ->
+withdraw_events(#{events := Es} = D) ->
   D2 = D#{
-    game_events := []
+    events := []
   },
-  {GameEvents, D2}.
+  {Es, D2}.
 
 
-handle_game_events([], D) ->
+handle_events([], D) ->
   D;
-handle_game_events([X|Xs], D) ->
-  D2 = handle_game_event(X, D),
-  handle_game_events(Xs, D2).
+handle_events([X|Xs], D) ->
+  D2 = handle_event(X, D),
+  handle_events(Xs, D2).
 
-handle_game_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
+handle_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
   av_health:subtract_health(Damage, D).
 
 
 %% Spec
 
--spec append_game_event(GameEvent :: game_event(), Data :: av:data()) -> av:data().
--spec withdraw_game_events(Data :: av:data()) -> {game_events(), av:data()}.
+-spec add_event(E :: event(), Data :: av:data()) -> av:data().
+-spec withdraw_events(Data :: av:data()) -> {events(), av:data()}.
 
--spec handle_game_events(GameEvents :: game_events(), D :: av:data()) -> av:data().
--spec handle_game_event(GameEvent :: game_event(), D :: av:data()) -> av:data().
+-spec handle_events(Es :: events(), D :: av:data()) -> av:data().
+-spec handle_event(Es :: event(), D :: av:data()) -> av:data().

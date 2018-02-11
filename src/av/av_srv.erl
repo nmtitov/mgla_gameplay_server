@@ -58,8 +58,8 @@ handle_call({move, Dt, MapRect, Blocks}, _From, D) ->
   D2 = move(Dt, MapRect, Blocks, D),
   {reply, D2, D2};
 
-handle_call({append_game_event,GameEvent}, _From, D) ->
-  D2 = av_events:append_game_event(GameEvent, D),
+handle_call({add_event,E}, _From, D) ->
+  D2 = av_events:add_event(E, D),
   {reply, D2, D2};
 
 handle_call(is_dirty, _From, D) ->
@@ -74,8 +74,8 @@ handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
   _AutoattackEvents = autoattack_statem:update(Dt, Id),
-  {AppendedEvents,D3} = av_events:withdraw_game_events(D2),
-  D4 = av_events:handle_game_events(AppendedEvents, D3),
+  {AppendedEvents,D3} = av_events:withdraw_events(D2),
+  D4 = av_events:handle_events(AppendedEvents, D3),
   {reply, ok, D4};
 
 handle_call(broadcast_update, _From, D) ->

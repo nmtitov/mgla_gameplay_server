@@ -88,10 +88,10 @@ handle_event(cast, {set_target,T}, D) ->
 %% Actions
 
 do_attack(D) ->
-  GameEvent = autoattack:create_event(D),
+  E = autoattack:create_event(D),
   TargetId = autoattack:get_target(D),
-  av_sapi:append_game_event(GameEvent, TargetId),
-  GameEvent.
+  av_sapi:add_event(E, TargetId),
+  E.
 
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().

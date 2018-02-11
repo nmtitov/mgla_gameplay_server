@@ -18,7 +18,7 @@
 
   get_position/1,
 
-  append_game_event/2,
+  add_event/2,
 
   update/4,
   broadcast_update/1,
@@ -39,8 +39,8 @@ get_position(Id) ->
   gproc_tools:call(av_srv:name(Id), get_position).
 
 
-append_game_event(GameEvent, Id) ->
-  gproc_tools:call(av_srv:name(Id), {append_game_event,GameEvent}).
+add_event(E, Id) ->
+  gproc_tools:call(av_srv:name(Id), {add_event,E}).
 
 
 update(Dt, MapRect, Blocks, Id) ->
@@ -59,7 +59,7 @@ clear_update_flags(Id) ->
 
 -spec get_position(Id :: id_server:id()) -> {ok, point:point()} | gproc_tools:not_found().
 
--spec append_game_event(GameEvent :: any(), Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
+-spec add_event(GameEvent :: any(), Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 
 -spec update(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
 -spec broadcast_update(Id :: id_server:id()) -> {ok, _} | gproc_tools:not_found().
