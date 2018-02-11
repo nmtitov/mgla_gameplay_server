@@ -71,9 +71,9 @@ cooldown(EventType, EventContent, D) ->
 ready({call,From}, {update,_}, D) ->
   case av_misc:is_valid_target(D) of
     true ->
-      GameEvent = do_attack(D),
+      E = do_attack(D),
       D2 = autoattack:trigger_cooldown(D),
-      {next_state,cooldown,D2,[{reply,From,[GameEvent]}]};
+      {next_state,cooldown,D2,[{reply,From,[E]}]};
     _ ->
       {keep_state_and_data,[{reply,From,[]}]}
   end;
@@ -88,11 +88,10 @@ handle_event(cast, {set_target,T}, D) ->
 %% Actions
 
 do_attack(D) ->
-  Id = autoattack:get_target(D),
+  E = autoattack:create_event(D),
   TargetId = autoattack:get_target(D),
-  Damage = 10,
-  {ok,_} = av_sapi:subtract_health(Damage, TargetId),
-  autoattack:game_event(D).
+  av_sapi:add_event(E, TargetId),
+  E.
 
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().

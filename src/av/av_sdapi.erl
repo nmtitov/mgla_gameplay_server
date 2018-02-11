@@ -17,6 +17,12 @@
   get_state/1,
   set_state/2,
 
+  add_health/2,
+  subtract_health/2,
+
+  add_mana/2,
+  subtract_mana/2,
+
   move/4,
 
   is_dirty/1
@@ -37,6 +43,20 @@ set_state(X, Id) ->
   gproc_tools:cast(av_srv:name(Id), {set_state, X}).
 
 
+add_health(X, Id) ->
+  gproc_tools:cast(av_srv:name(Id), {add_health, X}).
+
+subtract_health(X, Id) ->
+  gproc_tools:call(av_srv:name(Id), {subtract_health, X}).
+
+
+add_mana(X, Id) ->
+  gproc_tools:cast(av_srv:name(Id), {add_mana, X}).
+
+subtract_mana(X, Id) ->
+  gproc_tools:cast(av_srv:name(Id), {subtract_mana, X}).
+
+
 -spec move(Dt :: float(), MapRect :: rect:rect(), Blocks :: [block()], Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
 move(Dt, MapRect, Blocks, Id) ->
   gproc_tools:call(av_srv:name(Id), {move, Dt, MapRect, Blocks}).
@@ -45,3 +65,12 @@ move(Dt, MapRect, Blocks, Id) ->
 -spec is_dirty(Id :: id_server:id()) -> {ok, boolean()} | gproc_tools:not_found().
 is_dirty(Id) ->
   gproc_tools:call(av_srv:name(Id), is_dirty).
+
+
+%% Spec
+
+-spec add_health(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec subtract_health(X :: number(), Id :: id_server:id()) -> {ok, av:data()} | gproc_tools:not_found().
+
+-spec add_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
+-spec subtract_mana(X :: number(), Id :: id_server:id()) -> ok | gproc_tools:not_found().
