@@ -92,7 +92,7 @@ do_attack(D) ->
   TargetId = autoattack:get_target(D),
   Damage = 10,
   {ok,_} = av_sapi:subtract_health(Damage, TargetId),
-  #{type => autoattack, from => Id, to => TargetId, damage => Damage}.
+  autoattack:game_event(D).
 
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().
