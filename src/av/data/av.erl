@@ -82,7 +82,6 @@
 
 zero() -> new(0, bot, <<"Zero">>, {0, 0}).
 
--spec new(Id :: non_neg_integer(), Type :: type(), Name :: binary(), Position :: point:point()) -> data().
 new(Id, Type, Name, Position) ->
   #{
     id => Id,
@@ -135,13 +134,8 @@ new(Id, Type, Name, Position) ->
     game_events => []
   }.
 
--spec get_id(Data) -> X when Data :: data(), X :: non_neg_integer().
 get_id(#{id := X}) -> X.
-
--spec get_type(Data) -> X when Data :: data(), X :: type().
 get_type(#{type := X}) -> X.
-
--spec get_name(Data) -> X when Data :: data(), X :: binary().
 get_name(#{name := X}) -> X.
 
 
@@ -157,7 +151,6 @@ withdraw_game_events(#{game_events := GameEvents} = D) ->
   {GameEvents, D2}.
 
 
--spec is_dirty(D :: data()) -> boolean().
 is_dirty(D) ->
   av_position:get_position_update(D)
   orelse av_position:get_state_update(D)
@@ -165,7 +158,6 @@ is_dirty(D) ->
   orelse av_mana:get_mana_update(D)
   orelse av_attack:get_state_update(D).
 
--spec clear_update_flags(Data :: data()) -> data().
 clear_update_flags(#{position := Position, mana := M, health := H, attack := #{state := AS} = A, state := State} = Data) ->
   Data#{
     position := Position#{
@@ -189,5 +181,15 @@ clear_update_flags(#{position := Position, mana := M, health := H, attack := #{s
 
 
 %% Spec
+
+-spec new(Id :: non_neg_integer(), Type :: type(), Name :: binary(), Position :: point:point()) -> data().
+
+-spec get_id(Data) -> X when Data :: data(), X :: non_neg_integer().
+-spec get_type(Data) -> X when Data :: data(), X :: type().
+-spec get_name(Data) -> X when Data :: data(), X :: binary().
+
+-spec is_dirty(D :: data()) -> boolean().
+-spec clear_update_flags(Data :: data()) -> data().
+
 -spec append_game_event(GameEvent :: game_event(), Data :: data()) -> data().
 -spec withdraw_game_events(Data :: data()) -> {game_events(), data()}.
