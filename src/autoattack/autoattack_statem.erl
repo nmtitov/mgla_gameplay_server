@@ -71,9 +71,9 @@ cooldown(EventType, EventContent, D) ->
 ready({call,From}, {update,_}, D) ->
   case av_misc:is_valid_target(D) of
     true ->
-      GameEvent = do_attack(D),
+      E = do_attack(D),
       D2 = autoattack:trigger_cooldown(D),
-      {next_state,cooldown,D2,[{reply,From,[GameEvent]}]};
+      {next_state,cooldown,D2,[{reply,From,[E]}]};
     _ ->
       {keep_state_and_data,[{reply,From,[]}]}
   end;
