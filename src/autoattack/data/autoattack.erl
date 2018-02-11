@@ -24,7 +24,7 @@
   is_ready/1,
   trigger_cooldown/1,
 
-  game_event/1
+  create_event/1
 ]).
 
 
@@ -86,7 +86,7 @@ trigger_cooldown(D) ->
   Cooldown = get_cooldown(D),
   set_time_left(Cooldown, D).
 
-game_event(D) ->
+create_event(D) ->
   Id = get_id(D),
   TargetId = get_target(D),
   case TargetId == undefined of true -> error(internal); _ -> ok end,
@@ -108,4 +108,4 @@ game_event(D) ->
 -spec is_ready(D :: data()) -> boolean().
 -spec trigger_cooldown(D :: data()) -> data().
 
--spec game_event(D :: data()) -> game_event().
+-spec create_event(D :: data()) -> game_event().

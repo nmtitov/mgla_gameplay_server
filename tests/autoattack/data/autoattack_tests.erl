@@ -74,6 +74,6 @@ game_event_test_() ->
   D2 = autoattack:set_target(1, D),
   Expected = #{type => autoattack, from => 0, to => 1, damage => 10},
   [
-    ?_assertError(internal, autoattack:game_event(D)),
-    ?_assertEqual(Expected, autoattack:game_event(D2))
+    ?_assertError(internal, autoattack:create_event(D)),
+    ?_assertEqual(Expected, autoattack:create_event(D2))
   ].
