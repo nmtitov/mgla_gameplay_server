@@ -50,7 +50,7 @@ handle_call(get_state, _From, State) ->
   X = av_position:get_state_value(State),
   {reply, X, State};
 
-handle_call({subtract_health, X} = M, _From, State) ->
+handle_call({subtract_health, X}, _From, State) ->
   State2 = av_health:subtract_health(X, State),
   {reply, State2, State2};
 
