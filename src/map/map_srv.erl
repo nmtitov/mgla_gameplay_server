@@ -121,7 +121,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
   Dt = ?UPDATE_RATE / 1000.0,
 
-  update(AvatarsMeta, Dt, MapRect, Blocks),
+  do_update(AvatarsMeta, Dt, MapRect, Blocks),
 
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
@@ -129,7 +129,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   erlang:start_timer(?UPDATE_RATE, self(), update),
   State.
 
-update(AvatarsMeta, Dt, MapRect, Blocks) ->
+do_update(AvatarsMeta, Dt, MapRect, Blocks) ->
   lists:foreach(fun({_, Id}) ->
     av_sapi:update(Dt, MapRect, Blocks, Id)
   end, AvatarsMeta),
