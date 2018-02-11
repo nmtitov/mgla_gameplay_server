@@ -12,7 +12,7 @@
 -export([
   add_event/2,
   withdraw_events/1,
-  handle_events/2
+  process_events/2
 ]).
 
 -type event() :: any().
@@ -34,13 +34,13 @@ withdraw_events(#{incoming_events := Es} = D) ->
   {Es, D2}.
 
 
-handle_events([], D) ->
+process_events([], D) ->
   D;
-handle_events([X|Xs], D) ->
-  D2 = handle_event(X, D),
-  handle_events(Xs, D2).
+process_events([X|Xs], D) ->
+  D2 = process_event(X, D),
+  process_events(Xs, D2).
 
-handle_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
+process_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
   av_health:subtract_health(Damage, D).
 
 
@@ -49,5 +49,5 @@ handle_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damag
 -spec add_event(E :: event(), Data :: av:data()) -> av:data().
 -spec withdraw_events(Data :: av:data()) -> {events(), av:data()}.
 
--spec handle_events(Es :: events(), D :: av:data()) -> av:data().
--spec handle_event(Es :: event(), D :: av:data()) -> av:data().
+-spec process_events(Es :: events(), D :: av:data()) -> av:data().
+-spec process_event(Es :: event(), D :: av:data()) -> av:data().

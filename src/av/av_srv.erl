@@ -75,7 +75,7 @@ handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   D2 = move(Dt, MapRect, Blocks, D),
   _AutoattackEvents = autoattack_statem:update(Dt, Id),
   {AppendedEvents,D3} = av_events:withdraw_events(D2),
-  D4 = av_events:handle_events(AppendedEvents, D3),
+  D4 = av_events:process_events(AppendedEvents, D3),
   {reply, ok, D4};
 
 handle_call(broadcast_update, _From, D) ->

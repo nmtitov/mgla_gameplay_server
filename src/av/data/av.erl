@@ -69,7 +69,8 @@
     value := number(),
     update := boolean()
   },
-  incoming_events := av_events:events()
+  incoming_events := av_events:events(),
+  processed_events := av_events:events()
 }.
 -type state() :: idle | walk.
 -type type() :: player | bot.
@@ -126,7 +127,8 @@ new(Id, Type, Name, Position) ->
       value => 0,
       update => true
     },
-    incoming_events => []
+    incoming_events => [],
+    processed_events => []
   }.
 
 get_id(#{id := X}) -> X.
