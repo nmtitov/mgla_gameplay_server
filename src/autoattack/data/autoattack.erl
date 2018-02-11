@@ -33,7 +33,12 @@
   time_left => number()
 }.
 
--export_type([data/0]).
+-type autoattack() :: #{
+  id => id_server:id(),
+  target => id_server:id_opt()
+}.
+
+-export_type([data/0, autoattack/0]).
 
 
 %% API
