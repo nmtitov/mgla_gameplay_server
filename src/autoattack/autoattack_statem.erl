@@ -26,8 +26,7 @@ start_link(Id) ->
   gen_statem:start_link(autoattack_statem, [Id], []).
 
 set_target(TargetId, Id) ->
-  lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, TargetId, Id]),
-  {ok, _} = gproc_tools:statem_call(name(Id), {set_target,TargetId}).
+  ok = gproc_tools:statem_cast(name(Id), {set_target,TargetId}).
 
 update(Dt, Id) ->
   {ok, _} = gproc_tools:statem_call(name(Id), {update,Dt}).
@@ -46,7 +45,7 @@ callback_mode() ->
 
 terminate(_Reason = M, State, D) ->
   Id = autoattack:get_id(D),
-  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, Id]),
+  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, D]),
   gproc:unreg(name(Id)),
   void.
 
@@ -71,25 +70,22 @@ cooldown({call,From}, {update,Dt}, D) ->
     _ ->
       {keep_state,D2,[{reply,From,ok}]}
   end;
-cooldown({call,From} = E, {set_target,T} = M, D) ->
-  lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
+cooldown(cast, {set_target,T}, D) ->
   D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,ok}]}.
+  {keep_state,D2,[]}.
 
 
 ready({call,From}, {update,_}, _) ->
   {keep_state_and_data,[{reply,From,ok}]};
 
-ready({call,From}, {set_target,undefined = T} = M, D) ->
-  lager:info("~p", [M]),
+ready(cast, {set_target,undefined = T}, D) ->
   D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,ok}]};
+  {keep_state,D2,[]};
 
-ready({call,From}, {set_target,T} = M, D) ->
-  lager:info("~p", [M]),
+ready(cast, {set_target,T}, D) ->
   D2 = autoattack:set_target(T, D),
   D3 = do_attack(D2),
-  {next_state,cooldown,D3,[{reply,From,ok}]}.
+  {next_state,cooldown,D3,[]}.
 
 
 %% Actions
