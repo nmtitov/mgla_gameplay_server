@@ -29,7 +29,8 @@ set_target(TargetId, Id) ->
   ok = gproc_tools:statem_cast(name(Id), {set_target,TargetId}).
 
 update(Dt, Id) ->
-  {ok, _} = gproc_tools:statem_call(name(Id), {update,Dt}).
+  {ok, GameEvents} = gproc_tools:statem_call(name(Id), {update,Dt}),
+  GameEvents.
 
 
 %% Callback
@@ -56,48 +57,47 @@ code_change(_Vsn, State, Data, _Extra) ->
 %%% State
 
 cooldown({call,From}, {update,Dt}, D) ->
-  Id = autoattack:get_id(D),
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
     true  ->
-      case av_misc:is_valid_target(Id, autoattack:get_target(D)) of
-        true ->
-          D3 = do_attack(D2),
-          {keep_state,D3,[{reply,From,ok}]};
-        _ ->
-          {next_state,ready,D2,[{reply,From,ok}]}
-      end;
+      {next_state,ready,D2,[{reply,From,[]}]};
     _ ->
-      {keep_state,D2,[{reply,From,ok}]}
+      {keep_state,D2,[{reply,From,[]}]}
   end;
-cooldown(cast, {set_target,T}, D) ->
+cooldown(EventType, EventContent, D) ->
+  handle_event(EventType, EventContent, D).
+
+
+ready({call,From}, {update,_}, D) ->
+  Id = autoattack:get_id(D),
+  TargetId = autoattack:get_target(D),
+  case av_misc:is_valid_target(Id, TargetId) of
+    true ->
+      {D2, GameEvent} = do_attack(D),
+      {next_state,cooldown,D2,[{reply,From,[GameEvent]}]};
+    _ ->
+      {keep_state_and_data,[{reply,From,[]}]}
+  end;
+
+ready(EventType, EventContent, D) ->
+  handle_event(EventType, EventContent, D).
+
+handle_event(cast, {set_target,T}, D) ->
   D2 = autoattack:set_target(T, D),
   {keep_state,D2,[]}.
-
-
-ready({call,From}, {update,_}, _) ->
-  {keep_state_and_data,[{reply,From,ok}]};
-
-ready(cast, {set_target,undefined = T}, D) ->
-  D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[]};
-
-ready(cast, {set_target,T}, D) ->
-  D2 = autoattack:set_target(T, D),
-  D3 = do_attack(D2),
-  {next_state,cooldown,D3,[]}.
-
 
 %% Actions
 
 do_attack(D) ->
+  Id = autoattack:get_target(D),
   TargetId = autoattack:get_target(D),
-  lager:info("Attacking #~p", [TargetId]),
   Damage = 10,
   {ok,_} = av_sapi:subtract_health(Damage, TargetId),
-  autoattack:trigger_cooldown(D).
+  D2 = autoattack:trigger_cooldown(D),
+  GameEvent = #{type => autoattack, from => Id, to => TargetId, damage => Damage},
+  {D2, GameEvent}.
 
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().
 
--spec do_attack(D :: autoattack:data()) -> D2 :: autoattack:data().
+-spec do_attack(D :: autoattack:data()) -> {autoattack:data(), any()}.
