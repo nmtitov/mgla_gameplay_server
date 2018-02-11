@@ -22,14 +22,14 @@
 
 %% API
 
-add_event(E, #{events := Es} = D) ->
+add_event(E, #{incoming_events := Es} = D) ->
   D#{
-    events := [E | Es]
+    incoming_events := [E | Es]
   }.
 
-withdraw_events(#{events := Es} = D) ->
+withdraw_events(#{incoming_events := Es} = D) ->
   D2 = D#{
-    events := []
+    incoming_events := []
   },
   {Es, D2}.
 
