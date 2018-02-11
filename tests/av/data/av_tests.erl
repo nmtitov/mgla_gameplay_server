@@ -10,6 +10,7 @@
 -author("nt").
 -include_lib("eunit/include/eunit.hrl").
 
+
 zero_test_() ->
   Id = 0,
   Position = {0, 0},
