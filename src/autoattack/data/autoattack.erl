@@ -35,13 +35,11 @@
   time_left => number()
 }.
 
+-type event_type() :: autoattack.
+
 -type game_event() :: #{
-  type => autoattack,
-  body => #{
-    from => id_server:id(),
-    to => id_server:id(),
-    damage => number()
-  }
+  type => event_type(),
+  body => map()
 }.
 
 -export_type([data/0, game_event/0]).
