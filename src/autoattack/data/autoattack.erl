@@ -89,7 +89,7 @@ trigger_cooldown(D) ->
 create_event(D) ->
   Id = get_id(D),
   TargetId = get_target(D),
-  case TargetId == undefined of true -> error(internal); _ -> ok end,
+  case av_misc:is_valid_target(D) of false -> error(internal); _ -> ok end,
   #{type => autoattack, from => Id, to => TargetId, damage => 10}.
 
 -spec new(Id :: id_server:id(), Cooldown :: number()) -> data().
