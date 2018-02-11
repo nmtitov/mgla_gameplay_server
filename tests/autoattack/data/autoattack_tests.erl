@@ -69,10 +69,10 @@ active_cooldown_test_() ->
     ?_assertEqual(5, autoattack:get_time_left(D2))
   ].
 
-game_event_test_() ->
+create_event_test_() ->
   D = autoattack:new(0, 5),
   D2 = autoattack:set_target(1, D),
-  Expected = #{type => autoattack, from => 0, to => 1, damage => 10},
+  Expected = #{type => autoattack, body => #{from => 0, to => 1, damage => 10}},
   [
     ?_assertError(internal, autoattack:create_event(D)),
     ?_assertEqual(Expected, autoattack:create_event(D2))

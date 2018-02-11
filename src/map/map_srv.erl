@@ -54,29 +54,24 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
 
   ws_handler:broadcast(ws_send:enter_message(Id)),
 
-  case av_sapi:get_data(Id) of
-    {ok, Data} ->
-      case Type of
-        player ->
-          ws_handler:send(Id, map_tools:map()),
-          ws_handler:send(Id, ws_send:id(Id)),
-          ws_handler:send(Id, ws_send:init(Data)),
-          lists:foreach(fun({_, Id_}) ->
-            case av_sapi:get_data(Id_) of
-              {ok, Data_} -> ws_handler:send(Id, ws_send:init(Data_));
-              _ -> ok
-            end
-          end, AvatarsMeta);
-        _ -> ok
-      end,
-
+  {ok, Data} = av_sapi:get_data(Id),
+  case Type of
+    player ->
+      ws_handler:send(Id, map_tools:map()),
+      ws_handler:send(Id, ws_send:id(Id)),
+      ws_handler:send(Id, ws_send:init(Data)),
       lists:foreach(fun({_, Id_}) ->
-        ws_handler:send(Id_, ws_send:init(Data))
-      end, lists:filter(fun({Type_, _}) ->
-        Type_ == player
-      end, AvatarsMeta));
+        {ok, Data_} = av_sapi:get_data(Id_),
+        ws_handler:send(Id, ws_send:init(Data_))
+      end, AvatarsMeta);
     _ -> ok
   end,
+
+  lists:foreach(fun({_, Id_}) ->
+    ws_handler:send(Id_, ws_send:init(Data))
+  end, lists:filter(fun({Type_, _}) ->
+    Type_ == player
+  end, AvatarsMeta)),
 
   NewState = State#{avatars := [{Type, Id}|AvatarsMeta]},
   {noreply, NewState};
@@ -121,7 +116,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   TimeA = erlang:system_time(),
   Dt = ?UPDATE_RATE / 1000.0,
 
-  update(AvatarsMeta, Dt, MapRect, Blocks),
+  do_update(AvatarsMeta, Dt, MapRect, Blocks),
 
   TimeB = erlang:system_time(),
   _ = TimeB - TimeA,
@@ -129,7 +124,7 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
   erlang:start_timer(?UPDATE_RATE, self(), update),
   State.
 
-update(AvatarsMeta, Dt, MapRect, Blocks) ->
+do_update(AvatarsMeta, Dt, MapRect, Blocks) ->
   lists:foreach(fun({_, Id}) ->
     av_sapi:update(Dt, MapRect, Blocks, Id)
   end, AvatarsMeta),
