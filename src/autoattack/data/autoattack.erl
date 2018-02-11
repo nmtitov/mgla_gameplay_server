@@ -35,11 +35,6 @@
   time_left => number()
 }.
 
--type autoattack() :: #{
-  id => id_server:id(),
-  target => id_server:id_opt()
-}.
-
 -type game_event() :: #{
   type => autoattack,
   body => #{
@@ -49,7 +44,7 @@
   }
 }.
 
--export_type([data/0, autoattack/0, game_event/0]).
+-export_type([data/0, game_event/0]).
 
 
 %% API
