@@ -19,6 +19,7 @@
 
   append_game_event/2,
   withdraw_game_events/1,
+  handle_game_events/2,
 
   is_dirty/1,
   clear_update_flags/1
@@ -151,6 +152,16 @@ withdraw_game_events(#{game_events := GameEvents} = D) ->
   {GameEvents, D2}.
 
 
+handle_game_events([], D) ->
+  D;
+handle_game_events([X|Xs], D) ->
+  D2 = handle_game_event(X, D),
+  handle_game_events(Xs, D2).
+
+handle_game_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
+  av_health:subtract_health(Damage, D).
+
+
 is_dirty(D) ->
   av_position:get_position_update(D)
   orelse av_position:get_state_update(D)
@@ -187,6 +198,9 @@ clear_update_flags(#{position := Position, mana := M, health := H, attack := #{s
 -spec get_id(Data) -> X when Data :: data(), X :: non_neg_integer().
 -spec get_type(Data) -> X when Data :: data(), X :: type().
 -spec get_name(Data) -> X when Data :: data(), X :: binary().
+
+-spec handle_game_events(GameEvents :: game_events(), D :: data()) -> data().
+-spec handle_game_event(GameEvent :: game_event(), D :: data()) -> data().
 
 -spec is_dirty(D :: data()) -> boolean().
 -spec clear_update_flags(Data :: data()) -> data().

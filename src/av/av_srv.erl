@@ -74,7 +74,9 @@ handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
   _AutoattackEvents = autoattack_statem:update(Dt, Id),
-  {reply, ok, D2};
+  {AppendedEvents,D3} = av:withdraw_game_events(D2),
+  D4 = av:handle_game_events(AppendedEvents, D3),
+  {reply, ok, D4};
 
 handle_call(broadcast_update, _From, D) ->
   case av:is_dirty(D) of
