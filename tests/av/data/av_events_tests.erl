@@ -13,10 +13,10 @@
 
 append_game_event_test_() ->
   D = av:zero(),
-  {Es,_} = av_events:withdraw_events(D),
+  {Es,_} = av_events:withdraw_processed_events(av_events:process_events(D)),
   D2 = av_events:add_event(0, D),
-  {Es2,D3} = av_events:withdraw_events(D2),
-  {Es3,_} = av_events:withdraw_events(D3),
+  {Es2,D3} = av_events:withdraw_processed_events(av_events:process_events(D2)),
+  {Es3,_} = av_events:withdraw_processed_events(av_events:process_events(D3)),
   [
     ?_assertEqual([], Es),
     ?_assertEqual([0], Es2),
