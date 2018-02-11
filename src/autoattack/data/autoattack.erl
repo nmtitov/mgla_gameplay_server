@@ -42,9 +42,11 @@
 
 -type game_event() :: #{
   type => autoattack,
-  from => id_server:id(),
-  to => id_server:id(),
-  damage => number()
+  body => #{
+    from => id_server:id(),
+    to => id_server:id(),
+    damage => number()
+  }
 }.
 
 -export_type([data/0, autoattack/0, game_event/0]).
@@ -90,7 +92,7 @@ create_event(D) ->
   Id = get_id(D),
   TargetId = get_target(D),
   case TargetId == undefined of true -> error(internal); _ -> ok end,
-  #{type => autoattack, from => Id, to => TargetId, damage => 10}.
+  #{type => autoattack, body => #{from => Id, to => TargetId, damage => 10}}.
 
 -spec new(Id :: id_server:id(), Cooldown :: number()) -> data().
 

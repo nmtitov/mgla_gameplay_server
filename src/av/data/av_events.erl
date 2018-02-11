@@ -56,7 +56,7 @@ do_process_events([E|Es], PrEs, D) ->
   D2 = process_event(E, D),
   do_process_events(Es, [E|PrEs], D2).
 
-process_event(#{type := autoattack, from := _Id, to := _TargetId, damage := Damage}, D) ->
+process_event(#{type := autoattack, body := #{from := _Id, to := _TargetId, damage := Damage}}, D) ->
   av_health:subtract_health(Damage, D).
 
 
