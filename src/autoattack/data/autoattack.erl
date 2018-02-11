@@ -22,7 +22,9 @@
 
   update/2,
   is_ready/1,
-  trigger_cooldown/1
+  trigger_cooldown/1,
+
+  game_event/1
 ]).
 
 
@@ -33,7 +35,19 @@
   time_left => number()
 }.
 
--export_type([data/0]).
+-type autoattack() :: #{
+  id => id_server:id(),
+  target => id_server:id_opt()
+}.
+
+-type game_event() :: #{
+  type => autoattack,
+  from => id_server:id(),
+  to => id_server:id(),
+  damage => number()
+}.
+
+-export_type([data/0, autoattack/0, game_event/0]).
 
 
 %% API
@@ -72,6 +86,11 @@ trigger_cooldown(D) ->
   Cooldown = get_cooldown(D),
   set_time_left(Cooldown, D).
 
+game_event(D) ->
+  Id = get_id(D),
+  TargetId = get_target(D),
+  case TargetId == undefined of true -> error(internal); _ -> ok end,
+  #{type => autoattack, from => Id, to => TargetId, damage => 10}.
 
 -spec new(Id :: id_server:id(), Cooldown :: number()) -> data().
 
@@ -88,3 +107,5 @@ trigger_cooldown(D) ->
 -spec update(Dt :: number(), D :: data()) -> data().
 -spec is_ready(D :: data()) -> boolean().
 -spec trigger_cooldown(D :: data()) -> data().
+
+-spec game_event(D :: data()) -> game_event().

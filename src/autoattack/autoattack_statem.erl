@@ -26,11 +26,11 @@ start_link(Id) ->
   gen_statem:start_link(autoattack_statem, [Id], []).
 
 set_target(TargetId, Id) ->
-  lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, TargetId, Id]),
-  {ok, _} = gproc_tools:statem_call(name(Id), {set_target,TargetId}).
+  ok = gproc_tools:statem_cast(name(Id), {set_target,TargetId}).
 
 update(Dt, Id) ->
-  {ok, _} = gproc_tools:statem_call(name(Id), {update,Dt}).
+  {ok, GameEvents} = gproc_tools:statem_call(name(Id), {update,Dt}),
+  GameEvents.
 
 
 %% Callback
@@ -46,7 +46,7 @@ callback_mode() ->
 
 terminate(_Reason = M, State, D) ->
   Id = autoattack:get_id(D),
-  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, Id]),
+  lager:info("~p:~p(~p, ~p, ~p)", [?MODULE, ?FUNCTION_NAME, M, State, D]),
   gproc:unreg(name(Id)),
   void.
 
@@ -57,59 +57,44 @@ code_change(_Vsn, State, Data, _Extra) ->
 %%% State
 
 cooldown({call,From}, {update,Dt}, D) ->
-  Id = autoattack:get_id(D),
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
     true  ->
-      case do_attack(D2) of
-        {ok,D3} ->
-          {keep_state,D3,[{reply,From,ok}]};
-        {error,D3} ->
-          {next_state,ready,D3,[{reply,From,ok}]}
-      end;
+      {next_state,ready,D2,[{reply,From,[]}]};
     _ ->
-      {keep_state,D2,[{reply,From,ok}]}
+      {keep_state,D2,[{reply,From,[]}]}
   end;
-cooldown({call,From} = E, {set_target,T} = M, D) ->
-  lager:info("~p:~p(~p, ~p)", [?MODULE, ?FUNCTION_NAME, E, M]),
+cooldown(EventType, EventContent, D) ->
+  handle_event(EventType, EventContent, D).
+
+
+ready({call,From}, {update,_}, D) ->
+  case av_misc:is_valid_target(D) of
+    true ->
+      GameEvent = do_attack(D),
+      D2 = autoattack:trigger_cooldown(D),
+      {next_state,cooldown,D2,[{reply,From,[GameEvent]}]};
+    _ ->
+      {keep_state_and_data,[{reply,From,[]}]}
+  end;
+
+ready(EventType, EventContent, D) ->
+  handle_event(EventType, EventContent, D).
+
+handle_event(cast, {set_target,T}, D) ->
   D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,ok}]}.
-
-
-ready({call,From}, {update,_}, _) ->
-  {keep_state_and_data,[{reply,From,ok}]};
-
-ready({call,From}, {set_target,undefined = T} = M, D) ->
-  lager:info("~p", [M]),
-  D2 = autoattack:set_target(T, D),
-  {keep_state,D2,[{reply,From,ok}]};
-
-ready({call,From}, {set_target,T} = M, D) ->
-  lager:info("~p", [M]),
-  D2 = autoattack:set_target(T, D),
-  {_, D3} = do_attack(D2),
-  {next_state,cooldown,D3,[{reply,From,ok}]}.
-
+  {keep_state,D2,[]}.
 
 %% Actions
 
 do_attack(D) ->
-  Id = autoattack:get_id(D),
+  Id = autoattack:get_target(D),
   TargetId = autoattack:get_target(D),
-  lager:info("Attacking #~p", [TargetId]),
-  case av_misc:is_valid_target(Id, TargetId) of
-    true ->
-      Damage = 10,
-      {ok,_} = av_sapi:subtract_health(Damage, TargetId),
-      D2 = autoattack:trigger_cooldown(D),
-      {ok,D2};
-    _ ->
-      {error,D}
-  end.
+  Damage = 10,
+  {ok,_} = av_sapi:subtract_health(Damage, TargetId),
+  autoattack:game_event(D).
 
-
-%% Specs
 
 -spec set_target(id_server:id_opt(), id_server:id()) -> any().
 
--spec do_attack(D :: autoattack:data()) -> {ok,autoattack:data()} | {error,autoattack:data()}.
+-spec do_attack(D :: autoattack:data()) -> any().

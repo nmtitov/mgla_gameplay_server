@@ -69,7 +69,7 @@ handle_call(clear_update_flags, _From, D) ->
 handle_call({update, Dt, MapRect, Blocks}, _From, D) ->
   Id = av:get_id(D),
   D2 = move(Dt, MapRect, Blocks, D),
-  autoattack_statem:update(Dt, Id),
+  _AutoattackEvents = autoattack_statem:update(Dt, Id),
   {reply, ok, D2};
 
 handle_call(broadcast_update, _From, D) ->
@@ -89,7 +89,7 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Id = av:get_id(State),
   Position = av_position:get_position_value(State),
   Range = av_attack:get_range(State),
-  State2 = case av_misc:is_valid_target(Id, AvatarId) andalso av_misc:is_in_range(Range, Position, AvatarId) of
+  State2 = case av_misc:do_is_valid_target(Id, AvatarId) andalso av_misc:is_in_range(Range, Position, AvatarId) of
     true ->
       autoattack_statem:set_target(AvatarId, Id),
       av_attack:set_target(AvatarId, State);
