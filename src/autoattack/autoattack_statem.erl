@@ -57,6 +57,7 @@ code_change(_Vsn, State, Data, _Extra) ->
 %%% State
 
 cooldown({call,From}, {update,Dt}, D) ->
+  Id = autoattack:get_id(D),
   D2 = autoattack:update(Dt, D),
   case autoattack:is_ready(D2) of
     true  ->
