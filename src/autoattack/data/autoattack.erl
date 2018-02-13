@@ -87,6 +87,9 @@ create_event(D) ->
   case TargetId == undefined of true -> error(internal); _ -> ok end,
   #{type => autoattack, body => #{from => Id, to => TargetId, damage => 10}}.
 
+
+%% Spec
+
 -spec new(Id :: id_server:id(), Cooldown :: number()) -> data().
 
 -spec get_id(D :: data()) -> id_server:id().
