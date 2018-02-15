@@ -23,25 +23,17 @@
 %% API
 
 add_event(E, #{incoming_events := Es} = D) ->
-  D#{
-    incoming_events := [E | Es]
-  }.
+  D#{incoming_events := [E|Es]}.
 
 withdraw_events(#{incoming_events := Es} = D) ->
-  D2 = D#{
-    incoming_events := []
-  },
+  D2 = D#{incoming_events := []},
   {Es, D2}.
 
 set_processed_events(PrEs, D) ->
-  D#{
-    processed_events := PrEs
-  }.
+  D#{processed_events := PrEs}.
 
 withdraw_processed_events(#{processed_events := Es} = D) ->
-  D2 = D#{
-    processed_events := []
-  },
+  D2 = D#{processed_events := []},
   {Es, D2}.
 
 
