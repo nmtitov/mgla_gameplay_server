@@ -1,4 +1,4 @@
--module(map_srv).
+-module(map_server).
 -author("nt").
 -behaviour(gen_server).
 -include("../../include/block.hrl").

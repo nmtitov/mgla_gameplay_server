@@ -188,7 +188,7 @@ handle_info(timeout = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = av:get_id(State),
   Type = av:get_type(State),
-  map_srv:add_avatar(Type, Id),
+  map_server:add_avatar(Type, Id),
   {noreply, State};
 
 handle_info(_Info = M, State) ->
@@ -199,7 +199,7 @@ handle_info(_Info = M, State) ->
 terminate(_Reason = M, State) ->
   lager:info("~p:~p(~p)", [?MODULE, ?FUNCTION_NAME, M]),
   Id = av:get_id(State),
-  map_srv:remove_avatar(Id),
+  map_server:remove_avatar(Id),
   gproc:unreg(name(Id)),
   ok.
 
