@@ -28,29 +28,29 @@
 
 
 handle_click(Id, Point, AvatarId) ->
-  gproc_tools:cast(av_srv:name(Id), {handle_click, Point, AvatarId}).
+  gproc_tools:cast(avatar_server:name(Id), {handle_click, Point, AvatarId}).
 
 
 get_data(Id) ->
-  gproc_tools:call(av_srv:name(Id), get_data).
+  gproc_tools:call(avatar_server:name(Id), get_data).
 
 
 get_position(Id) ->
-  gproc_tools:call(av_srv:name(Id), get_position).
+  gproc_tools:call(avatar_server:name(Id), get_position).
 
 
 add_event(E, Id) ->
-  gproc_tools:call(av_srv:name(Id), {add_event,E}).
+  gproc_tools:call(avatar_server:name(Id), {add_event,E}).
 
 
 update(Dt, MapRect, Blocks, Id) ->
-  gproc_tools:call(av_srv:name(Id), {update, Dt, MapRect, Blocks}).
+  gproc_tools:call(avatar_server:name(Id), {update, Dt, MapRect, Blocks}).
 
 broadcast_update(Id) ->
-  gproc_tools:call(av_srv:name(Id), broadcast_update).
+  gproc_tools:call(avatar_server:name(Id), broadcast_update).
 
 clear_update_flags(Id) ->
-  gproc_tools:call(av_srv:name(Id), clear_update_flags).
+  gproc_tools:call(avatar_server:name(Id), clear_update_flags).
 
 
 -spec handle_click(Id :: id_server:id(), Point :: point:point(), AvatarId :: id_server:id()) -> ok | gproc_tools:not_found().
