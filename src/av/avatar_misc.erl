@@ -30,5 +30,5 @@ do_is_valid_target(_, _)         -> true.
 
 -spec is_in_range(Range :: number(), Position :: point:point(), TargetId :: id_server:id()) -> boolean().
 is_in_range(Range, Position, TargetId) ->
-  {ok, TargetPosition} = av_sapi:get_position(TargetId),
+  {ok, TargetPosition} = avatar_server:get_position(TargetId),
   point:distance(Position, TargetPosition) < Range.

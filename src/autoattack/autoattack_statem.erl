@@ -90,7 +90,7 @@ handle_event(cast, {set_target,T}, D) ->
 do_attack(D) ->
   E = autoattack:create_event(D),
   TargetId = autoattack:get_target(D),
-  av_sapi:add_event(E, TargetId),
+  avatar_server:add_event(E, TargetId),
   E.
 
 
