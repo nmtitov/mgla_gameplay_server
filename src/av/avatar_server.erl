@@ -94,7 +94,7 @@ handle_cast({handle_click, Point, AvatarId} = M, State) ->
   Id = av:get_id(State),
   Position = av_position:get_position_value(State),
   Range = av_attack:get_range(State),
-  State2 = case av_misc:do_is_valid_target(Id, AvatarId) andalso av_misc:is_in_range(Range, Position, AvatarId) of
+  State2 = case avatar_misc:do_is_valid_target(Id, AvatarId) andalso avatar_misc:is_in_range(Range, Position, AvatarId) of
     true ->
       autoattack_statem:set_target(AvatarId, Id),
       av_attack:set_target(AvatarId, State);

@@ -69,7 +69,7 @@ cooldown(EventType, EventContent, D) ->
 
 
 ready({call,From}, {update,_}, D) ->
-  case av_misc:is_valid_target(D) of
+  case avatar_misc:is_valid_target(D) of
     true ->
       E = do_attack(D),
       D2 = autoattack:trigger_cooldown(D),

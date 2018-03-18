@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 01. Feb 2018 20:39
 %%%-------------------------------------------------------------------
--module(av_misc).
+-module(avatar_misc).
 -author("nt").
 
 %% API
@@ -28,8 +28,7 @@ do_is_valid_target(Id, Id)       -> false;
 do_is_valid_target(_, undefined) -> false;
 do_is_valid_target(_, _)         -> true.
 
+-spec is_in_range(Range :: number(), Position :: point:point(), TargetId :: id_server:id()) -> boolean().
 is_in_range(Range, Position, TargetId) ->
   {ok, TargetPosition} = av_sapi:get_position(TargetId),
   point:distance(Position, TargetPosition) < Range.
-
--spec is_in_range(Range :: number(), Position :: point:point(), TargetId :: id_server:id()) -> boolean().
