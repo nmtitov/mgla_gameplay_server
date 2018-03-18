@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
-%%% @author nt
-%%% @copyright (C) 2018, <COMPANY>
+%%% @author Nikita Titov
+%%% @copyright (C) 2018, N. M. Titov
 %%% @doc
 %%%
 %%% @end
