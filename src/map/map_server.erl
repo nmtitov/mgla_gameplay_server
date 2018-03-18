@@ -1,4 +1,4 @@
--module(map_srv).
+-module(map_server).
 -author("nt").
 -behaviour(gen_server).
 -include("../../include/block.hrl").
@@ -24,7 +24,7 @@ add_avatar(Type, Id) ->
 remove_avatar(Id) ->
   gen_server:cast(?SERVER, {remove_avatar, Id}).
 
--spec get_avatars_meta() -> [av:data()].
+-spec get_avatars_meta() -> [data_avatar:data()].
 get_avatars_meta() ->
   gen_server:call(?SERVER, get_avatars_meta).
 
@@ -54,14 +54,14 @@ handle_cast({add_avatar, Type, Id}, #{avatars := AvatarsMeta} = State) ->
 
   ws_handler:broadcast(ws_send:enter_message(Id)),
 
-  {ok, Data} = av_sapi:get_data(Id),
+  {ok, Data} = avatar_server:get_data(Id),
   case Type of
     player ->
       ws_handler:send(Id, map_tools:map()),
       ws_handler:send(Id, ws_send:id(Id)),
       ws_handler:send(Id, ws_send:init(Data)),
       lists:foreach(fun({_, Id_}) ->
-        {ok, Data_} = av_sapi:get_data(Id_),
+        {ok, Data_} = avatar_server:get_data(Id_),
         ws_handler:send(Id, ws_send:init(Data_))
       end, AvatarsMeta);
     _ -> ok
@@ -126,13 +126,13 @@ update(#{rect := MapRect, avatars := AvatarsMeta, blocks := Blocks} = State) ->
 
 do_update(AvatarsMeta, Dt, MapRect, Blocks) ->
   lists:foreach(fun({_, Id}) ->
-    av_sapi:update(Dt, MapRect, Blocks, Id)
+    avatar_server:update(Dt, MapRect, Blocks, Id)
   end, AvatarsMeta),
 
   lists:foreach(fun({_, Id}) ->
-    av_sapi:broadcast_update(Id)
+    avatar_server:broadcast_update(Id)
   end, AvatarsMeta),
 
   lists:foreach(fun({_, Id}) ->
-    {ok, _} = av_sapi:clear_update_flags(Id)
+    {ok, _} = avatar_server:clear_update_flags(Id)
   end, AvatarsMeta).

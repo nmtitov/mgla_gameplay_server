@@ -40,7 +40,7 @@ websocket_handle({text, Message} = Info, #{id := Id} = State) ->
   case ws_receive:decompose_message(Term) of
     {<<"click">>, Body} ->
       {Point, AvatarId} = ws_receive:parse_click_body(Body),
-      av_sapi:handle_click(Id, Point, AvatarId);
+      avatar_server:handle_click(Id, Point, AvatarId);
     {<<"enter">>, _} ->
       avatar_factory_sup:start_child(Id);
     {<<"leave">>, _} ->

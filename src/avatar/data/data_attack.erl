@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 01. Feb 2018 19:50
 %%%-------------------------------------------------------------------
--module(av_attack).
+-module(data_attack).
 -author("nt").
 
 %% API
@@ -33,10 +33,10 @@
 get_speed(#{attack := #{speed := X}}) -> X.
 get_range(#{attack := #{range := X}}) -> X.
 
--spec get_init_cd(D :: av:data()) -> X :: number().
+-spec get_init_cd(D :: data_avatar:data()) -> X :: number().
 get_init_cd(#{attack := #{default_cooldown := X}}) -> X.
 
--spec set_init_cd(X :: number(), D :: av:data()) -> av:data().
+-spec set_init_cd(X :: number(), D :: data_avatar:data()) -> data_avatar:data().
 set_init_cd(X, #{attack := N} = D) ->
   case X < 0 of true -> error(badarg); _ -> ok end,
   D#{
@@ -45,10 +45,10 @@ set_init_cd(X, #{attack := N} = D) ->
     }
   }.
 
--spec get_cd(D :: av:data()) -> X :: number().
+-spec get_cd(D :: data_avatar:data()) -> X :: number().
 get_cd(#{attack := #{cooldown := X}}) -> X.
 
--spec set_cd(X :: number(), D :: av:data()) -> av:data().
+-spec set_cd(X :: number(), D :: data_avatar:data()) -> data_avatar:data().
 set_cd(X, #{attack := #{default_cooldown := DefaultCooldown, cooldown := X} = N} = D) when is_number(X) ->
   D#{
     attack := N#{
@@ -60,10 +60,10 @@ set_cd(X, #{attack := #{default_cooldown := DefaultCooldown, cooldown := X} = N}
     }
   }.
 
--spec get_state_value(D) -> X when D :: av:data(), X :: state().
+-spec get_state_value(D) -> X when D :: data_avatar:data(), X :: state().
 get_state_value(#{attack := #{state := #{value := X}}}) -> X.
 
--spec set_state_value(X :: state(), D :: av:data()) -> av:data().
+-spec set_state_value(X :: state(), D :: data_avatar:data()) -> data_avatar:data().
 set_state_value(X, #{attack := #{state := NN} = N} = D) when is_atom(X) ->
   D#{
     attack := N#{
@@ -74,22 +74,22 @@ set_state_value(X, #{attack := #{state := NN} = N} = D) when is_atom(X) ->
     }
   }.
 
--spec get_state_update(D :: av:data()) -> boolean().
+-spec get_state_update(D :: data_avatar:data()) -> boolean().
 get_state_update(#{attack := #{state := #{update := X}}}) -> X.
 
--spec get_target(D :: av:data()) -> target().
+-spec get_target(D :: data_avatar:data()) -> target().
 get_target(#{attack := #{target := X}}) -> X.
 
--spec set_target(X :: target(), D :: av:data()) -> av:data().
+-spec set_target(X :: target(), D :: data_avatar:data()) -> data_avatar:data().
 set_target(X, #{attack := N} = D) when is_number(X) ->
-  D2 = av_position:set_path([], D),
+  D2 = data_position:set_path([], D),
   D2#{
     attack := N#{
       target := X
     }
   }.
 
--spec clear_target(D :: av:data()) -> av:data().
+-spec clear_target(D :: data_avatar:data()) -> data_avatar:data().
 clear_target(#{attack := N} = D) ->
   D#{
     attack := N#{
@@ -98,5 +98,5 @@ clear_target(#{attack := N} = D) ->
   }.
 
 
--spec get_speed(D :: av:data()) -> X :: number().
--spec get_range(D :: av:data()) -> X :: number().
+-spec get_speed(D :: data_avatar:data()) -> X :: number().
+-spec get_range(D :: data_avatar:data()) -> X :: number().

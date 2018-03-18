@@ -39,8 +39,8 @@ init([Id]) ->
     start => {autoattack_statem, start_link, [Id]},
     shutdown => 5000
   }, #{
-    id => av_srv,
-    start => {av_srv, start_link, [player, Id]},
+    id => avatar_server,
+    start => {avatar_server, start_link, [player, Id]},
     shutdown => 5000
   }],
   {ok, {RestartStrategy, Children}}.

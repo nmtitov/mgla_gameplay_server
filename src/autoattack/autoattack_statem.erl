@@ -69,7 +69,7 @@ cooldown(EventType, EventContent, D) ->
 
 
 ready({call,From}, {update,_}, D) ->
-  case av_misc:is_valid_target(D) of
+  case avatar_misc:is_valid_target(D) of
     true ->
       E = do_attack(D),
       D2 = autoattack:trigger_cooldown(D),
@@ -90,7 +90,7 @@ handle_event(cast, {set_target,T}, D) ->
 do_attack(D) ->
   E = autoattack:create_event(D),
   TargetId = autoattack:get_target(D),
-  av_sapi:add_event(E, TargetId),
+  avatar_server:add_event(E, TargetId),
   E.
 
 

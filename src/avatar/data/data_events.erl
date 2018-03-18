@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 11. Feb 2018 18:08
 %%%-------------------------------------------------------------------
--module(av_events).
+-module(data_events).
 -author("nt").
 
 -export([
@@ -49,15 +49,15 @@ do_process_events([E|Es], PrEs, D) ->
   do_process_events(Es, [E|PrEs], D2).
 
 process_event(#{type := autoattack, body := #{from := _Id, to := _TargetId, damage := Damage}}, D) ->
-  av_health:subtract_health(Damage, D).
+  data_health:subtract_health(Damage, D).
 
 
 %% Spec
 
--spec add_event(E :: event(), Data :: av:data()) -> av:data().
--spec withdraw_events(Data :: av:data()) -> {events(), av:data()}.
--spec withdraw_processed_events(Data :: av:data()) -> {events(), av:data()}.
+-spec add_event(E :: event(), Data :: data_avatar:data()) -> data_avatar:data().
+-spec withdraw_events(Data :: data_avatar:data()) -> {events(), data_avatar:data()}.
+-spec withdraw_processed_events(Data :: data_avatar:data()) -> {events(), data_avatar:data()}.
 
--spec process_events(D :: av:data()) -> av:data().
--spec do_process_events(Es :: events(), PrEs :: events(), D :: av:data()) -> {events(), av:data()}.
--spec process_event(Es :: event(), D :: av:data()) -> av:data().
+-spec process_events(D :: data_avatar:data()) -> data_avatar:data().
+-spec do_process_events(Es :: events(), PrEs :: events(), D :: data_avatar:data()) -> {events(), data_avatar:data()}.
+-spec process_event(Es :: event(), D :: data_avatar:data()) -> data_avatar:data().

@@ -11,14 +11,14 @@ id(Id) ->
     }
   }).
 
--spec init(D :: av:data()) -> jsx:json_text().
+-spec init(D :: data_avatar:data()) -> jsx:json_text().
 init(D) ->
-  Id = av:get_id(D),
-  Name = av:get_name(D),
-  {X, Y} = av_position:get_position_value(D),
-  HealthPercent = av_health:get_health_percent(D),
-  ManaPercent = av_mana:get_mana_percent(D),
-  State = av_position:get_state_value(D),
+  Id = data_avatar:get_id(D),
+  Name = data_avatar:get_name(D),
+  {X, Y} = data_position:get_position_value(D),
+  HealthPercent = data_health:get_health_percent(D),
+  ManaPercent = data_mana:get_mana_percent(D),
+  State = data_position:get_state_value(D),
   jsx:encode(#{
     type => init,
     body => #{
@@ -61,17 +61,17 @@ leave_message(Id) ->
     }
   }).
 
--spec update_message(D :: av:data()) -> jsx:json_text().
+-spec update_message(D :: data_avatar:data()) -> jsx:json_text().
 update_message(D) ->
-  Id = av:get_id(D),
+  Id = data_avatar:get_id(D),
   jsx:encode(#{
     type => update,
     body => #{
       id => Id,
-      position => valueOrNull(point:pointToMap(av_position:get_position_value(D)), av_position:get_position_update(D)),
-      state => valueOrNull(av_position:get_state_value(D), av_position:get_state_update(D)),
-      health_percent => valueOrNull(av_health:get_health_percent(D), av_health:get_health_update(D)),
-      mana_percent => valueOrNull(av_mana:get_mana_percent(D), av_mana:get_mana_update(D))
+      position => valueOrNull(point:pointToMap(data_position:get_position_value(D)), data_position:get_position_update(D)),
+      state => valueOrNull(data_position:get_state_value(D), data_position:get_state_update(D)),
+      health_percent => valueOrNull(data_health:get_health_percent(D), data_health:get_health_update(D)),
+      mana_percent => valueOrNull(data_mana:get_mana_percent(D), data_mana:get_mana_update(D))
     }
   }).
 
