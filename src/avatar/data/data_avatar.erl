@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 22. Jan 2018 11:51
 %%%-------------------------------------------------------------------
--module(av).
+-module(data_avatar).
 -author("nt").
 
 -export([
@@ -53,11 +53,11 @@
     speed := number(),
     range := number(),
     damage := number(),
-    target := av_attack:target(),
+    target := data_attack:target(),
     default_cooldown := number(), % second
     cooldown := number(), % seconds
     state := #{
-      value := av_attack:state(),
+      value := data_attack:state(),
       update := boolean()
     }
   },
@@ -69,8 +69,8 @@
     value := number(),
     update := boolean()
   },
-  incoming_events := av_events:events(),
-  processed_events := av_events:events()
+  incoming_events := data_events:events(),
+  processed_events := data_events:events()
 }.
 -type state() :: idle | walk.
 -type type() :: player | bot.
@@ -137,11 +137,11 @@ get_name(#{name := X}) -> X.
 
 
 is_dirty(D) ->
-  av_position:get_position_update(D)
-  orelse av_position:get_state_update(D)
-  orelse av_health:get_health_update(D)
-  orelse av_mana:get_mana_update(D)
-  orelse av_attack:get_state_update(D).
+  data_position:get_position_update(D)
+  orelse data_position:get_state_update(D)
+  orelse data_health:get_health_update(D)
+  orelse data_mana:get_mana_update(D)
+  orelse data_attack:get_state_update(D).
 
 clear_update_flags(#{position := Position, mana := M, health := H, attack := #{state := AS} = A, state := State} = Data) ->
   Data#{

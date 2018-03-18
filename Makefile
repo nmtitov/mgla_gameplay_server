@@ -59,7 +59,7 @@ test_clock:
 
 test_all:
 	erl -noshell -pa ebin/		\
-	-eval "eunit:test([av, av_attack, av_events, av_health, av_mana, av_position, avatar_misc, autoattack, clock, clock_statem], [verbose])" -s init stop
+	-eval "eunit:test([data_avatar, data_attack, data_events, data_health, data_mana, data_position, avatar_misc, autoattack, clock, clock_statem], [verbose])" -s init stop
 
 test: compile test_all
 
