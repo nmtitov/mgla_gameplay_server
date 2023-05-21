@@ -6,7 +6,8 @@
 -type point() :: {number(), number()}.
 -export_type([point/0]).
 
--spec is_point(P :: point()) -> boolean().
+-spec
+is_point(P :: point()) -> boolean().
 is_point({X, Y}) when is_number(X), is_number(Y) -> true;
 is_point(_) -> false.
 
